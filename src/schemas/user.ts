@@ -1,27 +1,28 @@
 import { z } from "@hono/zod-openapi";
 
-import { ROLES, USER_STATUSES, ONBOARDING_PAGES } from "../constants";
-import type { Role, UserStatus, OnboardingPage } from "../constants";
-import { ProjectBookmarkEntitySchema, ProjectEntitySchema } from "./project";
+import {
+  ROLES,
+  USER_STATUSES,
+  ONBOARDING_PAGES,
+  ACTIVITY_TYPES,
+  ACTIVITY_PARENT_TYPES,
+} from "../constants";
+import type {
+  Role,
+  UserStatus,
+  OnboardingPage,
+  ActivityType,
+  ActivityParentType,
+} from "../constants";
+import { ProjectEntitySchema } from "./project";
+import { BookmarkEntitySchema } from "./bookmark";
+import { LikeEntitySchema } from "./like";
+import { BrandEntitySchema } from "./brand";
+import { CreativeEntitySchema } from "./creative";
+import { InvestorEntitySchema } from "./investor";
+import { PostWithFilesEntitySchema } from "./post";
 
-export const UserSocialGraphEntitySchema = z
-  .object({
-    followerCount: z
-      .number()
-      .int()
-      .nonnegative()
-      .optional()
-      .openapi({ example: 120 }),
-    followingCount: z
-      .number()
-      .int()
-      .nonnegative()
-      .optional()
-      .openapi({ example: 45 }),
-  })
-  .openapi("UserSocialGraphEntity");
-
-export const BaseUserEntitySchema = z
+export const UserEntitySchema = z
   .object({
     id: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
     email: z.string().email().openapi({ example: "user@example.com" }),
@@ -53,7 +54,7 @@ export const BaseUserEntitySchema = z
   })
   .openapi("BaseUserEntity");
 
-export const MinimalUserSchema = BaseUserEntitySchema.pick({
+export const MinimalUserSchema = UserEntitySchema.pick({
   id: true,
   name: true,
   email: true,
@@ -62,22 +63,17 @@ export const MinimalUserSchema = BaseUserEntitySchema.pick({
   role: true,
 }).openapi("MinimalUser");
 
-export const UserEntitySchema = BaseUserEntitySchema.extend(
-  UserSocialGraphEntitySchema.shape
-).openapi("UserEntity");
+export const UserStatsEntitySchema = z.object({
+  followerCount: z.int(),
+  followingCount: z.int(),
+  followingIds: z.array(z.string()),
+});
 
 export const UserProfileEntitySchema = UserEntitySchema.extend({
   profileType: z.enum(["creative", "brand", "investor"]).optional(),
-  bio: z.string().optional(),
-  location: z.string().optional(),
-  experienceLevel: z.string().optional(),
-  disciplines: z.array(z.any()).optional(),
-  tags: z.array(z.any()).optional(),
-  brandName: z.string().optional(),
-  websiteURL: z.string().url().optional(),
-  investorType: z.string().optional(),
-  investmentSize: z.string().optional(),
-  geographicFocus: z.string().optional(),
+  brand: BrandEntitySchema,
+  creative: CreativeEntitySchema,
+  investor: InvestorEntitySchema,
 }).openapi("UserProfileEntity");
 
 export const UserWithProjectsEntitySchema = z
@@ -87,11 +83,28 @@ export const UserWithProjectsEntitySchema = z
   })
   .openapi("UserWithProjectsEntity");
 
+export const UserWithProjectLikesEntitySchema = z.object({
+  userId: z.cuid2(),
+  projectLikes: z.array(
+    LikeEntitySchema.extend({
+      project: ProjectEntitySchema.pick({
+        id: true,
+        title: true,
+        description: true,
+        tags: true,
+        startDate: true,
+        endDate: true,
+        imagePlaceholderUrl: true,
+      }),
+    })
+  ),
+});
+
 export const UserWithProjectBookmarksEntitySchema = z
   .object({
     userId: z.cuid2(),
     projectBookmarks: z.array(
-      ProjectBookmarkEntitySchema.extend({
+      BookmarkEntitySchema.extend({
         project: ProjectEntitySchema.pick({
           id: true,
           title: true,
@@ -105,7 +118,7 @@ export const UserWithProjectBookmarksEntitySchema = z
     ),
   })
   .openapi("UserWithProjectBookmarksEntity");
-  
+
 export const GetUserFollowingInputSchema = z.object({
   searchQuery: z.string().optional().openapi({ example: "design systems" }),
   offset: z.number().int().nonnegative().optional().openapi({ example: 20 }),
@@ -127,6 +140,13 @@ export const UserWithFollowersEntitySchema = MinimalUserSchema.extend({
     .openapi({ description: "List of users who follow this user." }),
 }).openapi("UserWithFollowersEntity");
 
+export const UserWithPostsEntitySchema = z
+  .object({
+    userId: z.cuid2(),
+    posts: z.array(PostWithFilesEntitySchema),
+  })
+  .openapi("UserWithPostsEntity");
+
 export const GetUserFollowingOutputSchema = z.object({
   results: UserWithFollowingEntitySchema,
 });
@@ -134,8 +154,6 @@ export const GetUserFollowingOutputSchema = z.object({
 export const GetUserFollowersOutputSchema = z.object({
   results: UserWithFollowersEntitySchema,
 });
-
-
 
 export const GetAuthenticatedUserOutputSchema = UserEntitySchema;
 
@@ -152,3 +170,24 @@ export const GetAuthenticatedUserWithUserFollowingOutputSchema =
 
 export const GetAuthenticatedUserWithUserFollowersOutputSchema =
   UserWithFollowersEntitySchema;
+
+export const GetAuthenticatedUserWithProjectLikesOutputSchema =
+  UserWithProjectLikesEntitySchema;
+
+export const GetUserActivityInputSchema = z.object({
+  activityType: z.enum(
+    Object.values(ACTIVITY_TYPES) as [ActivityType, ...ActivityType[]]
+  ),
+});
+
+export const GetUserActivityOutputSchema = z.array(
+  z.object({
+    parentId: z.string(),
+    parentType: z.enum(
+      Object.values(ACTIVITY_PARENT_TYPES) as [
+        ActivityParentType,
+        ...ActivityParentType[]
+      ]
+    ),
+  })
+);

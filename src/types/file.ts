@@ -2,37 +2,38 @@ import { z } from "@hono/zod-openapi";
 import {
   CreateFileInputSchema,
   CreateFileOutputSchema,
-  DeleteFileInputParams,
+  DeleteFileInputSchema,
   DeleteFileOutputSchema,
   FileEntitySchema,
-  FileUpdateEntitySchema,
-  GetFilePresignedDownloadUrlParams,
-  GetFilePresignedUploadUrlInputSchema,
-  GetFilePresignedUploadUrlOutputSchema,
+  FileKeySchema,
+  FileUpdateInputSchema,
+  GetPresignedDownloadUrlInputSchema,
+  GetPresignedDownloadUrlOutputSchema,
+  GetPresignedUploadUrlInputSchema,
+  GetPresignedUploadUrlOutputSchema,
 } from "../schemas/file";
 
 export type FileEntity = z.infer<typeof FileEntitySchema>;
 
-export type FileUpdateEntity = z.infer<typeof FileUpdateEntitySchema>;
+export type CreateFileInput = z.infer<typeof CreateFileInputSchema>;
+export type CreateFileOutput = z.infer<typeof CreateFileOutputSchema>;
 
+export type FileUpdateEntity = z.infer<typeof FileUpdateInputSchema>;
+
+export type DeleteFileInput = z.infer<typeof DeleteFileInputSchema>;
+export type DeleteFileOutput = z.infer<typeof DeleteFileOutputSchema>;
+
+export type FileKeyInput = z.infer<typeof FileKeySchema>;
 export type GetPresignedUploadUrlInput = z.infer<
-  typeof GetFilePresignedUploadUrlInputSchema
+  typeof GetPresignedUploadUrlInputSchema
 >;
-export type FileKeyInput = {
-  key: string;
-};
-
 export type GetPresignedUploadUrlOutput = z.infer<
-  typeof GetFilePresignedUploadUrlOutputSchema
+  typeof GetPresignedUploadUrlOutputSchema
 >;
 
 export type GetPresignedDownloadUrlInput = z.infer<
-  typeof GetFilePresignedDownloadUrlParams
+  typeof GetPresignedDownloadUrlInputSchema
 >;
-
-export type GetPresignedDownloadUrlOutput = GetPresignedUploadUrlOutput;
-
-export type CreateFileInput = z.infer<typeof CreateFileInputSchema>;
-export type CreateFileOutput = z.infer<typeof CreateFileOutputSchema>;
-export type DeleteFileInput = z.infer<typeof DeleteFileInputParams>;
-export type DeleteFileOutput = z.infer<typeof DeleteFileOutputSchema>;
+export type GetPresignedDownloadUrlOutput = z.infer<
+  typeof GetPresignedDownloadUrlOutputSchema
+>;

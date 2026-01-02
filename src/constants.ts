@@ -29,11 +29,7 @@ export const ONBOARDING_PAGES = {
   USERNAME_SELECTION: "USERNAME_SELECTION",
   ACCOUNT_TYPE_SELECTION: "ACCOUNT_TYPE_SELECTION",
   CREATIVE_PROFILE_DETAILS: "CREATIVE_PROFILE_DETAILS",
-  CREATIVE_PROFILE_CUSTOMIZE_FEED: "CREATIVE_PROFILE_CUSTOMIZE_FEED",
-  CREATIVE_PROFILE_PORTFOLIO: "CREATIVE_PROFILE_PORTFOLIO",
   BRAND_PROFILE_DETAILS: "BRAND_PROFILE_DETAILS",
-  BRAND_PROFILE_CUSTOMIZE_FEED: "BRAND_PROFILE_CUSTOMIZE_FEED",
-  BRAND_PROFILE_PORTFOLIO: "BRAND_PROFILE_PORTFOLIO",
   INVESTOR_PROFILE_DETAILS: "INVESTOR_PROFILE_DETAILS",
   INVESTOR_INVESTMENT_FOCUS: "INVESTOR_INVESTMENT_FOCUS",
   INVESTOR_VERIFICATION: "INVESTOR_VERIFICATION",
@@ -90,7 +86,177 @@ export const INVESTOR_VERIFICATION_DOCUMENT_TYPES = {
   OTHER_CERTIFICATE: "OTHER_CERTIFICATE",
 } as const;
 
+export const ACTIVITY_PARENT_TYPES = {
+  PROJECT: "PROJECT",
+  JOB: "JOB",
+  POST: "POST",
+} as const;
+
+export const POST_TYPES = {
+  MARKETPLACE: "MARKETPLACE",
+  PROJECT: "PROJECT",
+  JOB_OPENING: "JOB_OPENING",
+  DEFAULT_POST: "DEFAULT_POST",
+  POST_WITH_LINKS: "POST_WITH_LINKS",
+  POST_WITH_MEDIA: "POST_WITH_MEDIA",
+  POST_WITH_MEDIA_AND_LINKS: "POST_WITH_MEDIA_AND_LINKS",
+} as const;
+
+export const JOB_TYPE = {
+  GIG: "GIG",
+  ROLE: "ROLE",
+} as const;
+
+export const WORK_MODE = {
+  REMOTE: "Remote",
+  HYBRID: "Hybrid",
+  ON_SITE: "On Site",
+} as const;
+export const EMPLOYMENT_TYPE = {
+  FULL_TIME: "Full Time",
+  PART_TIME: "Part Time",
+  FREELANCE: "Freelance",
+  INTERNSHIP: "Internship",
+} as const;
+
+export const JOB_AVAILABILITY_TYPES = {
+  IMMEDIATE: "Immediate (Within 1 week)",
+  TWO_WEEKS_NOTICE: "2 weeks notice",
+  ONE_MONTH_NOTICE: "1 month notice",
+  FLEXIBLE: "Flexible",
+} as const;
+
+export const WAGE_TYPES = {
+  HOURLY: "Hourly",
+  DAILY: "Daily",
+  WEEKLY: "Weekly",
+  MONTHLY: "Monthly",
+  PROJECT_BASED: "Project Based",
+} as const;
+
+export const JOB_SECTIONS = {
+  PERSONAL_INFORMATION: "PERSONAL_INFORMATION",
+  PHONE_NO: "PHONE_NO",
+  PROFESSIONAL_INFORMATION: "PROFESSIONAL_INFORMATION",
+  RESUME: "RESUME",
+  COVER_LETTER: "COVER_LETTER",
+  PORTFOLIO_OR_WORK_SAMPLES: "PORTFOLIO_OR_WORK_SAMPLES",
+  AVAILABILITY: "AVAILABILITY",
+  WAGES: "WAGES",
+} as const;
+
+export const JOB_LOCATIONS = {
+  AFRICA: "Africa",
+  REMOTE: "Remote",
+  EUROPE: "Europe",
+  ASIA: "Asia",
+  NORTH_AMERICA: "North America",
+  SOUTH_AMERICA: "South America",
+  MIDDLE_EAST: "Middle East",
+  OCEANIA: "Oceania",
+  EMEA: "EMEA", // Europe, Middle East, Africa
+  ASIA_PACIFIC: "Asia Pacific", // Asia Pacific
+  GLOBAL: "Global",
+  OTHER: "Other",
+} as const;
+
+export const MESSAGE_TYPES = {
+  MARKETPLACE: "MARKETPLACE",
+  PROJECT: "PROJECT",
+  JOB_OPENING: "JOB_OPENING",
+  DEFAULT_MESSAGE: "DEFAULT_MESSAGE",
+  MESSAGE_WITH_LINKS: "MESSAGE_WITH_LINKS",
+  MESSAGE_WITH_MEDIA: "MESSAGE_WITH_MEDIA",
+  MESSAGE_WITH_MEDIA_AND_LINKS: "MESSAGE_WITH_MEDIA_AND_LINKS",
+} as const;
+
+export type JobLocation = (typeof JOB_LOCATIONS)[keyof typeof JOB_LOCATIONS];
+
+export const GIG_TYPE = {
+  ONE_TIME: "One Time",
+  RECURRING: "Recurring",
+} as const;
+
+export const WAGES_CURRENCY = {
+  USD: "USD (United States Dollar)",
+  EUR: "EUR (Euro)",
+  GBP: "GBP (British Pound Sterling)",
+  NGN: "NGN (Nigerian Naira)",
+  CAD: "CAD (Canadian Dollar)",
+  AUD: "AUD (Australian Dollar)",
+  JPY: "JPY (Japanese Yen)",
+  CHF: "CHF (Swiss Franc)",
+  INR: "INR (Indian Rupee)",
+  ZAR: "ZAR (South African Rand)",
+} as const;
+
+export const JOB_STATUS = {
+  ACTIVE: "ACTIVE",
+  DRAFT: "DRAFT",
+  ARCHIVED: "ARCHIVED",
+  DELETED: "DELETED",
+} as const;
+
+export const POST_BADGE_TYPES = {
+  NETWORKING: "Networking",
+  FUNDING: "Funding",
+  COLLABORATION: "Collaboration",
+  OPPORTUNITIES: "Opportunities",
+  SHOWCASE: "Showcase",
+  LEARNING: "Learning",
+  DISCUSSION: "Discussion",
+  MENTORSHIP: "Mentorship",
+} as const;
+
+export const ACTIVITY_TYPES = {
+  LIKE: "LIKE",
+  UNLIKE: "UNLIKE",
+  BOOKMARK: "BOOKMARK",
+  UNBOOKMARK: "UNBOOKMARK",
+  VIEW: "VIEW",
+} as const;
+
+export const LINK_TYPES = {
+  INSTAGRAM: "Instagram",
+  LINKEDIN: "LinkedIn",
+  TWITTER: "Twitter",
+  YOUTUBE: "Youtube",
+  PORTFOLIO: "Portfolio Website",
+  GENERIC_WEBSITE: "Generic Website",
+} as const;
+
+export const APPLICATION_STATUS = {
+  SENT: "Application Sent",
+  OPENED: "Opened",
+  REJECTED: "Rejected",
+  DECLINED: "Declined",
+  OFFERED: "Offered",
+  HIRED: "Hired",
+} as const;
+
+export type ApplicationStatus =
+  (typeof APPLICATION_STATUS)[keyof typeof APPLICATION_STATUS];
+export type ActivityType = (typeof ACTIVITY_TYPES)[keyof typeof ACTIVITY_TYPES];
+export type PostBadgeType =
+  (typeof POST_BADGE_TYPES)[keyof typeof POST_BADGE_TYPES];
+export type JobSections = (typeof JOB_SECTIONS)[keyof typeof JOB_SECTIONS];
+export type WagesCurrency =
+  (typeof WAGES_CURRENCY)[keyof typeof WAGES_CURRENCY];
+export type JobStatus = (typeof JOB_STATUS)[keyof typeof JOB_STATUS];
 export type Role = (typeof ROLES)[keyof typeof ROLES];
+export type JobType = (typeof JOB_TYPE)[keyof typeof JOB_TYPE];
+export type WorkMode = (typeof WORK_MODE)[keyof typeof WORK_MODE];
+export type GigType = (typeof GIG_TYPE)[keyof typeof GIG_TYPE];
+export type EmploymentType =
+  (typeof EMPLOYMENT_TYPE)[keyof typeof EMPLOYMENT_TYPE];
+export type JobAvailabilityTypes =
+  (typeof JOB_AVAILABILITY_TYPES)[keyof typeof JOB_AVAILABILITY_TYPES];
+export type WageTypes = (typeof WAGE_TYPES)[keyof typeof WAGE_TYPES];
+export type PostType = (typeof POST_TYPES)[keyof typeof POST_TYPES];
+export type MessageType = (typeof MESSAGE_TYPES)[keyof typeof MESSAGE_TYPES];
+export type LinkType = (typeof LINK_TYPES)[keyof typeof LINK_TYPES];
+export type ActivityParentType =
+  (typeof ACTIVITY_PARENT_TYPES)[keyof typeof ACTIVITY_PARENT_TYPES];
 export type UserStatus = (typeof USER_STATUSES)[keyof typeof USER_STATUSES];
 export type ClientType = (typeof CLIENT_TYPES)[keyof typeof CLIENT_TYPES];
 export type ExperienceLevel =
@@ -195,151 +361,66 @@ export const API_ROUTES = {
   },
 } as const;
 
-export const FRONTEND_API_ROUTES = {
-  healthCheck: "health",
-  username: {
-    base: "usernames",
-    checkAvailability: (username: string) => `${username}/availability`,
-  },
-  personal: {
-    base: "me",
-    getUser: "",
-    getProfile: "profile",
-    getProjects: "projects",
-    getProjectBookmarks: "project-bookmarks",
-    getFollowers: "followers",
-    getFollowing: "following",
-  },
-  user: {
-    base: "users",
-    getUser: (value: string) => `${value}`,
-    getProfile: (value: string) => `${value}/profile`,
-    getProjects: (value: string) => `${value}/projects`,
-    getFollowers: (userId: string) => `${userId}/followers`,
-    getFollowing: (userId: string) => `${userId}/following`,
-    followUser: (userId: string) => `${userId}/follow`,
-    unfollowUser: (userId: string) => `${userId}/unfollow`,
-    reserveUsername: "reserve-username",
-  },
-  redirect: {
-    base: "redirect",
-    passwordReset: "password-reset",
-    verifiedUser: "verified-user",
-    googleProfile: "google-profile",
-    newGoogleProfile: "new-google-profile",
-  },
-  file: {
-    base: "files",
-    getPresignedUploadUrl: "get-upload-url",
-    getPresignedDownloadUrl: (fileId: string) => `${fileId}/download-url`,
-    getPublicUrl: (fileId: string) => `${fileId}/public-url`,
-    createFile: "",
-    deleteFile: (fileId: string) => `${fileId}`,
-  },
-  disciplines: {
-    base: "disciplines",
-    getDisciplines: "",
-    getSingleDiscipline: (slug: string) => `${slug}`,
-    addDisciplines: "",
-    deleteDiscipline: (slug: string) => `${slug}`,
-  },
-  creatives: {
-    base: "creatives",
-    createCreative: "",
-    getCreative: (value: string) => `${value}`,
-    updateCreative: "",
-  },
-  brands: {
-    base: "brands",
-    createBrand: "",
-    getBrand: (value: string) => `${value}`,
-    updateBrand: "",
-  },
-  investors: {
-    base: "investors",
-    createInvestor: "",
-    getInvestor: (value: string) => `${value}`,
-    updateInvestor: "",
-  },
-  projects: {
-    base: "projects",
-    createProject: "",
-    updateProject: "",
-    listProjects: "",
-    getProject: (projectId: string) => `${projectId}`,
-    deleteProject: (projectId: string) => `${projectId}`,
-    commentOnProject: (projectId: string) => `${projectId}/comment`,
-    deleteCommentOnProject: (projectId: string, commentId: string) =>
-      `${projectId}/comments/${commentId}`,
-    bookmarkProject: (projectId: string) => `${projectId}/bookmark`,
-    unbookmarkProject: (projectId: string) => `${projectId}/unbookmark`,
-    likeProject: (projectId: string) => `${projectId}/like`,
-    unlikeProject: (projectId: string) => `${projectId}/unlike`,
-    viewProject: (projectId: string) => `${projectId}/view`,
-    getProjectComments: (projectId: string) => `${projectId}/comments`,
-    getProjectLikes: (projectId: string) => `${projectId}/likes`,
-    getProjectBookmarks: (projectId: string) => `${projectId}/bookmarks`,
-    getProjectViews: (projectId: string) => `${projectId}/views`,
-    getProjectUser: (projectId: string) => `${projectId}/user`,
-  },
-} as const;
-
 export const DEFAULT_DISCIPLINES = [
-  { name: "Painting", slug: "painting" },
-  { name: "Drawing", slug: "drawing" },
-  { name: "Sculpture", slug: "sculpture" },
-  { name: "Printmaking", slug: "printmaking" },
-  { name: "Photography", slug: "photography" },
-  { name: "Illustration", slug: "illustration" },
-  { name: "Installation Art", slug: "installation_art" },
-  { name: "Mixed Media Art", slug: "mixed_media_art" },
-  { name: "Conceptual Art", slug: "conceptual_art" },
-  { name: "Graphic Design", slug: "graphic_design" },
-  { name: "Fashion Design", slug: "fashion_design" },
-  { name: "Interior Design", slug: "interior_design" },
-  { name: "Industrial / Product Design", slug: "industrial_product_design" },
-  { name: "UX Design", slug: "ux_design" },
-  { name: "UI Design", slug: "ui_design" },
-  { name: "Motion Design", slug: "motion_design" },
-  { name: "Textile Design", slug: "textile_design" },
-  { name: "Jewelry Design", slug: "jewelry_design" },
-  { name: "Furniture Design", slug: "furniture_design" },
-  { name: "Architecture", slug: "architecture" },
-  { name: "Web Design", slug: "web_design" },
-  { name: "Exhibition Design", slug: "exhibition_design" },
-  { name: "Design Research", slug: "design_research" },
-  { name: "Film / Video Production", slug: "film_video_production" },
-  { name: "Animation", slug: "animation" },
-  { name: "Game Design", slug: "game_design" },
-  { name: "Digital Media Art", slug: "digital_media_art" },
-  { name: "Advertising / Art Direction", slug: "advertising_art_direction" },
-  { name: "Copywriting", slug: "copywriting" },
-  { name: "Content Strategy", slug: "content_strategy" },
+  { name: "3D Art", slug: "3d_art" },
+  { name: "Advertising & Marketing", slug: "advertising_marketing" },
+  { name: "AI & Machine Learning Art", slug: "ai_machine_learning_art" },
+  { name: "Animation & Motion", slug: "animation_motion" },
+  { name: "Architecture & Interior", slug: "architecture_interior" },
+  { name: "Art Business", slug: "art_business" },
+  { name: "Art Challenges & Community", slug: "art_challenges_community" },
+  { name: "Art Education", slug: "art_education" },
+  { name: "Book & Editorial Design", slug: "book_editorial_design" },
+  { name: "Brand Strategy", slug: "brand_strategy" },
+  { name: "Business & Consulting", slug: "business_consulting" },
+  { name: "Calligraphy & Penmanship", slug: "calligraphy_penmanship" },
   {
-    name: "Social Media Content Creation",
-    slug: "social_media_content_creation",
+    name: "Character Rigging & Animation Setup",
+    slug: "character_rigging_setup",
   },
-  { name: "Podcasting", slug: "podcasting" },
-  { name: "Journalism", slug: "journalism" },
+  { name: "Comics & Webtoons", slug: "comics_webtoons" },
+  { name: "Concept Art", slug: "concept_art" },
+  { name: "Content Creation", slug: "content_creation" },
+  {
+    name: "Copywriting & Content Writing",
+    slug: "copywriting_content_writing",
+  },
+  { name: "Crafts & DIY", slug: "crafts_diy" },
   { name: "Creative Coding", slug: "creative_coding" },
+  { name: "Data Science & Analysis", slug: "data_science_analysis" },
+  { name: "Data Visualization", slug: "data_visualization" },
+  { name: "Digital Art", slug: "digital_art" },
+  { name: "Digital Painting & Matte Painting", slug: "digital_painting_matte" },
+  { name: "E-commerce & Store Design", slug: "ecommerce_store_design" },
+  { name: "Fashion & Style", slug: "fashion_style" },
+  { name: "Food Content", slug: "food_content" },
+  { name: "Game Development", slug: "game_development" },
+  { name: "Graphic Design", slug: "graphic_design" },
+  { name: "Illustration", slug: "illustration" },
+  { name: "Lettering & Typography", slug: "lettering_typography" },
+  { name: "Miniature & Model Making", slug: "miniature_model_making" },
+  { name: "Music Performance", slug: "music_performance" },
+  { name: "Music Production", slug: "music_production" },
+  { name: "Photography", slug: "photography" },
+  { name: "Pixel Art", slug: "pixel_art" },
   {
-    name: "Augmented Reality (AR) Design",
-    slug: "augmented_reality_ar_design",
+    name: "Product Strategy & Management",
+    slug: "product_strategy_management",
   },
-  { name: "Virtual Reality (VR) Design", slug: "virtual_reality_vr_design" },
-  { name: "Interaction Design", slug: "interaction_design" },
-  { name: "Music", slug: "music" },
-  { name: "Dance", slug: "dance" },
-  { name: "Theatre / Acting", slug: "theatre_acting" },
-  {
-    name: "Spoken Word / Performance Poetry",
-    slug: "spoken_word_performance_poetry",
-  },
-  { name: "DJ", slug: "dj" },
-  { name: "Sound Design", slug: "sound_design" },
-  { name: "Voice Acting", slug: "voice_acting" },
-  { name: "Creative Writing", slug: "creative_writing" },
-  { name: "Comics / Graphic Novels", slug: "comics_graphic_novels" },
-  { name: "Curation", slug: "curation" },
-  { name: "Creative Entrepreneurship", slug: "creative_entrepreneurship" },
+  { name: "Sculpture & 3D Crafts", slug: "sculpture_3d_crafts" },
+  { name: "Sound Design & Audio", slug: "sound_design_audio" },
+  { name: "Storyboarding & Pre-Vis", slug: "storyboarding_previs" },
+  { name: "Street Art & Murals", slug: "street_art_murals" },
+  { name: "Tattoo Art", slug: "tattoo_art" },
+  { name: "Technical Illustration", slug: "technical_illustration" },
+  { name: "Technical Writing", slug: "technical_writing" },
+  { name: "Traditional Art", slug: "traditional_art" },
+  { name: "Translation & Localization", slug: "translation_localization" },
+  { name: "UI/UX Design", slug: "ui_ux_design" },
+  { name: "Video Content", slug: "video_content" },
+  { name: "Virtual/Augmented Reality", slug: "virtual_augmented_reality" },
+  { name: "Visual Effects (VFX)", slug: "visual_effects_vfx" },
+  { name: "Web Development (Back-End)", slug: "web_development_backend" },
+  { name: "Web Development (Front-End)", slug: "web_development_frontend" },
+  { name: "Writing & Storytelling", slug: "writing_storytelling" },
 ];

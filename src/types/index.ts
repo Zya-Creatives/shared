@@ -1,3 +1,4 @@
+export * from "./auth";
 export * from "./brand";
 export * from "./common";
 export * from "./creative";
@@ -6,3 +7,12 @@ export * from "./file";
 export * from "./investor";
 export * from "./project";
 export * from "./user";
+export * from "./comment";
+export * from "./username";
+export * from "./entity-stats";
+export * from "./post";
+export * from "./job-application";
+export * from "./message";
+export * from "./chat";
+export * from "./job";
+export * from "./user-strike";
