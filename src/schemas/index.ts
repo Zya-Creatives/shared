@@ -15,3 +15,4 @@ export * from "./chat";
 export * from "./job";
 export * from "./job-application";
 export * from "./user-strike";
+export * from "./notification";
