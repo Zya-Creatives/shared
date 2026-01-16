@@ -179,7 +179,12 @@ export const MinimalPostSchema = PostEntitySchema.pick({
 });
 
 export const PostWithLikesEntitySchema = MinimalPostSchema.extend({
-    likes: z.array(ActivitySchema),
+    likes: z.array(
+        ActivitySchema.extend({
+            followsYou: z.boolean().optional(),
+            isFollowing: z.boolean().optional(),
+        }),
+    ),
 }).openapi({
     title: "PostWithPostLikesEntity",
 });
