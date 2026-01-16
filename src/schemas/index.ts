@@ -16,3 +16,6 @@ export * from "./job";
 export * from "./job-application";
 export * from "./user-strike";
 export * from "./notification";
+export * from "./feed";
+export * from "./bookmark";
+export * from "./like";

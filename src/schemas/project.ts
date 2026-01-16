@@ -7,7 +7,6 @@ import { ViewEntitySchema } from "./view";
 import { LikeEntitySchema } from "./like";
 import { MinimalUserSchema } from "./user";
 
-/* ------------------------------ Core Entities ------------------------------ */
 export const ProjectEntitySchema = z
   .object({
     id: z.string().openapi({

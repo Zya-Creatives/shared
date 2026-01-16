@@ -9,6 +9,7 @@ import { BookmarkEntitySchema } from "./bookmark";
 import { CommentEntitySchema } from "./comment";
 import { LikeEntitySchema } from "./like";
 import { EntityStatsSchema } from "./entity-stats";
+import { ActivitySchema } from "./activity";
 
 export const PostEntitySchema = z.object({
   id: z
@@ -170,22 +171,33 @@ export const MinimalPostSchema = PostEntitySchema.pick({
 });
 
 export const PostWithLikesEntitySchema = MinimalPostSchema.extend({
-  likes: z.array(LikeEntitySchema),
+  likes: z.array(ActivitySchema),
 }).openapi({
   title: "PostWithPostLikesEntity",
 });
 
+export const GetPostWithLikesOutputSchema = PostWithLikesEntitySchema.extend({
+  totalNo: z.number().int(),
+});
+
 export const PostWithCommentsEntitySchema = MinimalPostSchema.extend({
-  comments: z.array(CommentEntitySchema),
+  comments: z.array(
+    CommentEntitySchema
+  ),
 }).openapi({
   title: "PostWithPostCommentsEntity",
 });
 
 export const PostWithBookmarksEntitySchema = MinimalPostSchema.extend({
-  bookmarks: z.array(BookmarkEntitySchema),
+  bookmarks: z.array(ActivitySchema),
 }).openapi({
   title: "PostWithPostBookmarksEntity",
 });
+
+export const GetPostWithBookmarksOutputSchema =
+  PostWithBookmarksEntitySchema.extend({
+    totalNo: z.number().int(),
+  });
 
 export const LinkPreviewInputSchema = z.object({
   url: z.string(),

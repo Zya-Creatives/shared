@@ -36,6 +36,8 @@ export const CommentEntitySchema = z.object({
     example: "2023-10-27T10:00:00.000Z",
     format: "date-time",
   }),
+  isLiked: z.boolean().default(false),
+  likesCount: z.int().default(0),
   updatedAt: z.coerce.date().optional().openapi({
     description: "The date and time the comment was last updated.",
     example: "2023-10-27T10:05:00.000Z",

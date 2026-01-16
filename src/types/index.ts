@@ -1,5 +1,7 @@
 export * from "./auth";
 export * from "./brand";
+export * from "./bookmark";
+export * from "./like";
 export * from "./common";
 export * from "./creative";
 export * from "./discipline";
@@ -10,6 +12,7 @@ export * from "./user";
 export * from "./comment";
 export * from "./username";
 export * from "./entity-stats";
+export * from "./feed";
 export * from "./post";
 export * from "./job-application";
 export * from "./message";

@@ -6,6 +6,8 @@ import {
   GetFeedInputSchema,
   GetFeedOutputSchema,
   GetPostOutputSchema,
+  GetPostWithBookmarksOutputSchema,
+  GetPostWithLikesOutputSchema,
   LinkPreviewInputSchema,
   LinkPreviewOutputSchema,
   PostEntitySchema,
@@ -41,3 +43,10 @@ export type GetFeedOutput = z.infer<typeof GetFeedOutputSchema>;
 
 export type SearchPostInput = z.infer<typeof SearchPostInputSchema>;
 export type SearchPostOutput = z.infer<typeof SearchPostOutputSchema>;
+
+export type GetPostWithLikesOutput = z.infer<
+  typeof GetPostWithLikesOutputSchema
+>;
+export type GetPostWithBookmarksOutput = z.infer<
+  typeof GetPostWithBookmarksOutputSchema
+>;
