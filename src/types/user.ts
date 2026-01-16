@@ -1,27 +1,27 @@
 import {
-  MinimalUserSchema,
-  UserEntitySchema,
-  UserProfileEntitySchema,
-  UserWithProjectsEntitySchema,
-  UserWithProjectBookmarksEntitySchema,
-  GetUserFollowingInputSchema,
-  GetUserFollowersInputSchema,
-  UserWithFollowingEntitySchema,
-  UserWithFollowersEntitySchema,
-  GetUserFollowingOutputSchema,
-  GetUserFollowersOutputSchema,
-  GetAuthenticatedUserOutputSchema,
-  GetAuthenticatedUserProfileOutputSchema,
-  GetAuthenticatedUserWithProjectsOutputSchema,
-  GetAuthenticatedUserWithProjectBookmarksOutputSchema,
-  GetAuthenticatedUserWithUserFollowingOutputSchema,
-  GetAuthenticatedUserWithUserFollowersOutputSchema,
-  UserWithProjectLikesEntitySchema,
-  GetAuthenticatedUserWithProjectLikesOutputSchema,
-  GetUserActivityInputSchema,
-  GetUserActivityOutputSchema,
-  UserStatsEntitySchema,
-  UserWithPostsEntitySchema,
+    MinimalUserSchema,
+    UserEntitySchema,
+    UserProfileEntitySchema,
+    UserWithProjectsEntitySchema,
+    UserWithProjectBookmarksEntitySchema,
+    GetUserFollowingInputSchema,
+    GetUserFollowersInputSchema,
+    UserWithFollowingEntitySchema,
+    UserWithFollowersEntitySchema,
+    GetUserFollowingOutputSchema,
+    GetUserFollowersOutputSchema,
+    GetAuthenticatedUserOutputSchema,
+    GetAuthenticatedUserProfileOutputSchema,
+    GetAuthenticatedUserWithProjectsOutputSchema,
+    GetAuthenticatedUserWithProjectBookmarksOutputSchema,
+    GetAuthenticatedUserWithUserFollowingOutputSchema,
+    GetAuthenticatedUserWithUserFollowersOutputSchema,
+    UserWithProjectLikesEntitySchema,
+    GetAuthenticatedUserWithProjectLikesOutputSchema,
+    GetUserActivityInputSchema,
+    GetUserActivityOutputSchema,
+    UserStatsEntitySchema,
+    UserWithPostsEntitySchema,
 } from "../schemas/user";
 
 import { z } from "@hono/zod-openapi";
@@ -31,49 +31,49 @@ export type MinimalUser = z.infer<typeof MinimalUserSchema>;
 export type UserEntity = z.infer<typeof UserEntitySchema>;
 export type UserProfileEntity = z.infer<typeof UserProfileEntitySchema>;
 export type UserWithProjectsEntity = z.infer<
-  typeof UserWithProjectsEntitySchema
+    typeof UserWithProjectsEntitySchema
 >;
 export type UserWithProjectBookmarksEntity = z.infer<
-  typeof UserWithProjectBookmarksEntitySchema
+    typeof UserWithProjectBookmarksEntitySchema
 >;
 export type UserWithProjectLikesEntity = z.infer<
-  typeof UserWithProjectLikesEntitySchema
+    typeof UserWithProjectLikesEntitySchema
 >;
 export type UserWithUserPostsEntity = z.infer<typeof UserWithPostsEntitySchema>;
 export type GetUserFollowingInput = z.infer<typeof GetUserFollowingInputSchema>;
 export type GetUserFollowersInput = z.infer<typeof GetUserFollowersInputSchema>;
 export type UserWithFollowingEntity = z.infer<
-  typeof UserWithFollowingEntitySchema
+    typeof UserWithFollowingEntitySchema
 >;
 export type UserWithFollowersEntity = z.infer<
-  typeof UserWithFollowersEntitySchema
+    typeof UserWithFollowersEntitySchema
 >;
 export type GetUserFollowingOutput = z.infer<
-  typeof GetUserFollowingOutputSchema
+    typeof GetUserFollowingOutputSchema
 >;
 export type GetUserFollowersOutput = z.infer<
-  typeof GetUserFollowersOutputSchema
+    typeof GetUserFollowersOutputSchema
 >;
 export type GetAuthenticatedUserOutput = z.infer<
-  typeof GetAuthenticatedUserOutputSchema
+    typeof GetAuthenticatedUserOutputSchema
 >;
 export type GetAuthenticatedUserProfileOutput = z.infer<
-  typeof GetAuthenticatedUserProfileOutputSchema
+    typeof GetAuthenticatedUserProfileOutputSchema
 >;
 export type GetAuthenticatedUserWithProjectsOutput = z.infer<
-  typeof GetAuthenticatedUserWithProjectsOutputSchema
+    typeof GetAuthenticatedUserWithProjectsOutputSchema
 >;
 export type GetAuthenticatedUserWithProjectBookmarksOutput = z.infer<
-  typeof GetAuthenticatedUserWithProjectBookmarksOutputSchema
+    typeof GetAuthenticatedUserWithProjectBookmarksOutputSchema
 >;
 export type GetAuthenticatedUserWithProjectLikesOutput = z.infer<
-  typeof GetAuthenticatedUserWithProjectLikesOutputSchema
+    typeof GetAuthenticatedUserWithProjectLikesOutputSchema
 >;
 export type GetAuthenticatedUserWithUserFollowingOutput = z.infer<
-  typeof GetAuthenticatedUserWithUserFollowingOutputSchema
+    typeof GetAuthenticatedUserWithUserFollowingOutputSchema
 >;
 export type GetAuthenticatedUserWithUserFollowersOutput = z.infer<
-  typeof GetAuthenticatedUserWithUserFollowersOutputSchema
+    typeof GetAuthenticatedUserWithUserFollowersOutputSchema
 >;
 
 export type GetUserActivityInput = z.infer<typeof GetUserActivityInputSchema>;

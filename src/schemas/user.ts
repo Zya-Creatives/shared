@@ -137,15 +137,45 @@ export const GetUserFollowersInputSchema = z.object({
 });
 export const UserWithFollowingEntitySchema = MinimalUserSchema.extend({
     following: z
-        .array(MinimalUserSchema)
+        .array(
+            MinimalUserSchema.extend({
+                isFollowing: z.boolean().optional(),
+                followsYou: z.boolean().optional(),
+            }),
+        )
         .openapi({ description: "List of users this user is following." }),
 }).openapi("UserWithFollowingEntity");
 
 export const UserWithFollowersEntitySchema = MinimalUserSchema.extend({
     followers: z
-        .array(MinimalUserSchema)
+        .array(
+            MinimalUserSchema.extend({
+                isFollowing: z.boolean().optional(),
+                followsYou: z.boolean().optional(),
+            }),
+        )
         .openapi({ description: "List of users who follow this user." }),
 }).openapi("UserWithFollowersEntity");
+
+export const GetUserFollowersOutputSchema = z.object({
+    nextCursor: z.string(),
+    followers: z.array(
+        MinimalUserSchema.extend({
+            isFollowing: z.boolean().optional(),
+            followsYou: z.boolean().optional(),
+        }),
+    ),
+});
+
+export const GetUserFollowingOutputSchema = z.object({
+    nextCursor: z.string(),
+    following: z.array(
+        MinimalUserSchema.extend({
+            isFollowing: z.boolean().optional(),
+            followsYou: z.boolean().optional(),
+        }),
+    ),
+});
 
 export const UserWithPostsEntitySchema = z
     .object({
@@ -153,14 +183,6 @@ export const UserWithPostsEntitySchema = z
         posts: z.array(PostWithFilesEntitySchema),
     })
     .openapi("UserWithPostsEntity");
-
-export const GetUserFollowingOutputSchema = z.object({
-    results: UserWithFollowingEntitySchema,
-});
-
-export const GetUserFollowersOutputSchema = z.object({
-    results: UserWithFollowersEntitySchema,
-});
 
 export const GetAuthenticatedUserOutputSchema = UserEntitySchema;
 
