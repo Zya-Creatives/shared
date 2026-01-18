@@ -233,7 +233,7 @@ export const SearchUsersInputSchema = z.object({
         .max(100)
         .default(20)
         .openapi({ example: 20 }),
-    cursor: z.coerce.number().min(0).default(0).openapi({
+    cursor: z.string().optional().openapi({
         example: 0,
         description: "The offset/cursor for pagination",
     }),
