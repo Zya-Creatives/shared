@@ -238,3 +238,11 @@ export const SearchUsersInputSchema = z.object({
         description: "The offset/cursor for pagination",
     }),
 });
+
+export const SearchUsersOutputSchema = z.object({
+    users: z.array(UserEntitySchema),
+    nextCursor: z.string().optional().openapi({
+        example: "abc123",
+        description: "The next cursor for pagination",
+    }),
+});

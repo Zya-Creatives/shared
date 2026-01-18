@@ -23,6 +23,7 @@ import {
     GetUserActivityOutputSchema,
     UserStatsEntitySchema,
     UserWithPostsEntitySchema,
+    SearchUsersOutputSchema,
 } from "../schemas/user";
 
 import { z } from "@hono/zod-openapi";
@@ -80,4 +81,6 @@ export type GetAuthenticatedUserWithUserFollowersOutput = z.infer<
 export type GetUserActivityInput = z.infer<typeof GetUserActivityInputSchema>;
 export type GetUserActivityOutput = z.infer<typeof GetUserActivityOutputSchema>;
 export type UserStatsEntity = z.infer<typeof UserStatsEntitySchema>;
+
 export type SearchUsersInput = z.infer<typeof SearchUsersInputSchema>;
+export type SearchUsersOutput = z.infer<typeof SearchUsersOutputSchema>;

@@ -1,6 +1,6 @@
 {
     "name": "@zyacreatives/shared",
-    "version": "2.1.71",
+    "version": "2.1.73",
     "description": "",
     "scripts": {
         "build": "pnpm tsc",
