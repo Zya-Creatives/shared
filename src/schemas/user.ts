@@ -240,7 +240,7 @@ export const SearchUsersInputSchema = z.object({
 });
 
 export const SearchUsersOutputSchema = z.object({
-    users: z.array(UserEntitySchema),
+    users: z.array(MinimalUserSchema),
     nextCursor: z.string().optional().openapi({
         example: "abc123",
         description: "The next cursor for pagination",
