@@ -446,3 +446,38 @@ export const DEFAULT_DISCIPLINES = [
     { name: "Web Development (Front-End)", slug: "web_development_frontend" },
     { name: "Writing & Storytelling", slug: "writing_storytelling" },
 ];
+
+export const ANALYTICS_EVENTS = {
+    POST: {
+        VIEW_DETAILS: "post_view_details",
+        LIKE: "post_like",
+        BOOKMARK: "post_bookmark",
+        VIEW_LIKES_LIST: "post_view_likes_list",
+        TAG_CLICK: "post_tag_click",
+        LINK_PREVIEW_CLICK: "post_link_preview_click",
+        MEDIA_EXPAND: "post_media_expand",
+        LIGHTBOX_NAV: "post_lightbox_nav",
+        LIGHTBOX_THUMB_SELECT: "post_lightbox_thumb_select",
+        VIDEO_VIEW: "post_video_view",
+        SHARE_MENU_OPEN: "post_share_menu_open",
+        LINK_COPIED: "post_link_copied",
+        EXTERNAL_SHARE: "post_external_share",
+        DM_CLICK: "post_dm_click",
+        FOLLOW: "post_creator_follow",
+        UNFOLLOW: "post_creator_unfollow",
+        VIEW_OWN_ANALYTICS: "post_creator_view_analytics",
+        REPORT: "post_report",
+        NOT_INTERESTED: "post_not_interested",
+    },
+    COMMENT: {
+        FORM_FOCUS: "comment_form_focus",
+        SUBMIT_SUCCESS: "comment_submit_success",
+        LIST_LOAD_MORE: "comment_list_load_more",
+        ITEM_LIKE: "comment_item_like",
+        ITEM_REPLY_CLICK: "comment_item_reply_click",
+        ITEM_REPLIES_TOGGLE: "comment_item_replies_toggle",
+        ITEM_SHARE: "comment_item_share",
+        ITEM_PROFILE_CLICK: "comment_item_profile_click",
+        EMPTY_STATE_VIEW: "comment_empty_state_view",
+    },
+} as const;

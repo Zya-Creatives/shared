@@ -220,3 +220,21 @@ export const GetUserActivityOutputSchema = z.array(
         ),
     }),
 );
+
+export const SearchUsersInputSchema = z.object({
+    query: z.string().default("").openapi({
+        example: "john",
+        description: "Search by name, email, username, or discipline",
+    }),
+    role: z.enum(Object.values(ROLES) as [Role, ...Role[]]).optional(),
+    limit: z.coerce
+        .number()
+        .min(1)
+        .max(100)
+        .default(20)
+        .openapi({ example: 20 }),
+    cursor: z.coerce.number().min(0).default(0).openapi({
+        example: 0,
+        description: "The offset/cursor for pagination",
+    }),
+});

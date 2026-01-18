@@ -16,6 +16,7 @@ import {
     GetAuthenticatedUserWithProjectBookmarksOutputSchema,
     GetAuthenticatedUserWithUserFollowingOutputSchema,
     GetAuthenticatedUserWithUserFollowersOutputSchema,
+    SearchUsersInputSchema,
     UserWithProjectLikesEntitySchema,
     GetAuthenticatedUserWithProjectLikesOutputSchema,
     GetUserActivityInputSchema,
@@ -79,3 +80,4 @@ export type GetAuthenticatedUserWithUserFollowersOutput = z.infer<
 export type GetUserActivityInput = z.infer<typeof GetUserActivityInputSchema>;
 export type GetUserActivityOutput = z.infer<typeof GetUserActivityOutputSchema>;
 export type UserStatsEntity = z.infer<typeof UserStatsEntitySchema>;
+export type SearchUsersInput = z.infer<typeof SearchUsersInputSchema>;
