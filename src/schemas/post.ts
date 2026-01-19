@@ -4,10 +4,8 @@ import {
     POST_BADGE_TYPES,
     POST_TYPES,
 } from "../constants";
-import { CreateFileInputSchema, FileEntitySchema } from "./file";
-import { BookmarkEntitySchema } from "./bookmark";
+import { CreateFileInputSchema } from "./file";
 import { CommentEntitySchema } from "./comment";
-import { LikeEntitySchema } from "./like";
 import { EntityStatsSchema } from "./entity-stats";
 import { ActivitySchema } from "./activity";
 

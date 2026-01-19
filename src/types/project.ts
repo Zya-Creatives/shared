@@ -1,22 +1,22 @@
 import type { z } from "@hono/zod-openapi";
 import type {
-  ProjectEntitySchema,
-  ProjectIdSchema,
-  MinimalProjectSchema,
-  ProjectFileEntitySchema,
-  ProjectDetailsEntitySchema,
-  ProjectWithProjectViewsEntitySchema,
-  ProjectWithProjectCommentsEntitySchema,
-  ProjectWithProjectLikesEntitySchema,
-  ProjectWithProjectBookmarksEntitySchema,
-  CreateProjectInputSchema,
-  CreateProjectOutputSchema,
-  UpdateProjectInputSchema,
-  UpdateProjectOutputSchema,
-  DeleteProjectOutputSchema,
-  GetProjectOutputSchema,
-  ListProjectsInputSchema,
-  ViewProjectInputSchema,
+    ProjectEntitySchema,
+    ProjectIdSchema,
+    MinimalProjectSchema,
+    ProjectFileEntitySchema,
+    ProjectDetailsEntitySchema,
+    ProjectWithProjectViewsEntitySchema,
+    ProjectWithProjectCommentsEntitySchema,
+    ProjectWithLikesEntitySchema,
+    ProjectWithProjectBookmarksEntitySchema,
+    CreateProjectInputSchema,
+    CreateProjectOutputSchema,
+    UpdateProjectInputSchema,
+    UpdateProjectOutputSchema,
+    DeleteProjectOutputSchema,
+    GetProjectOutputSchema,
+    ListProjectsInputSchema,
+    ViewProjectInputSchema,
 } from "../schemas/project";
 import { ViewEntitySchema } from "../schemas/view";
 import { LikeEntitySchema } from "../schemas/like";
@@ -33,16 +33,16 @@ export type ProjectCommentEntity = z.infer<typeof CommentEntitySchema>;
 
 export type ProjectDetailsEntity = z.infer<typeof ProjectDetailsEntitySchema>;
 export type ProjectWithProjectViewsEntity = z.infer<
-  typeof ProjectWithProjectViewsEntitySchema
+    typeof ProjectWithProjectViewsEntitySchema
 >;
 export type ProjectWithProjectCommentsEntity = z.infer<
-  typeof ProjectWithProjectCommentsEntitySchema
+    typeof ProjectWithProjectCommentsEntitySchema
 >;
-export type ProjectWithProjectLikesEntity = z.infer<
-  typeof ProjectWithProjectLikesEntitySchema
+export type ProjectWithLikesEntity = z.infer<
+    typeof ProjectWithLikesEntitySchema
 >;
 export type ProjectWithProjectBookmarksEntity = z.infer<
-  typeof ProjectWithProjectBookmarksEntitySchema
+    typeof ProjectWithProjectBookmarksEntitySchema
 >;
 
 export type CreateProjectInput = z.infer<typeof CreateProjectInputSchema>;
