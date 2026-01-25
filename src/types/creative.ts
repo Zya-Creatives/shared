@@ -1,7 +1,6 @@
 import { z } from "@hono/zod-openapi";
 import {
   CreativeEntitySchema,
-  ListCreativesInputSchema,
   CreateCreativeProfileInputSchema,
   UpdateCreativeProfileInputSchema,
   GetCreativeInputSchema,
@@ -15,8 +14,6 @@ import {
 } from "../schemas/creative";
 
 export type CreativeEntity = z.infer<typeof CreativeEntitySchema>;
-
-export type ListCreativesInput = z.infer<typeof ListCreativesInputSchema>;
 
 export type CreateCreativeProfileInput = z.infer<
   typeof CreateCreativeProfileInputSchema

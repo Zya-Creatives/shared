@@ -1,25 +1,27 @@
 import { z } from "@hono/zod-openapi";
 import {
-    CreatePostInputSchema,
-    CreatePostOutputSchema,
-    FeedPostEntitySchema,
-    GetFeedInputSchema,
-    GetFeedOutputSchema,
-    GetPostOutputSchema,
-    GetPostWithBookmarksOutputSchema,
-    GetPostWithLikesOutputSchema,
-    LinkPreviewInputSchema,
-    LinkPreviewOutputSchema,
-    PostEntitySchema,
-    PostFileEntitySchema,
-    PostIdSchema,
-    PostWithBookmarksEntitySchema,
-    PostWithCommentsEntitySchema,
-    PostWithFilesEntitySchema,
-    PostWithLikesEntitySchema,
-    ReportPostInputSchema,
-    SearchPostInputSchema,
-    SearchPostOutputSchema,
+  CreatePostInputSchema,
+  CreatePostOutputSchema,
+  FeedPostEntitySchema,
+  GetFeedInputSchema,
+  GetFeedOutputSchema,
+  GetPostOutputSchema,
+  GetPostWithBookmarksOutputSchema,
+  GetPostWithCommentsOutputSchema,
+  GetPostWithLikesOutputSchema,
+  LinkPreviewInputSchema,
+  LinkPreviewOutputSchema,
+  PostAnalyticsOutputSchema,
+  PostEntitySchema,
+  PostFileEntitySchema,
+  PostIdSchema,
+  PostWithBookmarksEntitySchema,
+  PostWithCommentsEntitySchema,
+  PostWithFilesEntitySchema,
+  PostWithLikesEntitySchema,
+  ReportPostInputSchema,
+  SearchPostInputSchema,
+  SearchPostOutputSchema,
 } from "../schemas/post";
 
 export type PostEntity = z.infer<typeof PostEntitySchema>;
@@ -29,11 +31,11 @@ export type CreatePostInput = z.infer<typeof CreatePostInputSchema>;
 export type CreatePostOutput = z.infer<typeof CreatePostOutputSchema>;
 export type PostWithPostLikesEntity = z.infer<typeof PostWithLikesEntitySchema>;
 export type PostWithPostBookmarksEntity = z.infer<
-    typeof PostWithBookmarksEntitySchema
+  typeof PostWithBookmarksEntitySchema
 >;
 export type PostIdInput = z.infer<typeof PostIdSchema>;
 export type PostWithPostCommentsEntity = z.infer<
-    typeof PostWithCommentsEntitySchema
+  typeof PostWithCommentsEntitySchema
 >;
 export type GetPostOutput = z.infer<typeof GetPostOutputSchema>;
 export type LinkPreviewInput = z.infer<typeof LinkPreviewInputSchema>;
@@ -46,9 +48,16 @@ export type SearchPostInput = z.infer<typeof SearchPostInputSchema>;
 export type SearchPostOutput = z.infer<typeof SearchPostOutputSchema>;
 
 export type GetPostWithLikesOutput = z.infer<
-    typeof GetPostWithLikesOutputSchema
+  typeof GetPostWithLikesOutputSchema
 >;
+
+export type GetPostWithCommentsOutput = z.infer<
+  typeof GetPostWithCommentsOutputSchema
+>;
+
 export type GetPostWithBookmarksOutput = z.infer<
-    typeof GetPostWithBookmarksOutputSchema
+  typeof GetPostWithBookmarksOutputSchema
 >;
 export type ReportPostInput = z.infer<typeof ReportPostInputSchema>;
+
+export type PostAnalyticsOutput = z.infer<typeof PostAnalyticsOutputSchema>;

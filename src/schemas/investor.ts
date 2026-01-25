@@ -24,8 +24,8 @@ export const InvestorEntitySchema = z
       .enum(
         Object.values(EXPERIENCE_LEVELS) as [
           ExperienceLevel,
-          ...ExperienceLevel[]
-        ]
+          ...ExperienceLevel[],
+        ],
       )
       .optional()
       .openapi({ example: "EXPERT" }),
@@ -33,14 +33,17 @@ export const InvestorEntitySchema = z
       .enum(
         Object.values(GEOGRAPHIC_FOCUS) as [
           GeographicFocus,
-          ...GeographicFocus[]
-        ]
+          ...GeographicFocus[],
+        ],
       )
       .optional()
       .openapi({ example: "NORTH_AMERICA" }),
     investmentSize: z
       .enum(
-        Object.values(INVESTMENT_SIZES) as [InvestmentSize, ...InvestmentSize[]]
+        Object.values(INVESTMENT_SIZES) as [
+          InvestmentSize,
+          ...InvestmentSize[],
+        ],
       )
       .optional()
       .openapi({ example: "SEED" }),
@@ -64,6 +67,7 @@ export const InvestorEntitySchema = z
       .date()
       .optional()
       .openapi({ example: "2025-10-13T09:00:00.000Z" }),
+    version: z.int(),
   })
   .openapi("InvestorEntity");
 
@@ -79,8 +83,8 @@ export const CreateInvestorProfileInputSchema = z
       .enum(
         Object.values(EXPERIENCE_LEVELS) as [
           ExperienceLevel,
-          ...ExperienceLevel[]
-        ]
+          ...ExperienceLevel[],
+        ],
       )
       .default(EXPERIENCE_LEVELS.YEAR_0_1)
       .openapi({
@@ -106,8 +110,8 @@ export const UpdateInvestorProfileInputSchema = z
       .enum(
         Object.values(EXPERIENCE_LEVELS) as [
           ExperienceLevel,
-          ...ExperienceLevel[]
-        ]
+          ...ExperienceLevel[],
+        ],
       )
       .optional()
       .openapi({
@@ -128,7 +132,10 @@ export const UpdateInvestorProfileInputSchema = z
       }),
     investmentSize: z
       .enum(
-        Object.values(INVESTMENT_SIZES) as [InvestmentSize, ...InvestmentSize[]]
+        Object.values(INVESTMENT_SIZES) as [
+          InvestmentSize,
+          ...InvestmentSize[],
+        ],
       )
       .optional()
       .openapi({
@@ -138,8 +145,8 @@ export const UpdateInvestorProfileInputSchema = z
       .enum(
         Object.values(GEOGRAPHIC_FOCUS) as [
           GeographicFocus,
-          ...GeographicFocus[]
-        ]
+          ...GeographicFocus[],
+        ],
       )
       .optional()
       .openapi({
@@ -148,6 +155,7 @@ export const UpdateInvestorProfileInputSchema = z
     location: z.string().optional().openapi({
       example: "UK",
     }),
+    version: z.int(),
   })
   .openapi({
     title: "Update Investor Profile",
@@ -165,9 +173,9 @@ export const ListInvestorsInputSchema = z
         z.enum(
           Object.values(EXPERIENCE_LEVELS) as [
             ExperienceLevel,
-            ...ExperienceLevel[]
-          ]
-        )
+            ...ExperienceLevel[],
+          ],
+        ),
       )
       .optional()
       .openapi({

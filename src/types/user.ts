@@ -24,6 +24,8 @@ import {
     UserStatsEntitySchema,
     UserWithPostsEntitySchema,
     SearchUsersOutputSchema,
+    UserWithPostBookmarksEntitySchema,
+    UserWithPostLikesEntitySchema,
 } from "../schemas/user";
 
 import { z } from "@hono/zod-openapi";
@@ -41,6 +43,14 @@ export type UserWithProjectBookmarksEntity = z.infer<
 export type UserWithProjectLikesEntity = z.infer<
     typeof UserWithProjectLikesEntitySchema
 >;
+
+export type UserWithPostBookmarksEntity = z.infer<
+    typeof UserWithPostBookmarksEntitySchema
+>;
+export type UserWithPostLikesEntity = z.infer<
+    typeof UserWithPostLikesEntitySchema
+>;
+
 export type UserWithUserPostsEntity = z.infer<typeof UserWithPostsEntitySchema>;
 export type GetUserFollowingInput = z.infer<typeof GetUserFollowingInputSchema>;
 export type GetUserFollowersInput = z.infer<typeof GetUserFollowersInputSchema>;

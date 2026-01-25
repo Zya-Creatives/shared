@@ -1,7 +1,6 @@
 import { z } from "@hono/zod-openapi";
 import {
   BrandEntitySchema,
-  ListBrandsInputSchema,
   CreateBrandProfileInputSchema,
   UpdateBrandProfileInputSchema,
   GetBrandInputSchema,
@@ -15,8 +14,6 @@ import {
 } from "../schemas/brand";
 
 export type BrandEntity = z.infer<typeof BrandEntitySchema>;
-
-export type ListBrandsInput = z.infer<typeof ListBrandsInputSchema>;
 
 export type CreateBrandProfileInput = z.infer<
   typeof CreateBrandProfileInputSchema

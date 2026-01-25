@@ -20,7 +20,7 @@ import { LikeEntitySchema } from "./like";
 import { BrandEntitySchema } from "./brand";
 import { CreativeEntitySchema } from "./creative";
 import { InvestorEntitySchema } from "./investor";
-import { PostWithFilesEntitySchema } from "./post";
+import { PostEntitySchema, PostWithFilesEntitySchema } from "./post";
 
 export const UserEntitySchema = z
     .object({
@@ -55,6 +55,7 @@ export const UserEntitySchema = z
         createdAt: z.coerce
             .date()
             .openapi({ example: "2025-10-13T09:00:00.000Z" }),
+        version: z.int(),
         updatedAt: z.coerce
             .date()
             .openapi({ example: "2025-10-13T09:00:00.000Z" }),
@@ -102,6 +103,40 @@ export const UserWithProjectLikesEntitySchema = z.object({
                 startDate: true,
                 endDate: true,
                 imagePlaceholderUrl: true,
+            }),
+        }),
+    ),
+});
+
+export const UserWithPostLikesEntitySchema = z.object({
+    userId: z.cuid2(),
+    postLikes: z.array(
+        LikeEntitySchema.extend({
+            post: PostEntitySchema.pick({
+                id: true,
+                parentId: true,
+                title: true,
+                content: true,
+                tags: true,
+                createdAt: true,
+                updatedAt: true,
+            }),
+        }),
+    ),
+});
+
+export const UserWithPostBookmarksEntitySchema = z.object({
+    userId: z.cuid2(),
+    postBookmarks: z.array(
+        BookmarkEntitySchema.extend({
+            post: PostEntitySchema.pick({
+                id: true,
+                parentId: true,
+                title: true,
+                content: true,
+                tags: true,
+                createdAt: true,
+                updatedAt: true,
             }),
         }),
     ),
