@@ -7,3 +7,8 @@ export type ProjectSocialGraphEntity = z.infer<
 export type PostSocialGraphEntity = z.infer<
   typeof ProjectSocialGraphEntitySchema
 >;
+
+export type Cursor = {
+  id: string;
+  createdAt: string;
+};

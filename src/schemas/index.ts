@@ -11,6 +11,7 @@ export * from "./username";
 export * from "./post";
 export * from "./entity-stats";
 export * from "./message";
+export * from "./activity";
 export * from "./chat";
 export * from "./job";
 export * from "./job-application";

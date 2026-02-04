@@ -16,18 +16,19 @@ export const MessageEntitySchema = z.object({
       description: z.string().optional(),
       image: z.url().optional(),
     })
-    .optional()
-    .openapi({
-      description: "Optional metadata for a single link in the message",
-      example: {
-        url: "https://example.com",
-        title: "Example Website",
-        description: "This is an example link",
-        image: "https://example.com/preview.jpg",
-      },
-    }),
+    .optional(),
   content: z.string().optional(),
   messageType: z.enum(MESSAGE_TYPES).default(MESSAGE_TYPES.DEFAULT_MESSAGE),
+  replyToContent: z.string().optional(),
+  replyToImages: z.array(z.url()).optional(),
+  replyToLinkMeta: z
+    .object({
+      url: z.url(),
+      title: z.string().optional(),
+      description: z.string().optional(),
+      image: z.url().optional(),
+    })
+    .optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   deletedAt: z.coerce.date().optional(),
@@ -57,7 +58,7 @@ export const MessageWithFilesEntitySchema = MessageEntitySchema.extend({
     .array(
       MessageFileEntitySchema.extend({
         url: z.url(),
-      })
+      }),
     )
     .optional()
     .openapi({ description: "Files associated with the project." }),
@@ -83,11 +84,12 @@ export const CreateMessageInputSchema = z.object({
     .array(
       CreateFileInputSchema.extend({
         order: z.int().default(1),
-      })
+      }),
     )
     .optional(),
   chatId: z.string(),
   senderId: z.string(),
+  replyToMessageId: z.cuid2().optional(),
   linkMeta: z
     .object({
       url: z.url(),

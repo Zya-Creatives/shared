@@ -12,6 +12,8 @@ export const BaseChatEntitySchema = z.object({
 export const ChatEntitySchema = BaseChatEntitySchema.extend({
   senderImgUrl: z.string().optional(),
   senderName: z.string(),
+  senderUsername: z.string(),
+  receiverUsername: z.string(),
   receiverImgUrl: z.string().optional(),
   receiverName: z.string(),
   lastMessageSent: z.string().optional(),

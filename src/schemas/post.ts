@@ -8,6 +8,7 @@ import { CreateFileInputSchema } from "./file";
 import { CommentEntitySchema } from "./comment";
 import { EntityStatsSchema } from "./entity-stats";
 import { ActivitySchema } from "./activity";
+import { cleanHtml } from "../utils/clean-html";
 
 export const PostEntitySchema = z.object({
   id: z
@@ -36,7 +37,16 @@ export const PostEntitySchema = z.object({
   content: z
     .string()
     .optional()
-    .openapi({ description: "Post content", example: "Hello world" }),
+    .refine(
+      (val) => {
+        if (!val) return true;
+        const plainText = cleanHtml(val, Number.MAX_SAFE_INTEGER);
+        return plainText.length <= 300;
+      },
+      {
+        message: "Post content cannot exceed 300 characters",
+      },
+    ),
   postType: z.enum(POST_TYPES).openapi({
     description: "Type of the post entity this statistic belongs to.",
     title: "Post Type",
@@ -102,7 +112,7 @@ export const CreatePostInputSchema = z.object({
   parentType: z.enum(ACTIVITY_PARENT_TYPES).default(ACTIVITY_PARENT_TYPES.POST),
   content: z
     .string()
-    .max(500, { message: "Post content cannot exceed 500 characters" })
+    .max(300, { message: "Post content cannot exceed 300 characters" })
     .optional()
     .openapi({
       description: "Post content",
@@ -254,17 +264,26 @@ export const ReportPostInputSchema = z.object({
     .max(200, { error: "Complaint cannot be longer than 200 characters" }),
 });
 
+const AnalyticsChartItemSchema = z.object({
+  x: z.string(),
+  y: z.number(),
+});
+
 export const PostAnalyticsOutputSchema = z.object({
   awareness: z.object({
     reach: z.number(),
     impressions: z.number(),
+    visitors: z.number(),
     newFollowers: z.number(),
   }),
   engagement: z.object({
     rate: z.number(),
     likes: z.number(),
     comments: z.number(),
+    linkCopied: z.number(),
     bookmarks: z.number(),
+    tagsClicked: z.array(AnalyticsChartItemSchema),
+    platformShares: z.array(AnalyticsChartItemSchema),
   }),
   behavior: z.object({
     viralityScore: z.number(),
@@ -273,6 +292,9 @@ export const PostAnalyticsOutputSchema = z.object({
     sentiment: z.object({
       positive: z.number(),
       negative: z.number(),
+      score: z.number(),
+      reports: z.number(),
+      notInterested: z.number(),
       status: z.enum(["Healthy", "Polarizing"]),
     }),
   }),

@@ -13,6 +13,7 @@ export * from "./comment";
 export * from "./username";
 export * from "./entity-stats";
 export * from "./feed";
+export * from "./activity";
 export * from "./post";
 export * from "./job-application";
 export * from "./message";

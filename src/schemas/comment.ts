@@ -15,6 +15,7 @@ export const CommentEntitySchema = z.object({
       "The CUID2 of the parent entity (e.g., a post or project) this comment belongs to.",
     example: "clq9p8f2z0000c762s7k4g1b",
   }),
+  parentCommentId: z.cuid2().optional(),
   parentType: z.enum(ACTIVITY_PARENT_TYPES).openapi({
     description: "The type of the parent entity this comment is attached to.",
     example: "POST", // Assuming 'POST' is a value in ACTIVITY_PARENT_TYPES
@@ -38,6 +39,7 @@ export const CommentEntitySchema = z.object({
   }),
   isLiked: z.boolean().default(false),
   likesCount: z.int().default(0),
+  hasReplies: z.boolean().optional(),
   updatedAt: z.coerce.date().optional().openapi({
     description: "The date and time the comment was last updated.",
     example: "2023-10-27T10:05:00.000Z",

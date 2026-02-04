@@ -11,4 +11,7 @@ export const ActivitySchema = z.object({
   actorId: z.string(),
   actorUsername: z.string(),
   actorImageUrl: z.url().optional(),
+  followsYou: z.boolean().optional(),
+  isFollowing: z.boolean().optional(),
 });
+
