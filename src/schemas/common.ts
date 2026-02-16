@@ -20,3 +20,8 @@ export const ProjectIdentifierSchema = z.object({
 
 export type ProjectIdentifier = z.infer<typeof ProjectIdentifierSchema>;
 
+export const DefaultApiSuccessOutputSchema = z.object({
+  status: z.literal("success"),
+});
+
+export type ApiSuccessOutput = z.infer<typeof DefaultApiSuccessOutputSchema>;

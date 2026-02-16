@@ -200,6 +200,18 @@ export const JOB_STATUS = {
   DELETED: "DELETED",
 } as const;
 
+export const MESSAGE_REQUEST_STATUS = {
+  PENDING: "PENDING",
+  ACCEPTED: "ACCEPTED",
+  DECLINED: "DECLINED",
+} as const;
+
+export const PROJECT_STATUS = {
+  ACTIVE: "ACTIVE",
+  DRAFT: "DRAFT",
+  ARCHIVED: "ARCHIVED",
+} as const;
+
 export const POST_BADGE_TYPES = {
   NETWORKING: "Networking",
   FUNDING: "Funding",
@@ -250,9 +262,22 @@ export const NOTIFICATION_TYPES = {
   PROJECT_FEATURED: "Project Featured",
 } as const;
 
+export const VENTURE_STAGES = {
+  IDEA: "Idea",
+  PRE_SEED: "Pre Seed",
+  MVP: "MVP",
+  SEED: "Seed",
+  SERIES_A: "Series A",
+  SERIES_B: "Series B",
+  SERIES_C: "Series C",
+  GROWTH: "Growth",
+  EXIT: "Exit",
+} as const;
+
 export type NotificationType =
   (typeof NOTIFICATION_TYPES)[keyof typeof NOTIFICATION_TYPES];
-
+export type MessageRequestStatus =
+  (typeof MESSAGE_REQUEST_STATUS)[keyof typeof MESSAGE_REQUEST_STATUS];
 export type ApplicationStatus =
   (typeof APPLICATION_STATUS)[keyof typeof APPLICATION_STATUS];
 export type ActivityType = (typeof ACTIVITY_TYPES)[keyof typeof ACTIVITY_TYPES];
@@ -291,6 +316,9 @@ export type InvestorVerificationDocumentStatus =
   (typeof INVESTOR_VERIFICATION_DOCUMENT_STATUSES)[keyof typeof INVESTOR_VERIFICATION_DOCUMENT_STATUSES];
 export type InvestorVerificationDocumentType =
   (typeof INVESTOR_VERIFICATION_DOCUMENT_TYPES)[keyof typeof INVESTOR_VERIFICATION_DOCUMENT_TYPES];
+export type VentureStage = (typeof VENTURE_STAGES)[keyof typeof VENTURE_STAGES];
+export type ProjectStatus =
+  (typeof PROJECT_STATUS)[keyof typeof PROJECT_STATUS];
 
 export const API_ROUTES = {
   healthCheck: "/health",

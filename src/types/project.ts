@@ -3,7 +3,6 @@ import type {
   ProjectEntitySchema,
   ProjectIdSchema,
   MinimalProjectSchema,
-  ProjectFileEntitySchema,
   ProjectDetailsEntitySchema,
   ProjectWithProjectViewsEntitySchema,
   ProjectWithProjectCommentsEntitySchema,
@@ -19,6 +18,11 @@ import type {
   SearchProjectsOutputSchema,
   GetProjectWithLikesOutputSchema,
   GetProjectWithCommentsOutputSchema,
+  CommentOnProjectInputSchema,
+  CommentOnProjectOutputSchema,
+  ProjectSearchDocumentSchema,
+  CreateProjectFileInputSchema,
+  DeleteProjectFileInputSchema,
 } from "../schemas/project";
 import { ViewEntitySchema } from "../schemas/view";
 import { LikeEntitySchema } from "../schemas/like";
@@ -27,8 +31,6 @@ import { CommentEntitySchema } from "../schemas/comment";
 export type ProjectEntity = z.infer<typeof ProjectEntitySchema>;
 export type ProjectIdInput = z.infer<typeof ProjectIdSchema>;
 export type MinimalProject = z.infer<typeof MinimalProjectSchema>;
-
-export type ProjectFileEntity = z.infer<typeof ProjectFileEntitySchema>;
 export type ProjectViewEntity = z.infer<typeof ViewEntitySchema>;
 export type ProjectLikeEntity = z.infer<typeof LikeEntitySchema>;
 export type ProjectCommentEntity = z.infer<typeof CommentEntitySchema>;
@@ -63,4 +65,17 @@ export type GetProjectWithCommentsOutput = z.infer<
 
 export type GetProjectWithLikesOutput = z.infer<
   typeof GetProjectWithLikesOutputSchema
+>;
+
+export type CommentOnProjectInput = z.infer<typeof CommentOnProjectInputSchema>;
+
+export type CommentOnProjectOutput = z.infer<
+  typeof CommentOnProjectOutputSchema
+>;
+
+export type ProjectSearchDocument = z.infer<typeof ProjectSearchDocumentSchema>;
+
+export type ProjectFileInput = z.infer<typeof CreateProjectFileInputSchema>;
+export type DeleteProjectFileInput = z.infer<
+  typeof DeleteProjectFileInputSchema
 >;

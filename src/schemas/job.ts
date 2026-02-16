@@ -297,28 +297,20 @@ export const GetCreatedJobsOutputSchema = z.object({
 
 export const GetJobsInputSchema = z.object({
   q: z.string().optional(),
-  jobType: z
-    .enum(Object.values(JOB_TYPE) as [JobType, ...JobType[]])
-    .optional(),
+  jobType: z.enum(Object.values(JOB_TYPE) as [string, ...string[]]).optional(),
   workMode: z
-    .enum(Object.values(WORK_MODE) as [WorkMode, ...WorkMode[]])
-    .optional(),
-  location: z
-    .enum(Object.values(JOB_LOCATIONS) as [JobLocation, ...JobLocation[]])
-    .optional(),
-  employmentType: z
-    .enum(
-      Object.values(EMPLOYMENT_TYPE) as [EmploymentType, ...EmploymentType[]],
-    )
-    .optional(),
-  gigType: z
-    .enum(Object.values(GIG_TYPE) as [GigType, ...GigType[]])
-    .optional(),
-  requiredSkills: z
     .string()
     .optional()
-    .describe("Comma-separated: React,Node.js"),
-
+    .describe("Comma-separated values, e.g. 'Remote,Hybrid'"),
+  location: z
+    .enum(Object.values(JOB_LOCATIONS) as [string, ...string[]])
+    .optional(),
+  employmentType: z
+    .string()
+    .optional()
+    .describe("Comma-separated values, e.g. 'Full Time,Freelance'"),
+  gigType: z.enum(Object.values(GIG_TYPE) as [string, ...string[]]).optional(),
+  requiredSkills: z.string().optional().describe("Comma-separated skills"),
   status: z.string().optional(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
@@ -328,6 +320,7 @@ export const GetJobsOutputSchema = z.object({
   jobs: z.array(NormalizedJobSchema),
   total: z.number(),
   page: z.number(),
+  limit: z.number(),
   totalPages: z.number(),
   hasNextPage: z.boolean(),
   hasPrevPage: z.boolean(),
