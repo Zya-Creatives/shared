@@ -73,9 +73,6 @@ export const InvestorEntitySchema = z
 
 export const CreateInvestorProfileInputSchema = z
   .object({
-    bio: z.string().max(600).optional().openapi({
-      example: "Angel investor backing early-stage African startups.",
-    }),
     websiteURL: z.url("Invalid url").optional().openapi({
       example: "https://www.investorportfolio.com",
     }),
