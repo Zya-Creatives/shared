@@ -20,3 +20,5 @@ export * from "./notification";
 export * from "./feed";
 export * from "./bookmark";
 export * from "./like";
+export * from "./investor-signal";
+export * from "./investor-shortlist";

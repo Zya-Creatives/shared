@@ -21,3 +21,5 @@ export * from "./chat";
 export * from "./job";
 export * from "./user-strike";
 export * from "./notification";
+export * from "./investor-signal"
+export * from "./investor-shortlist"

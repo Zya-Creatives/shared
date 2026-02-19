@@ -274,6 +274,25 @@ export const VENTURE_STAGES = {
   EXIT: "Exit",
 } as const;
 
+export const SIGNAL_INTEREST_TYPES = {
+  INVESTMENT: "Exploring investment opportunities",
+  PARTNERSHIP: "Partnership & Collaboration",
+  PRODUCT_INTEREST: "Interested in using the product",
+  TECHNICAL_COLLABORATION: "Technical collaboration / integration",
+  TALENT_HIRING: "Talent & Hiring",
+  MEDIA_PRESS: "Media / Press",
+  GENERAL_INQUIRY: "General inquiry",
+} as const;
+
+export const SIGNAL_STATUS = {
+  ACCEPTED: "ACCEPTED",
+  DECLINED: "DECLINED",
+  PENDING: "PENDING",
+} as const;
+
+export type SignalInterestType =
+  (typeof SIGNAL_INTEREST_TYPES)[keyof typeof SIGNAL_INTEREST_TYPES];
+export type SignalStatus = (typeof SIGNAL_STATUS)[keyof typeof SIGNAL_STATUS];
 export type NotificationType =
   (typeof NOTIFICATION_TYPES)[keyof typeof NOTIFICATION_TYPES];
 export type MessageRequestStatus =
