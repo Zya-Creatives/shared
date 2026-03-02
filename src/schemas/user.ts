@@ -1,18 +1,18 @@
 import { z } from "@hono/zod-openapi";
 
 import {
-    ROLES,
-    USER_STATUSES,
-    ONBOARDING_PAGES,
-    ACTIVITY_TYPES,
-    ACTIVITY_PARENT_TYPES,
+  ROLES,
+  USER_STATUSES,
+  ONBOARDING_PAGES,
+  ACTIVITY_TYPES,
+  ACTIVITY_PARENT_TYPES,
 } from "../constants";
 import type {
-    Role,
-    UserStatus,
-    OnboardingPage,
-    ActivityType,
-    ActivityParentType,
+  Role,
+  UserStatus,
+  OnboardingPage,
+  ActivityType,
+  ActivityParentType,
 } from "../constants";
 import { ProjectEntitySchema } from "./project";
 import { BookmarkEntitySchema } from "./bookmark";
@@ -23,261 +23,259 @@ import { InvestorEntitySchema } from "./investor";
 import { PostEntitySchema, PostWithFilesEntitySchema } from "./post";
 
 export const UserEntitySchema = z
-    .object({
-        id: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
-        email: z.email().openapi({ example: "user@example.com" }),
-        emailVerified: z.boolean().openapi({ example: true }),
-        name: z.string().optional().openapi({ example: "John Doe" }),
-        image: z
-            .string()
-            .optional()
-            .openapi({ example: "https://example.com/avatar.png" }),
-        username: z.string().optional().openapi({ example: "johndoe" }),
-        displayUsername: z.string().optional().openapi({ example: "@johndoe" }),
-        role: z.enum(Object.values(ROLES) as [Role, ...Role[]]).openapi({
-            example: "CREATIVE",
-        }),
-        status: z
-            .enum(Object.values(USER_STATUSES) as [UserStatus, ...UserStatus[]])
-            .openapi({
-                example: "ACTIVE",
-            }),
-        onboardingPage: z
-            .enum(
-                Object.values(ONBOARDING_PAGES) as [
-                    OnboardingPage,
-                    ...OnboardingPage[],
-                ],
-            )
-            .openapi({
-                example: "DONE",
-            }),
-        createdAt: z.coerce
-            .date()
-            .openapi({ example: "2025-10-13T09:00:00.000Z" }),
-        version: z.int(),
-        updatedAt: z.coerce
-            .date()
-            .openapi({ example: "2025-10-13T09:00:00.000Z" }),
-    })
-    .openapi("BaseUserEntity");
+  .object({
+    id: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
+    email: z.email().openapi({ example: "user@example.com" }),
+    emailVerified: z.boolean().openapi({ example: true }),
+    name: z.string().optional().openapi({ example: "John Doe" }),
+    image: z
+      .string()
+      .optional()
+      .openapi({ example: "https://example.com/avatar.png" }),
+    username: z.string().optional().openapi({ example: "johndoe" }),
+    displayUsername: z.string().optional().openapi({ example: "@johndoe" }),
+    role: z.enum(Object.values(ROLES) as [Role, ...Role[]]).openapi({
+      example: "CREATIVE",
+    }),
+    status: z
+      .enum(Object.values(USER_STATUSES) as [UserStatus, ...UserStatus[]])
+      .openapi({
+        example: "ACTIVE",
+      }),
+    onboardingPage: z
+      .enum(
+        Object.values(ONBOARDING_PAGES) as [
+          OnboardingPage,
+          ...OnboardingPage[],
+        ],
+      )
+      .openapi({
+        example: "DONE",
+      }),
+    createdAt: z.coerce.date().openapi({ example: "2025-10-13T09:00:00.000Z" }),
+    version: z.int(),
+    updatedAt: z.coerce.date().openapi({ example: "2025-10-13T09:00:00.000Z" }),
+  })
+  .openapi("BaseUserEntity");
 
 export const MinimalUserSchema = UserEntitySchema.pick({
-    id: true,
-    name: true,
-    email: true,
-    image: true,
-    username: true,
-    role: true,
+  id: true,
+  name: true,
+  email: true,
+  image: true,
+  username: true,
+  role: true,
 }).openapi("MinimalUser");
 
 export const UserStatsEntitySchema = z.object({
-    followerCount: z.int(),
-    followingCount: z.int(),
-    followingIds: z.array(z.string()),
+  followerCount: z.int(),
+  followingCount: z.int(),
+  followingIds: z.array(z.string()),
 });
 
 export const UserProfileEntitySchema = UserEntitySchema.extend({
-    profileType: z.enum(["creative", "brand", "investor"]).optional(),
-    brand: BrandEntitySchema,
-    creative: CreativeEntitySchema,
-    investor: InvestorEntitySchema,
+  profileType: z.enum(["creative", "brand", "investor"]).optional(),
+  brand: BrandEntitySchema,
+  creative: CreativeEntitySchema,
+  investor: InvestorEntitySchema,
 }).openapi("UserProfileEntity");
 
 export const UserWithProjectsEntitySchema = z
-    .object({
-        userId: z.cuid2(),
-        projects: z.array(ProjectEntitySchema.omit({ overview: true })),
-    })
-    .openapi("UserWithProjectsEntity");
+  .object({
+    userId: z.cuid2(),
+    projects: z.array(ProjectEntitySchema.omit({ overview: true })),
+  })
+  .openapi("UserWithProjectsEntity");
 
 export const UserWithProjectLikesEntitySchema = z.object({
-    userId: z.cuid2(),
-    projectLikes: z.array(
-        LikeEntitySchema.extend({
-            project: ProjectEntitySchema.pick({
-                id: true,
-                title: true,
-                description: true,
-                tags: true,
-                startDate: true,
-                endDate: true,
-                imagePlaceholderUrl: true,
-            }),
-        }),
-    ),
+  userId: z.cuid2(),
+  projectLikes: z.array(
+    LikeEntitySchema.extend({
+      project: ProjectEntitySchema.pick({
+        id: true,
+        title: true,
+        description: true,
+        tags: true,
+        startDate: true,
+        endDate: true,
+        imagePlaceholderUrl: true,
+      }),
+    }),
+  ),
 });
 
 export const UserWithPostLikesEntitySchema = z.object({
-    userId: z.cuid2(),
-    postLikes: z.array(
-        LikeEntitySchema.extend({
-            post: PostEntitySchema.pick({
-                id: true,
-                parentId: true,
-                title: true,
-                content: true,
-                tags: true,
-                createdAt: true,
-                updatedAt: true,
-            }),
-        }),
-    ),
+  userId: z.cuid2(),
+  postLikes: z.array(
+    LikeEntitySchema.extend({
+      post: PostEntitySchema.pick({
+        id: true,
+        parentId: true,
+        title: true,
+        content: true,
+        tags: true,
+        createdAt: true,
+        updatedAt: true,
+      }),
+    }),
+  ),
 });
 
 export const UserWithPostBookmarksEntitySchema = z.object({
-    userId: z.cuid2(),
-    postBookmarks: z.array(
-        BookmarkEntitySchema.extend({
-            post: PostEntitySchema.pick({
-                id: true,
-                parentId: true,
-                title: true,
-                content: true,
-                tags: true,
-                createdAt: true,
-                updatedAt: true,
-            }),
-        }),
-    ),
+  userId: z.cuid2(),
+  postBookmarks: z.array(
+    BookmarkEntitySchema.extend({
+      post: PostEntitySchema.pick({
+        id: true,
+        parentId: true,
+        title: true,
+        content: true,
+        tags: true,
+        createdAt: true,
+        updatedAt: true,
+      }),
+    }),
+  ),
 });
 
 export const UserWithProjectBookmarksEntitySchema = z
-    .object({
-        userId: z.cuid2(),
-        projectBookmarks: z.array(
-            BookmarkEntitySchema.extend({
-                project: ProjectEntitySchema.pick({
-                    id: true,
-                    title: true,
-                    description: true,
-                    tags: true,
-                    startDate: true,
-                    endDate: true,
-                    imagePlaceholderUrl: true,
-                }),
-            }),
-        ),
-    })
-    .openapi("UserWithProjectBookmarksEntity");
+  .object({
+    userId: z.cuid2(),
+    projectBookmarks: z.array(
+      BookmarkEntitySchema.extend({
+        project: ProjectEntitySchema.pick({
+          id: true,
+          title: true,
+          description: true,
+          tags: true,
+          startDate: true,
+          endDate: true,
+          imagePlaceholderUrl: true,
+        }),
+      }),
+    ),
+  })
+  .openapi("UserWithProjectBookmarksEntity");
 
 export const GetUserFollowingInputSchema = z.object({
-    searchQuery: z.string().optional().openapi({ example: "design systems" }),
-    offset: z.number().int().nonnegative().optional().openapi({ example: 20 }),
+  searchQuery: z.string().optional().openapi({ example: "design systems" }),
+  offset: z.number().int().nonnegative().optional().openapi({ example: 20 }),
 });
 
 export const GetUserFollowersInputSchema = z.object({
-    searchQuery: z.string().optional().openapi({ example: "design systems" }),
-    offset: z.number().int().nonnegative().optional().openapi({ example: 20 }),
+  searchQuery: z.string().optional().openapi({ example: "design systems" }),
+  offset: z.number().int().nonnegative().optional().openapi({ example: 20 }),
 });
 export const UserWithFollowingEntitySchema = MinimalUserSchema.extend({
-    following: z
-        .array(
-            MinimalUserSchema.extend({
-                isFollowing: z.boolean().optional(),
-                followsYou: z.boolean().optional(),
-            }),
-        )
-        .openapi({ description: "List of users this user is following." }),
+  following: z
+    .array(
+      MinimalUserSchema.extend({
+        isFollowing: z.boolean().optional(),
+        followsYou: z.boolean().optional(),
+      }),
+    )
+    .openapi({ description: "List of users this user is following." }),
 }).openapi("UserWithFollowingEntity");
 
 export const UserWithFollowersEntitySchema = MinimalUserSchema.extend({
-    followers: z
-        .array(
-            MinimalUserSchema.extend({
-                isFollowing: z.boolean().optional(),
-                followsYou: z.boolean().optional(),
-            }),
-        )
-        .openapi({ description: "List of users who follow this user." }),
+  followers: z
+    .array(
+      MinimalUserSchema.extend({
+        isFollowing: z.boolean().optional(),
+        followsYou: z.boolean().optional(),
+      }),
+    )
+    .openapi({ description: "List of users who follow this user." }),
 }).openapi("UserWithFollowersEntity");
 
 export const GetUserFollowersOutputSchema = z.object({
-    nextCursor: z.string(),
-    followers: z.array(
-        MinimalUserSchema.extend({
-            isFollowing: z.boolean().optional(),
-            followsYou: z.boolean().optional(),
-        }),
-    ),
+  nextCursor: z.string(),
+  followers: z.array(
+    MinimalUserSchema.extend({
+      isFollowing: z.boolean().optional(),
+      followsYou: z.boolean().optional(),
+    }),
+  ),
 });
 
 export const GetUserFollowingOutputSchema = z.object({
-    nextCursor: z.string(),
-    following: z.array(
-        MinimalUserSchema.extend({
-            isFollowing: z.boolean().optional(),
-            followsYou: z.boolean().optional(),
-        }),
-    ),
+  nextCursor: z.string(),
+  following: z.array(
+    MinimalUserSchema.extend({
+      isFollowing: z.boolean().optional(),
+      followsYou: z.boolean().optional(),
+    }),
+  ),
 });
 
 export const UserWithPostsEntitySchema = z
-    .object({
-        userId: z.cuid2(),
-        posts: z.array(PostWithFilesEntitySchema),
-    })
-    .openapi("UserWithPostsEntity");
+  .object({
+    userId: z.cuid2(),
+    posts: z.array(PostWithFilesEntitySchema),
+  })
+  .openapi("UserWithPostsEntity");
 
 export const GetAuthenticatedUserOutputSchema = UserEntitySchema;
 
 export const GetAuthenticatedUserProfileOutputSchema = UserProfileEntitySchema;
 
 export const GetAuthenticatedUserWithProjectsOutputSchema =
-    UserWithProjectsEntitySchema;
+  UserWithProjectsEntitySchema;
 
 export const GetAuthenticatedUserWithProjectBookmarksOutputSchema =
-    UserWithProjectBookmarksEntitySchema;
+  UserWithProjectBookmarksEntitySchema;
 
 export const GetAuthenticatedUserWithUserFollowingOutputSchema =
-    UserWithFollowingEntitySchema;
+  UserWithFollowingEntitySchema;
 
 export const GetAuthenticatedUserWithUserFollowersOutputSchema =
-    UserWithFollowersEntitySchema;
+  UserWithFollowersEntitySchema;
 
 export const GetAuthenticatedUserWithProjectLikesOutputSchema =
-    UserWithProjectLikesEntitySchema;
+  UserWithProjectLikesEntitySchema;
 
 export const GetUserActivityInputSchema = z.object({
-    activityType: z.enum(
-        Object.values(ACTIVITY_TYPES) as [ActivityType, ...ActivityType[]],
-    ),
+  activityType: z.enum(
+    Object.values(ACTIVITY_TYPES) as [ActivityType, ...ActivityType[]],
+  ),
 });
 
 export const GetUserActivityOutputSchema = z.array(
-    z.object({
-        parentId: z.string(),
-        parentType: z.enum(
-            Object.values(ACTIVITY_PARENT_TYPES) as [
-                ActivityParentType,
-                ...ActivityParentType[],
-            ],
-        ),
-    }),
+  z.object({
+    parentId: z.string(),
+    parentType: z.enum(
+      Object.values(ACTIVITY_PARENT_TYPES) as [
+        ActivityParentType,
+        ...ActivityParentType[],
+      ],
+    ),
+  }),
 );
 
 export const SearchUsersInputSchema = z.object({
-    query: z.string().default("").openapi({
-        example: "john",
-        description: "Search by name, email, username, or discipline",
-    }),
-    role: z.enum(Object.values(ROLES) as [Role, ...Role[]]).optional(),
-    limit: z.coerce
-        .number()
-        .min(1)
-        .max(100)
-        .default(20)
-        .openapi({ example: 20 }),
-    cursor: z.string().optional().openapi({
-        example: 0,
-        description: "The offset/cursor for pagination",
-    }),
+  query: z.string().default("").openapi({
+    example: "john",
+    description: "Search by name, email, username, or discipline",
+  }),
+  role: z.enum(Object.values(ROLES) as [Role, ...Role[]]).optional(),
+  limit: z.coerce.number().min(1).max(100).default(20).openapi({ example: 20 }),
+  cursor: z.string().optional().openapi({
+    example: 0,
+    description: "The offset/cursor for pagination",
+  }),
 });
 
 export const SearchUsersOutputSchema = z.object({
-    users: z.array(MinimalUserSchema),
-    nextCursor: z.string().optional().openapi({
-        example: "abc123",
-        description: "The next cursor for pagination",
+  users: z.array(
+    MinimalUserSchema.extend({
+      isFollowing: z.boolean().optional(),
+      followsYou: z.boolean().optional(),
+      noOfFollowers: z.number().int().nonnegative().optional(),
+      disciplines: z.array(z.string()).optional(),
     }),
+  ),
+  nextCursor: z.string().optional().openapi({
+    example: "abc123",
+    description: "The next cursor for pagination",
+  }),
 });

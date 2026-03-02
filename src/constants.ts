@@ -288,6 +288,7 @@ export const SIGNAL_STATUS = {
   ACCEPTED: "ACCEPTED",
   DECLINED: "DECLINED",
   PENDING: "PENDING",
+  ARCHIVED: "ARCHIVED",
 } as const;
 
 export type SignalInterestType =
@@ -492,7 +493,7 @@ export const DEFAULT_DISCIPLINES = [
   { name: "Web Development (Back-End)", slug: "web_development_backend" },
   { name: "Web Development (Front-End)", slug: "web_development_frontend" },
   { name: "Writing & Storytelling", slug: "writing_storytelling" },
-];
+] as const;
 
 export const ANALYTICS_EVENTS = {
   POST: {

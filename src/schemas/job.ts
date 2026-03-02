@@ -134,8 +134,8 @@ export const RoleJobEntitySchema = z.object({
   requiredSkills: z.array(z.string()),
   employeeRequirements: z.string().optional(),
   companyBenefits: z.string().optional(),
-  wagesMin: z.number().optional(),
-  wagesMax: z.number().optional(),
+  wagesMin: z.number().optional().nullable(),
+  wagesMax: z.number().optional().nullable(),
   wagesCurrency: z
     .enum(Object.values(WAGES_CURRENCY) as [WagesCurrency, ...WagesCurrency[]])
     .optional(),
@@ -218,8 +218,8 @@ export const CreateRoleJobInputSchema = z
     requiredSkills: z.array(z.string()),
     employeeRequirements: z.string().optional(),
     companyBenefits: z.string().optional(),
-    wagesMin: z.number().optional(),
-    wagesMax: z.number().optional(),
+    wagesMin: z.number().optional().nullable(),
+    wagesMax: z.number().optional().nullable(),
     wagesCurrency: z
       .enum(
         Object.values(WAGES_CURRENCY) as [WagesCurrency, ...WagesCurrency[]],
@@ -231,7 +231,7 @@ export const CreateRoleJobInputSchema = z
   })
   .refine(
     ({ wagesMin, wagesMax }) =>
-      wagesMin === undefined || wagesMax === undefined || wagesMax > wagesMin,
+      wagesMin == null || wagesMax == null || wagesMax > wagesMin,
     {
       message: "wagesMax must be greater than wagesMin",
       path: ["wagesMax"],
@@ -246,8 +246,8 @@ export const CreateGigJobInputSchema = z
     employeeRequirements: z.string().optional(),
     aboutCompany: z.string().optional(),
     requiredSkills: z.array(z.string()),
-    wagesMin: z.number().optional(),
-    wagesMax: z.number().optional(),
+    wagesMin: z.number().optional().nullable(),
+    wagesMax: z.number().optional().nullable(),
     wagesCurrency: z
       .enum(
         Object.values(WAGES_CURRENCY) as [WagesCurrency, ...WagesCurrency[]],
@@ -259,7 +259,7 @@ export const CreateGigJobInputSchema = z
   })
   .refine(
     ({ wagesMin, wagesMax }) =>
-      wagesMin === undefined || wagesMax === undefined || wagesMax > wagesMin,
+      wagesMin == null || wagesMax == null || wagesMax > wagesMin,
     {
       message: "wagesMax must be greater than wagesMin",
       path: ["wagesMax"],
