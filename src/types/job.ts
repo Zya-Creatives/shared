@@ -16,6 +16,7 @@ import {
   GetJobsOutputSchema,
   GetJobsInputSchema,
   GetCreatedJobsOutputSchema,
+  JobSearchDocumentSchema,
 } from "../schemas/job";
 
 export type BaseJobEntity = z.infer<typeof BaseJobEntitySchema>;
@@ -63,9 +64,14 @@ export type JobWithRoleDetailsEntity = z.infer<
 >;
 
 export type GetJobsInput = z.infer<typeof GetJobsInputSchema>;
+
 export type GetJobsOutput = z.infer<typeof GetJobsOutputSchema>;
+
 export type GetCreatedJobsOutput = z.infer<typeof GetCreatedJobsOutputSchema>;
+
 export type NormalizedJobEntity =
   | JobEntity
   | JobWithGigDetailsEntity
   | JobWithRoleDetailsEntity;
+
+export type JobSearchDocument = z.infer<typeof JobSearchDocumentSchema>;

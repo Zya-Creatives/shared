@@ -15,6 +15,7 @@ import {
   PostEntitySchema,
   PostFileEntitySchema,
   PostIdSchema,
+  PostSearchDocumentSchema,
   PostWithBookmarksEntitySchema,
   PostWithCommentsEntitySchema,
   PostWithFilesEntitySchema,
@@ -61,3 +62,5 @@ export type GetPostWithBookmarksOutput = z.infer<
 export type ReportPostInput = z.infer<typeof ReportPostInputSchema>;
 
 export type PostAnalyticsOutput = z.infer<typeof PostAnalyticsOutputSchema>;
+
+export type PostSearchDocument = z.infer<typeof PostSearchDocumentSchema>;
