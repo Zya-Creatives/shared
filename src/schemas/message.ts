@@ -35,7 +35,16 @@ export const MessageEntitySchema = z.object({
   linkMeta: LinkMetaSchema.optional(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date().optional(),
+  deletedBySender: z.boolean().default(false),
+  deletedByReceiver: z.boolean().default(false),
+  isEdited: z.boolean().default(false),
   deletedAt: z.coerce.date().optional(),
+});
+
+
+export const DeleteMessagesInputSchema = z.object({
+  messageIds: z.array(z.cuid2()),
+  deleteForEveryone: z.boolean().default(false),
 });
 
 export const MessageFileEntitySchema = z.object({

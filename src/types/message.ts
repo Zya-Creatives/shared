@@ -1,6 +1,7 @@
 import z from "zod";
 import {
   CreateMessageInputSchema,
+  DeleteMessagesInputSchema,
   GetMessagesOutputSchema,
   MessageEntitySchema,
   MessageFileEntitySchema,
@@ -18,3 +19,5 @@ export type MessageWithFilesEntity = z.infer<
 export type CreateMessageInput = z.infer<typeof CreateMessageInputSchema>;
 
 export type GetMessagesOutput = z.infer<typeof GetMessagesOutputSchema>;
+
+export type DeleteMessagesInput = z.infer<typeof DeleteMessagesInputSchema>;
