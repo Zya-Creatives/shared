@@ -71,7 +71,7 @@ export const CreateMessageInputSchema = z.object({
 
   parentId: z.cuid2().optional(),
   replyToMessageId: z.cuid2().optional(),
-
+  isEdited: z.boolean().default(false),
   linkMeta: LinkMetaSchema.optional(),
   files: z
     .array(CreateFileInputSchema.extend({ order: z.number().int() }))
