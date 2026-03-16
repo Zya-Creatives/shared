@@ -41,7 +41,6 @@ export const MessageEntitySchema = z.object({
   deletedAt: z.coerce.date().optional(),
 });
 
-
 export const DeleteMessagesInputSchema = z.object({
   messageIds: z.array(z.cuid2()),
   deleteForEveryone: z.boolean().default(false),
@@ -71,11 +70,20 @@ export const CreateMessageInputSchema = z.object({
 
   parentId: z.cuid2().optional(),
   replyToMessageId: z.cuid2().optional(),
-  isEdited: z.boolean().default(false),
+
   linkMeta: LinkMetaSchema.optional(),
   files: z
     .array(CreateFileInputSchema.extend({ order: z.number().int() }))
     .optional(),
+});
+
+export const EditMessageInputSchema = z.object({
+  id: z.cuid2(),
+  chatId: z.cuid2(),
+  senderId: z.cuid2(),
+  receiverId: z.cuid2(),
+  content: z.string().optional(),
+  isEdited: z.boolean().default(true),
 });
 
 export const GetMessagesOutputSchema = z.object({
