@@ -21,6 +21,7 @@ import { BrandEntitySchema } from "./brand";
 import { CreativeEntitySchema } from "./creative";
 import { InvestorEntitySchema } from "./investor";
 import { PostEntitySchema, PostWithFilesEntitySchema } from "./post";
+import { JobEntitySchema, JobSearchDocumentSchema } from "./job";
 
 export const UserEntitySchema = z
   .object({
@@ -149,6 +150,25 @@ export const UserWithPostBookmarksEntitySchema = z.object({
       }),
     )
     .openapi({ example: [] }),
+});
+
+export const UserWithJobBookmarksEntitySchema = z.object({
+  userId: z.cuid2().openapi({ example: "afoaifaofi" }),
+  jobBookmarks: z.array(
+    BookmarkEntitySchema.extend({
+      job: JobSearchDocumentSchema,
+    }),
+  ).optional(),
+});
+
+export const UserWithJobBookmarksInputSchema = z.object({
+  cursor: z.string().optional().nullable(),
+  limit: z.int().positive().optional().nullable(),
+});
+
+export const UserWithJobBookmarksOutputSchema = z.object({
+  bookmarks: UserWithJobBookmarksEntitySchema,
+  nextCursor: z.string().nullable(),
 });
 
 export const UserWithProjectBookmarksEntitySchema = z
@@ -317,23 +337,37 @@ export const SearchUsersOutputSchema = z.object({
   }),
 });
 
-
-export const UserSearchDocumentSchema = z.object({
-  id: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
-  email: z.email().openapi({ example: "user@example.com" }),
-  username: z.string().nullable().openapi({ example: "johndoe" }),
-  name: z.string().nullable().openapi({ example: "John Doe" }),
-  image: z.string().nullable().openapi({ example: "https://example.com/avatar.png" }),
-  role: z
-    .enum(Object.values(ROLES) as [Role, ...Role[]])
-    .openapi({ example: "CREATIVE" }),
-  bio: z.string().nullable().openapi({ example: "Passionate designer and developer based in Lagos." }),
-  location: z.string().nullable().openapi({ example: "Lagos, Nigeria" }),
-  disciplines: z.array(z.string()).nullable().openapi({ example: ["Design Systems", "Web Development"] }),
-  updatedAt: z.string().nullable().openapi({ example: "2026-03-11T09:00:00.000Z" }),
-  createdAt: z.string().nullable().openapi({ example: "2026-03-11T09:00:00.000Z" }),
-}).openapi({
-  title: "User Search Document",
-  description: "Flattened schema used for indexing users in search engines.",
-});
-
+export const UserSearchDocumentSchema = z
+  .object({
+    id: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
+    email: z.email().openapi({ example: "user@example.com" }),
+    username: z.string().nullable().openapi({ example: "johndoe" }),
+    name: z.string().nullable().openapi({ example: "John Doe" }),
+    image: z
+      .string()
+      .nullable()
+      .openapi({ example: "https://example.com/avatar.png" }),
+    role: z
+      .enum(Object.values(ROLES) as [Role, ...Role[]])
+      .openapi({ example: "CREATIVE" }),
+    bio: z.string().nullable().openapi({
+      example: "Passionate designer and developer based in Lagos.",
+    }),
+    location: z.string().nullable().openapi({ example: "Lagos, Nigeria" }),
+    disciplines: z
+      .array(z.string())
+      .nullable()
+      .openapi({ example: ["Design Systems", "Web Development"] }),
+    updatedAt: z
+      .string()
+      .nullable()
+      .openapi({ example: "2026-03-11T09:00:00.000Z" }),
+    createdAt: z
+      .string()
+      .nullable()
+      .openapi({ example: "2026-03-11T09:00:00.000Z" }),
+  })
+  .openapi({
+    title: "User Search Document",
+    description: "Flattened schema used for indexing users in search engines.",
+  });

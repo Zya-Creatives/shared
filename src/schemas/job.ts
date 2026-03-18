@@ -91,7 +91,6 @@ export const JobEntitySchema = z.object({
   brandId: z.cuid2().openapi({ example: "ckj1a2b3c0000brnd" }),
   brandName: z.string().openapi({ example: "Acme Corp" }),
   brandImgUrl: z
-    .string()
     .url()
     .optional()
     .openapi({ example: "https://example.com/logo.png" }),
