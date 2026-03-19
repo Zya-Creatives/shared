@@ -14,14 +14,22 @@ import type {
   ActivityType,
   ActivityParentType,
 } from "../constants";
-import { ProjectEntitySchema } from "./project";
+import { ProjectEntitySchema, ProjectSearchDocumentSchema } from "./project";
 import { BookmarkEntitySchema } from "./bookmark";
 import { LikeEntitySchema } from "./like";
 import { BrandEntitySchema } from "./brand";
 import { CreativeEntitySchema } from "./creative";
 import { InvestorEntitySchema } from "./investor";
-import { PostEntitySchema, PostWithFilesEntitySchema } from "./post";
+import {
+  FeedPostEntitySchema,
+  PostEntitySchema,
+  PostWithFilesEntitySchema,
+} from "./post";
 import { JobEntitySchema, JobSearchDocumentSchema } from "./job";
+
+// ==========================================
+// 1. CORE USER ENTITIES
+// ==========================================
 
 export const UserEntitySchema = z
   .object({
@@ -68,14 +76,6 @@ export const MinimalUserSchema = UserEntitySchema.pick({
   role: true,
 }).openapi("MinimalUser");
 
-export const UserStatsEntitySchema = z.object({
-  followerCount: z.int().openapi({ example: 1540 }),
-  followingCount: z.int().openapi({ example: 234 }),
-  followingIds: z
-    .array(z.cuid2())
-    .openapi({ example: ["cksd0v6q0000s9a5y8z7p3x9", "clm1a2b3c0000abc"] }),
-});
-
 export const UserProfileEntitySchema = UserEntitySchema.extend({
   profileType: z
     .enum(["creative", "brand", "investor"])
@@ -86,6 +86,18 @@ export const UserProfileEntitySchema = UserEntitySchema.extend({
   investor: InvestorEntitySchema,
 }).openapi("UserProfileEntity");
 
+export const UserStatsEntitySchema = z.object({
+  followerCount: z.int().openapi({ example: 1540 }),
+  followingCount: z.int().openapi({ example: 234 }),
+  followingIds: z
+    .array(z.cuid2())
+    .openapi({ example: ["cksd0v6q0000s9a5y8z7p3x9", "clm1a2b3c0000abc"] }),
+});
+
+// ==========================================
+// 2. CONTENT ASSOCIATIONS (Projects, Posts)
+// ==========================================
+
 export const UserWithProjectsEntitySchema = z
   .object({
     userId: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
@@ -94,6 +106,17 @@ export const UserWithProjectsEntitySchema = z
       .openapi({ example: [] }),
   })
   .openapi("UserWithProjectsEntity");
+
+export const UserWithPostsEntitySchema = z
+  .object({
+    userId: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
+    posts: z.array(PostWithFilesEntitySchema).openapi({ example: [] }),
+  })
+  .openapi("UserWithPostsEntity");
+
+// ==========================================
+// 3. LIKES
+// ==========================================
 
 export const UserWithProjectLikesEntitySchema = z.object({
   userId: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
@@ -122,25 +145,6 @@ export const UserWithPostLikesEntitySchema = z.object({
         post: PostEntitySchema.pick({
           id: true,
           parentId: true,
-          title: true, // Note: Make sure 'title' exists on PostEntitySchema in your post.ts!
-          content: true,
-          tags: true,
-          createdAt: true,
-          updatedAt: true, // Note: Make sure 'updatedAt' exists on PostEntitySchema as well!
-        }),
-      }),
-    )
-    .openapi({ example: [] }),
-});
-
-export const UserWithPostBookmarksEntitySchema = z.object({
-  userId: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
-  postBookmarks: z
-    .array(
-      BookmarkEntitySchema.extend({
-        post: PostEntitySchema.pick({
-          id: true,
-          parentId: true,
           title: true,
           content: true,
           tags: true,
@@ -152,13 +156,21 @@ export const UserWithPostBookmarksEntitySchema = z.object({
     .openapi({ example: [] }),
 });
 
+// ==========================================
+// 4. BOOKMARKS
+// ==========================================
+
 export const UserWithJobBookmarksEntitySchema = z.object({
   userId: z.cuid2().openapi({ example: "afoaifaofi" }),
-  jobBookmarks: z.array(
-    BookmarkEntitySchema.extend({
-      job: JobSearchDocumentSchema,
-    }),
-  ).optional(),
+  jobBookmarks: z
+    .array(
+      BookmarkEntitySchema.extend({
+        job: JobSearchDocumentSchema.extend({
+          isBookmarked: z.boolean().default(true),
+        }),
+      }),
+    )
+    .optional(),
 });
 
 export const UserWithJobBookmarksInputSchema = z.object({
@@ -177,30 +189,40 @@ export const UserWithProjectBookmarksEntitySchema = z
     projectBookmarks: z
       .array(
         BookmarkEntitySchema.extend({
-          project: ProjectEntitySchema.pick({
-            id: true,
-            title: true,
-            description: true,
-            tags: true,
-            startDate: true,
-            endDate: true,
-            imagePlaceholderUrl: true,
-          }),
+          project: ProjectSearchDocumentSchema,
         }),
       )
       .openapi({ example: [] }),
   })
   .openapi("UserWithProjectBookmarksEntity");
 
-export const GetUserFollowingInputSchema = z.object({
-  searchQuery: z.string().optional().openapi({ example: "design systems" }),
-  offset: z.number().int().nonnegative().optional().openapi({ example: 20 }),
+export const UserWithPostBookmarksEntitySchema = z.object({
+  userId: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
+  postBookmarks: z.array(
+    BookmarkEntitySchema.extend({
+      post: PostWithFilesEntitySchema,
+    }),
+  ),
 });
 
-export const GetUserFollowersInputSchema = z.object({
-  searchQuery: z.string().optional().openapi({ example: "design systems" }),
-  offset: z.number().int().nonnegative().optional().openapi({ example: 20 }),
+export const GetUserWithProjectBookmarksInputSchema =
+  UserWithJobBookmarksInputSchema;
+export const GetUserWithPostBookmarksInputSchema =
+  UserWithJobBookmarksInputSchema;
+
+export const GetUserWithProjectBookmarksOutputSchema = z.object({
+  bookmarks: UserWithProjectBookmarksEntitySchema,
+  nextCursor: z.string().nullable(),
 });
+
+export const GetUserWithPostBookmarksOutputSchema = z.object({
+  bookmarks: UserWithPostBookmarksEntitySchema,
+  nextCursor: z.string().nullable(),
+});
+
+// ==========================================
+// 5. FOLLOWERS & FOLLOWING
+// ==========================================
 
 export const UserWithFollowingEntitySchema = MinimalUserSchema.extend({
   following: z
@@ -230,16 +252,14 @@ export const UserWithFollowersEntitySchema = MinimalUserSchema.extend({
     }),
 }).openapi("UserWithFollowersEntity");
 
-export const GetUserFollowersOutputSchema = z.object({
-  nextCursor: z.string().openapi({ example: "cksd0v6q0000nxtcur" }),
-  followers: z
-    .array(
-      MinimalUserSchema.extend({
-        isFollowing: z.boolean().optional().openapi({ example: false }),
-        followsYou: z.boolean().optional().openapi({ example: true }),
-      }),
-    )
-    .openapi({ example: [] }),
+export const GetUserFollowingInputSchema = z.object({
+  searchQuery: z.string().optional().openapi({ example: "design systems" }),
+  offset: z.number().int().nonnegative().optional().openapi({ example: 20 }),
+});
+
+export const GetUserFollowersInputSchema = z.object({
+  searchQuery: z.string().optional().openapi({ example: "design systems" }),
+  offset: z.number().int().nonnegative().optional().openapi({ example: 20 }),
 });
 
 export const GetUserFollowingOutputSchema = z.object({
@@ -254,12 +274,21 @@ export const GetUserFollowingOutputSchema = z.object({
     .openapi({ example: [] }),
 });
 
-export const UserWithPostsEntitySchema = z
-  .object({
-    userId: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
-    posts: z.array(PostWithFilesEntitySchema).openapi({ example: [] }),
-  })
-  .openapi("UserWithPostsEntity");
+export const GetUserFollowersOutputSchema = z.object({
+  nextCursor: z.string().openapi({ example: "cksd0v6q0000nxtcur" }),
+  followers: z
+    .array(
+      MinimalUserSchema.extend({
+        isFollowing: z.boolean().optional().openapi({ example: false }),
+        followsYou: z.boolean().optional().openapi({ example: true }),
+      }),
+    )
+    .openapi({ example: [] }),
+});
+
+// ==========================================
+// 6. AUTHENTICATED USER OUTPUTS
+// ==========================================
 
 export const GetAuthenticatedUserOutputSchema = UserEntitySchema;
 export const GetAuthenticatedUserProfileOutputSchema = UserProfileEntitySchema;
@@ -267,12 +296,16 @@ export const GetAuthenticatedUserWithProjectsOutputSchema =
   UserWithProjectsEntitySchema;
 export const GetAuthenticatedUserWithProjectBookmarksOutputSchema =
   UserWithProjectBookmarksEntitySchema;
+export const GetAuthenticatedUserWithProjectLikesOutputSchema =
+  UserWithProjectLikesEntitySchema;
 export const GetAuthenticatedUserWithUserFollowingOutputSchema =
   UserWithFollowingEntitySchema;
 export const GetAuthenticatedUserWithUserFollowersOutputSchema =
   UserWithFollowersEntitySchema;
-export const GetAuthenticatedUserWithProjectLikesOutputSchema =
-  UserWithProjectLikesEntitySchema;
+
+// ==========================================
+// 7. ACTIVITY
+// ==========================================
 
 export const GetUserActivityInputSchema = z.object({
   activityType: z
@@ -295,6 +328,10 @@ export const GetUserActivityOutputSchema = z
     }),
   )
   .openapi({ example: [] });
+
+// ==========================================
+// 8. SEARCH
+// ==========================================
 
 export const SearchUsersInputSchema = z.object({
   query: z.string().default("").openapi({
