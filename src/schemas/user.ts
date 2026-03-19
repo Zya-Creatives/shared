@@ -211,7 +211,11 @@ export const GetUserWithPostBookmarksInputSchema =
   UserWithJobBookmarksInputSchema;
 
 export const GetUserWithProjectBookmarksOutputSchema = z.object({
-  bookmarks: UserWithProjectBookmarksEntitySchema,
+  bookmarks: z.array(
+    BookmarkEntitySchema.extend({
+      post: FeedPostEntitySchema,
+    }),
+  ),
   nextCursor: z.string().nullable(),
 });
 
