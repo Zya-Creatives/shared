@@ -5,6 +5,11 @@ export const ROLES = {
   ADMIN: "ADMIN",
 } as const;
 
+export type PaystackBank = {
+  name: string;
+  code: string;
+};
+
 export const USER_STATUSES = {
   ACTIVE: "ACTIVE",
   SUSPENDED: "SUSPENDED",
@@ -22,6 +27,18 @@ export const EXPERIENCE_LEVELS = {
   YEAR_1_3: "1-3 years",
   YEAR_3_5: "3-5 years",
   YEAR_5_PLUS: "5+ years",
+} as const;
+
+export const SELLER_STATUS = {
+  ACTIVE: "ACTIVE",
+  PENDING: "PENDING",
+  SUSPENDED: "SUSPENDED",
+} as const;
+
+export const PAYMENT_METHOD_STATUS = {
+  VERIFIED: "VERIFIED",
+  PENDING: "PENDING",
+  REJECTED: "REJECTED",
 } as const;
 
 export const ONBOARDING_PAGES = {
@@ -291,6 +308,16 @@ export const SIGNAL_STATUS = {
   ARCHIVED: "ARCHIVED",
 } as const;
 
+export const COUNTRY_OF_OPERATION = {
+  NG: "NG",
+  GB: "GB",
+} as const;
+
+export const GATEWAY_PROVIDER = {
+  PAYSTACK: "PAYSTACK",
+  STRIPE: "STRIPE",
+} as const;
+
 export type SignalInterestType =
   (typeof SIGNAL_INTEREST_TYPES)[keyof typeof SIGNAL_INTEREST_TYPES];
 export type SignalStatus = (typeof SIGNAL_STATUS)[keyof typeof SIGNAL_STATUS];
@@ -339,7 +366,13 @@ export type InvestorVerificationDocumentType =
 export type VentureStage = (typeof VENTURE_STAGES)[keyof typeof VENTURE_STAGES];
 export type ProjectStatus =
   (typeof PROJECT_STATUS)[keyof typeof PROJECT_STATUS];
-
+export type SellerStatus = (typeof SELLER_STATUS)[keyof typeof SELLER_STATUS];
+export type CountryOfOperation =
+  (typeof COUNTRY_OF_OPERATION)[keyof typeof COUNTRY_OF_OPERATION];
+export type GatewayProvider =
+  (typeof GATEWAY_PROVIDER)[keyof typeof GATEWAY_PROVIDER];
+export type PaymentMethodStatus =
+  (typeof PAYMENT_METHOD_STATUS)[keyof typeof PAYMENT_METHOD_STATUS];
 export const API_ROUTES = {
   healthCheck: "/health",
   username: {

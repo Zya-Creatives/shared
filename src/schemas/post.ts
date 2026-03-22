@@ -33,10 +33,7 @@ export const PostEntitySchema = z.object({
     .openapi({
       example: [{ name: "javascript", id: 101 }],
     }),
-  badge: z
-    .enum(POST_BADGE_TYPES)
-    .optional()
-    .openapi({ example: "FEATURED" }),
+  badge: z.enum(POST_BADGE_TYPES).optional().openapi({ example: "FEATURED" }),
   userId: z
     .cuid2()
     .openapi({ description: "User id", example: "ckj1a2b3c0000def" }),
@@ -44,10 +41,7 @@ export const PostEntitySchema = z.object({
     .string()
     .optional()
     .openapi({ description: "Username", example: "dev_guru" }),
-  creatorFullName: z
-    .string()
-    .optional()
-    .openapi({ example: "Jane Doe" }),
+  creatorFullName: z.string().optional().openapi({ example: "Jane Doe" }),
   creatorImageUrl: z
     .cuid2()
     .optional()
@@ -72,8 +66,7 @@ export const PostEntitySchema = z.object({
     example: "PROJECT",
   }),
 
-  createdAt: z
-    .coerce
+  createdAt: z.coerce
     .date()
     .optional()
     .openapi({ example: "2026-03-11T14:43:09Z" }),
@@ -107,14 +100,17 @@ export const PostFileEntitySchema = z
   .object({
     id: z
       .cuid2()
-      .openapi({ description: "CUID2 of the project file record.", example: "cxy1a2b3c0000qwe" }),
+      .openapi({
+        description: "CUID2 of the project file record.",
+        example: "cxy1a2b3c0000qwe",
+      }),
     postId: z.cuid2().openapi({
       description: "CUID2 of the post this file belongs to.",
       example: "ckj1a2b3c0000xyz",
     }),
-    fileId: z.cuid2().openapi({ 
-      description: "CUID2 of the linked file.", 
-      example: "cvb1a2b3c0000rty" 
+    fileId: z.cuid2().openapi({
+      description: "CUID2 of the linked file.",
+      example: "cvb1a2b3c0000rty",
     }),
     order: z.number().int().openapi({
       description: "Order index of the file in the project.",
@@ -134,7 +130,7 @@ export const PostWithFilesEntitySchema = PostEntitySchema.extend({
       }),
     )
     .optional()
-    .openapi({ 
+    .openapi({
       description: "Files associated with the project.",
       example: [
         {
@@ -142,9 +138,9 @@ export const PostWithFilesEntitySchema = PostEntitySchema.extend({
           postId: "ckj1a2b3c0000xyz",
           fileId: "cvb1a2b3c0000rty",
           order: 1,
-          url: "https://cdn.example.com/image.png"
-        }
-      ]
+          url: "https://cdn.example.com/image.png",
+        },
+      ],
     }),
 });
 
@@ -185,19 +181,26 @@ export const CreatePostInputSchema = z.object({
     )
     .max(5, { message: "Cannot attach more than 5 files" })
     .optional()
-    .openapi({ 
-      example: [{ fileId: "cvb1a2b3c0000rty", order: 1 }] 
+    .openapi({
+      example: [{ fileId: "cvb1a2b3c0000rty", order: 1 }],
     }),
 
   tags: z
-    .array(z.string().min(1, { message: "Tag cannot be empty" }).openapi({ example: "react" }))
+    .array(
+      z
+        .string()
+        .min(1, { message: "Tag cannot be empty" })
+        .openapi({ example: "react" }),
+    )
     .max(3, { message: "Cannot add more than 3 tags" })
     .optional()
     .openapi({ example: ["react", "frontend"] }),
   badge: z.enum(POST_BADGE_TYPES).optional().openapi({ example: "TRENDING" }),
   linkMeta: z
     .object({
-      url: z.url({ message: "Invalid URL format" }).openapi({ example: "https://example.com" }),
+      url: z
+        .url({ message: "Invalid URL format" })
+        .openapi({ example: "https://example.com" }),
       title: z
         .string()
         .max(200, { message: "Title cannot exceed 200 characters" })
@@ -210,7 +213,10 @@ export const CreatePostInputSchema = z.object({
         })
         .optional()
         .openapi({ example: "This is an example link" }),
-      image: z.url({ message: "Invalid image URL" }).optional().openapi({ example: "https://example.com/preview.jpg" }),
+      image: z
+        .url({ message: "Invalid image URL" })
+        .optional()
+        .openapi({ example: "https://example.com/preview.jpg" }),
     })
     .optional()
     .openapi({
@@ -226,8 +232,8 @@ export const CreatePostInputSchema = z.object({
 
 export const CreatePostOutputSchema = PostEntitySchema;
 export const GetPostOutputSchema = PostWithFilesEntitySchema;
-export const PostIdSchema = z.object({ 
-  postId: z.cuid2().openapi({ example: "ckj1a2b3c0000xyz" }) 
+export const PostIdSchema = z.object({
+  postId: z.cuid2().openapi({ example: "ckj1a2b3c0000xyz" }),
 });
 
 export const MinimalPostSchema = PostEntitySchema.pick({
@@ -237,18 +243,24 @@ export const MinimalPostSchema = PostEntitySchema.pick({
 });
 
 export const PostWithLikesEntitySchema = MinimalPostSchema.extend({
-  likes: z.array(
-    ActivitySchema.extend({
-      followsYou: z.boolean().optional().openapi({ example: true }),
-      isFollowing: z.boolean().optional().openapi({ example: false }),
-    }),
-  ).openapi({ example: [] }),
+  likes: z
+    .array(
+      ActivitySchema.extend({
+        followsYou: z.boolean().optional().openapi({ example: true }),
+        isFollowing: z.boolean().optional().openapi({ example: false }),
+      }),
+    )
+    .openapi({ example: [] }),
 }).openapi({
   title: "PostWithPostLikesEntity",
 });
 
 export const GetPostWithLikesOutputSchema = PostWithLikesEntitySchema.extend({
-  nextCursor: z.string().optional().nullable().openapi({ example: "ckj1a2b3c0000nxt" }),
+  nextCursor: z
+    .string()
+    .optional()
+    .nullable()
+    .openapi({ example: "ckj1a2b3c0000nxt" }),
 });
 
 export const PostWithCommentsEntitySchema = MinimalPostSchema.extend({
@@ -259,7 +271,11 @@ export const PostWithCommentsEntitySchema = MinimalPostSchema.extend({
 
 export const GetPostWithCommentsOutputSchema =
   PostWithCommentsEntitySchema.extend({
-    nextCursor: z.string().optional().nullable().openapi({ example: "ckj1a2b3c0000nxt" }),
+    nextCursor: z
+      .string()
+      .optional()
+      .nullable()
+      .openapi({ example: "ckj1a2b3c0000nxt" }),
   });
 
 export const PostWithBookmarksEntitySchema = MinimalPostSchema.extend({
@@ -274,14 +290,23 @@ export const GetPostWithBookmarksOutputSchema =
   });
 
 export const LinkPreviewInputSchema = z.object({
-  url: z.url().openapi({ example: "https://example.com/article" }), 
+  url: z.url().openapi({ example: "https://example.com/article" }),
 });
 
 export const LinkPreviewOutputSchema = z.object({
   title: z.string().openapi({ example: "Great Article" }),
-  description: z.string().optional().openapi({ example: "A detailed breakdown of the topic." }),
-  image: z.string().optional().openapi({ example: "https://example.com/hero.jpg" }),
-  url: z.string().optional().openapi({ example: "https://example.com/article" }),
+  description: z
+    .string()
+    .optional()
+    .openapi({ example: "A detailed breakdown of the topic." }),
+  image: z
+    .string()
+    .optional()
+    .openapi({ example: "https://example.com/hero.jpg" }),
+  url: z
+    .string()
+    .optional()
+    .openapi({ example: "https://example.com/article" }),
 });
 
 export const FeedPostEntitySchema = PostWithFilesEntitySchema.extend({
@@ -299,7 +324,11 @@ export const GetFeedInputSchema = z.object({
 
 export const GetFeedOutputSchema = z.object({
   feed: z.array(FeedPostEntitySchema).openapi({ example: [] }),
-  nextCursor: z.string().optional().nullable().openapi({ example: "ckj1a2b3c0000nxt" }),
+  nextCursor: z
+    .string()
+    .optional()
+    .nullable()
+    .openapi({ example: "ckj1a2b3c0000nxt" }),
 });
 
 export const SearchPostInputSchema = z.object({
@@ -313,7 +342,11 @@ export const SearchPostInputSchema = z.object({
 
 export const SearchPostOutputSchema = z.object({
   posts: z.array(FeedPostEntitySchema).openapi({ example: [] }),
-  nextCursor: z.string().optional().nullable().openapi({ example: "ckj1a2b3c0000nxt" }),
+  nextCursor: z
+    .string()
+    .optional()
+    .nullable()
+    .openapi({ example: "ckj1a2b3c0000nxt" }),
 });
 
 export const ReportPostInputSchema = z.object({
@@ -341,8 +374,12 @@ export const PostAnalyticsOutputSchema = z.object({
     comments: z.number().openapi({ example: 34 }),
     linkCopied: z.number().openapi({ example: 12 }),
     bookmarks: z.number().openapi({ example: 56 }),
-    tagsClicked: z.array(AnalyticsChartItemSchema).openapi({ example: [{ x: "javascript", y: 25 }] }),
-    platformShares: z.array(AnalyticsChartItemSchema).openapi({ example: [{ x: "Twitter", y: 10 }] }),
+    tagsClicked: z
+      .array(AnalyticsChartItemSchema)
+      .openapi({ example: [{ x: "javascript", y: 25 }] }),
+    platformShares: z
+      .array(AnalyticsChartItemSchema)
+      .openapi({ example: [{ x: "Twitter", y: 10 }] }),
   }),
   behavior: z.object({
     viralityScore: z.number().openapi({ example: 8.5 }),
@@ -359,44 +396,65 @@ export const PostAnalyticsOutputSchema = z.object({
   }),
 });
 
-
-export const PostSearchDocumentSchema = z.object({
-  id: z.cuid2().openapi({ example: "ckj1a2b3c0000doc" }),
-  userId: z.cuid2().openapi({ example: "ckj1a2b3c0000usr" }),
-  parentId: z.cuid2().nullable().openapi({ example: "ckj1a2b3c0000prt" }),
-  parentType: z.enum(ACTIVITY_PARENT_TYPES).openapi({ example: "POST" }),
-  creatorUsername: z.string().nullable().openapi({ example: "tech_lead" }),
-  creatorFullName: z.string().nullable().openapi({ example: "Alex Smith" }),
-  creatorImageUrl: z.cuid2().nullable().openapi({ example: "clm1a2b3c0000pic" }),
-  tagIds: z.array(z.number()).openapi({ example: [101, 102] }),
-  tagNames: z.array(z.string()).openapi({ example: ["react", "typescript"] }),
-  badge: z.enum(POST_BADGE_TYPES).nullable().openapi({ example: "TRENDING" }),
-  postType: z.enum(POST_TYPES).openapi({ example: "PROJECT" }),
-  content: z.string().nullable().openapi({ example: "Here is my latest open source tool." }),
-  linkTitle: z.string().nullable().openapi({ example: "GitHub Repo" }),
-  linkDescription: z.string().nullable().openapi({ example: "A fast, modern build system." }),
-  linkUrl: z.url().nullable().openapi({ example: "https://github.com/project" }),
-  linkImage: z.url().nullable().openapi({ example: "https://github.com/image.png" }),
-  postFiles: z
-    .array(
-      PostFileEntitySchema.extend({
-        url: z.url().openapi({ example: "https://cdn.example.com/file1.png" }),
+export const PostSearchDocumentSchema = z
+  .object({
+    id: z.cuid2().openapi({ example: "ckj1a2b3c0000doc" }),
+    userId: z.cuid2().openapi({ example: "ckj1a2b3c0000usr" }),
+    parentId: z.cuid2().nullable().openapi({ example: "ckj1a2b3c0000prt" }),
+    parentType: z.enum(ACTIVITY_PARENT_TYPES).openapi({ example: "POST" }),
+    creatorUsername: z.string().nullable().openapi({ example: "tech_lead" }),
+    creatorFullName: z.string().nullable().openapi({ example: "Alex Smith" }),
+    creatorImageUrl: z
+      .cuid2()
+      .nullable()
+      .openapi({ example: "clm1a2b3c0000pic" }),
+    tagIds: z.array(z.number()).openapi({ example: [101, 102] }),
+    tagNames: z.array(z.string()).openapi({ example: ["react", "typescript"] }),
+    badge: z.enum(POST_BADGE_TYPES).nullable().openapi({ example: "TRENDING" }),
+    postType: z.enum(POST_TYPES).openapi({ example: "PROJECT" }),
+    content: z
+      .string()
+      .nullable()
+      .openapi({ example: "Here is my latest open source tool." }),
+    linkTitle: z.string().nullable().openapi({ example: "GitHub Repo" }),
+    linkDescription: z
+      .string()
+      .nullable()
+      .openapi({ example: "A fast, modern build system." }),
+    linkUrl: z
+      .url()
+      .nullable()
+      .openapi({ example: "https://github.com/project" }),
+    linkImage: z
+      .url()
+      .nullable()
+      .openapi({ example: "https://github.com/image.png" }),
+    postFiles: z
+      .array(
+        PostFileEntitySchema.extend({
+          url: z
+            .url()
+            .openapi({ example: "https://cdn.example.com/file1.png" }),
+        }),
+      )
+      .nullable()
+      .openapi({
+        example: [
+          {
+            id: "cxy1a2b3c0000qwe",
+            postId: "ckj1a2b3c0000doc",
+            fileId: "cvb1a2b3c0000rty",
+            order: 1,
+            url: "https://cdn.example.com/file1.png",
+          },
+        ],
       }),
-    )
-    .nullable()
-    .openapi({
-      example: [
-        {
-          id: "cxy1a2b3c0000qwe",
-          postId: "ckj1a2b3c0000doc",
-          fileId: "cvb1a2b3c0000rty",
-          order: 1,
-          url: "https://cdn.example.com/file1.png",
-        },
-      ],
-    }),
-  createdAt: z.string().nullable().openapi({ example: "2026-03-11T14:43:09.000Z" }),
-}).openapi({
-  title: "Post Search Document",
-  description: "Flattened schema used for indexing posts in search engines.",
-});
+    createdAt: z
+      .string()
+      .nullable()
+      .openapi({ example: "2026-03-11T14:43:09.000Z" }),
+  })
+  .openapi({
+    title: "Post Search Document",
+    description: "Flattened schema used for indexing posts in search engines.",
+  });
