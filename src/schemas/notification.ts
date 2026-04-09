@@ -9,7 +9,6 @@ export const NotificationEntitySchema = z
         actorId: z.cuid2().openapi({ example: "user_actor_456" }),
         type: z.enum(NOTIFICATION_TYPES).openapi({ example: "LIKE" }),
         entityId: z.cuid2().optional().openapi({ example: "entity_789" }),
-
         parentId: z
             .cuid2()
             .optional()

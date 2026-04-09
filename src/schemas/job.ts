@@ -25,14 +25,11 @@ const JobSectionEnum = z
   .enum(Object.values(JOB_SECTIONS) as [string, ...string[]])
   .openapi({ example: "PROFESSIONAL_INFORMATION" });
 
-export const MinimalJobEntitySchema = z.object({
-  id: z.cuid2().openapi({ example: "ckj1a2b3c0000job1" }),
-  title: z.string().openapi({ example: "Senior Frontend Engineer" }),
-  brandId: z.cuid2().openapi({ example: "ckj1a2b3c0000brnd" }),
-  jobType: z
-    .enum(Object.values(JOB_TYPE) as [JobType, ...JobType[]])
-    .openapi({ example: "ROLE" }),
+export const JobIdSchema = z.object({
+  jobId: z.cuid2().openapi({ example: "ckj1a2b3c0000job1" }),
 });
+
+export type JobIdInput = z.infer<typeof JobIdSchema>;
 
 export const BaseJobEntitySchema = z.object({
   id: z.cuid2().openapi({ example: "ckj1a2b3c0000job1" }),
@@ -76,60 +73,24 @@ export const BaseJobEntitySchema = z.object({
         "COVER_LETTER",
       ],
     }),
-  createdAt: z.date().openapi({ example: "2026-03-11T09:00:00.000Z" }),
-  version: z.int().openapi({ example: 1 }),
-  updatedAt: z.date().openapi({ example: "2026-03-11T09:00:00.000Z" }),
+  createdAt: z.date().openapi({ example: "2026-04-09T12:00:00.000Z" }),
+  version: z.number().int().openapi({ example: 1 }),
+  updatedAt: z.date().openapi({ example: "2026-04-09T12:00:00.000Z" }),
 });
 
-export const JobIdSchema = z.object({
-  jobId: z.cuid2().openapi({ example: "ckj1a2b3c0000job1" }),
-});
+export type BaseJobEntity = z.infer<typeof BaseJobEntitySchema>;
 
-export const JobEntitySchema = z.object({
-  id: z.cuid2().openapi({ example: "ckj1a2b3c0000job1" }),
-  title: z.string().openapi({ example: "Senior Frontend Engineer" }),
-  brandId: z.cuid2().openapi({ example: "ckj1a2b3c0000brnd" }),
+export const JobEntitySchema = BaseJobEntitySchema.extend({
   brandName: z.string().openapi({ example: "Acme Corp" }),
+  isApplied: z.boolean().default(false).optional(),
   brandImgUrl: z
     .url()
     .optional()
     .openapi({ example: "https://example.com/logo.png" }),
-  jobType: z
-    .enum(Object.values(JOB_TYPE) as [JobType, ...JobType[]])
-    .openapi({ example: "ROLE" }),
-  status: z
-    .enum(Object.values(JOB_STATUS) as [JobStatus, ...JobStatus[]])
-    .openapi({ example: "OPEN" }),
-  employmentType: z
-    .enum(
-      Object.values(EMPLOYMENT_TYPE) as [EmploymentType, ...EmploymentType[]],
-    )
-    .optional()
-    .openapi({ example: "FULL_TIME" }),
-  workMode: z
-    .enum(Object.values(WORK_MODE) as [WorkMode, ...WorkMode[]])
-    .openapi({ example: "REMOTE" }),
-  gigType: z
-    .enum(Object.values(GIG_TYPE) as [GigType, ...GigType[]])
-    .optional()
-    .openapi({ example: "PROJECT_BASED" }),
-  location: z
-    .enum(Object.values(JOB_LOCATIONS) as [JobLocation, ...JobLocation[]])
-    .openapi({ example: "LAGOS" }),
-  jobSections: z
-    .array(JobSectionEnum)
-    .default([
-      JOB_SECTIONS.PERSONAL_INFORMATION,
-      JOB_SECTIONS.PROFESSIONAL_INFORMATION,
-      JOB_SECTIONS.RESUME,
-      JOB_SECTIONS.COVER_LETTER,
-    ])
-    .openapi({ example: ["PERSONAL_INFORMATION", "RESUME"] }),
   isBookmarked: z.boolean().openapi({ example: false }),
-  createdAt: z.date().openapi({ example: "2026-03-11T09:00:00.000Z" }),
-  version: z.int().openapi({ example: 1 }),
-  updatedAt: z.date().openapi({ example: "2026-03-11T09:00:00.000Z" }),
 });
+
+export type JobEntity = z.infer<typeof JobEntitySchema>;
 
 export const GigJobEntitySchema = z.object({
   id: z.cuid2().openapi({ example: "ckj1a2b3c0000gig1" }),
@@ -151,8 +112,8 @@ export const GigJobEntitySchema = z.object({
   requiredSkills: z
     .array(z.string())
     .openapi({ example: ["Figma", "UI Design"] }),
-  wagesMin: z.number().optional().openapi({ example: 500 }),
-  wagesMax: z.number().optional().openapi({ example: 1000 }),
+  wagesMin: z.number().optional().nullable().openapi({ example: 500 }),
+  wagesMax: z.number().optional().nullable().openapi({ example: 1000 }),
   wagesCurrency: z
     .enum(Object.values(WAGES_CURRENCY) as [WagesCurrency, ...WagesCurrency[]])
     .optional()
@@ -163,9 +124,15 @@ export const GigJobEntitySchema = z.object({
     .openapi({ example: "FIXED" }),
 });
 
+export type GigJobEntity = z.infer<typeof GigJobEntitySchema>;
+
 export const JobWithGigDetailsEntitySchema = JobEntitySchema.extend(
-  GigJobEntitySchema.shape,
+  GigJobEntitySchema.omit({ id: true, jobType: true }).shape,
 );
+
+export type JobWithGigDetailsEntity = z.infer<
+  typeof JobWithGigDetailsEntitySchema
+>;
 
 export const RoleJobEntitySchema = z.object({
   id: z.cuid2().openapi({ example: "ckj1a2b3c0000rol1" }),
@@ -207,38 +174,51 @@ export const RoleJobEntitySchema = z.object({
     .openapi({ example: "YEARLY" }),
 });
 
+export type RoleJobEntity = z.infer<typeof RoleJobEntitySchema>;
+
 export const JobWithRoleDetailsEntitySchema = JobEntitySchema.extend(
-  RoleJobEntitySchema.shape,
+  RoleJobEntitySchema.omit({ id: true, jobType: true }).shape,
 );
 
+export type JobWithRoleDetailsEntity = z.infer<
+  typeof JobWithRoleDetailsEntitySchema
+>;
+
+export const NormalizedJobSchema = z.union([
+  JobWithGigDetailsEntitySchema,
+  JobWithRoleDetailsEntitySchema,
+  JobEntitySchema,
+]);
+
+export type NormalizedJobEntity = z.infer<typeof NormalizedJobSchema>;
+
 const CreateJobInputBaseSchema = z.object({
-  title: z.string().openapi({ example: "Senior Frontend Engineer" }),
+  title: z
+    .string()
+    .min(3)
+    .max(255)
+    .openapi({ example: "Senior Frontend Engineer" }),
   brandId: z.cuid2().openapi({ example: "ckj1a2b3c0000brnd" }),
   jobType: z
     .enum(Object.values(JOB_TYPE) as [JobType, ...JobType[]])
     .openapi({ example: "ROLE" }),
-
   employmentType: z
     .enum(
       Object.values(EMPLOYMENT_TYPE) as [EmploymentType, ...EmploymentType[]],
     )
     .optional()
     .openapi({ example: "FULL_TIME" }),
-
   workMode: z
     .enum(Object.values(WORK_MODE) as [WorkMode, ...WorkMode[]])
     .openapi({ example: "REMOTE" }),
-
   gigType: z
     .enum(Object.values(GIG_TYPE) as [GigType, ...GigType[]])
     .optional()
     .openapi({ example: "PROJECT_BASED" }),
-
   location: z
     .enum(Object.values(JOB_LOCATIONS) as [JobLocation, ...JobLocation[]])
     .default(JOB_LOCATIONS.REMOTE)
     .openapi({ example: "REMOTE" }),
-
   jobSections: z
     .array(JobSectionEnum)
     .min(1, { message: "At least one job section must be provided." })
@@ -254,7 +234,6 @@ export const CreateJobInputSchema = CreateJobInputBaseSchema.superRefine(
         message: "employmentType is required for ROLE jobs",
       });
     }
-
     if (data.jobType === JOB_TYPE.GIG && !data.gigType) {
       ctx.addIssue({
         path: ["gigType"],
@@ -264,58 +243,19 @@ export const CreateJobInputSchema = CreateJobInputBaseSchema.superRefine(
     }
   },
 ).transform((data) => {
-  if (data.jobType === JOB_TYPE.ROLE) {
-    return { ...data, gigType: undefined };
-  }
-
-  if (data.jobType === JOB_TYPE.GIG) {
+  if (data.jobType === JOB_TYPE.ROLE) return { ...data, gigType: undefined };
+  if (data.jobType === JOB_TYPE.GIG)
     return { ...data, employmentType: undefined };
-  }
-
   return data;
 });
 
-export const CreateRoleJobInputSchema = z
-  .object({
-    id: z.cuid2().openapi({ example: "ckj1a2b3c0000rol1" }),
-    experienceLevel: z
-      .enum(
-        Object.values(EXPERIENCE_LEVELS) as [
-          ExperienceLevel,
-          ...ExperienceLevel[],
-        ],
-      )
-      .openapi({ example: "MID_LEVEL" }),
-    overview: z
-      .string()
-      .openapi({ example: "Build cool features for our app." }),
-    keyResponsibilities: z
-      .string()
-      .openapi({ example: "Write code, review PRs." }),
-    requiredSkills: z
-      .array(z.string())
-      .openapi({ example: ["JavaScript", "React"] }),
-    employeeRequirements: z
-      .string()
-      .optional()
-      .openapi({ example: "Good communication skills." }),
-    companyBenefits: z
-      .string()
-      .optional()
-      .openapi({ example: "Unlimited PTO." }),
-    wagesMin: z.number().optional().nullable().openapi({ example: 60000 }),
-    wagesMax: z.number().optional().nullable().openapi({ example: 90000 }),
-    wagesCurrency: z
-      .enum(
-        Object.values(WAGES_CURRENCY) as [WagesCurrency, ...WagesCurrency[]],
-      )
-      .optional()
-      .openapi({ example: "USD" }),
-    wagesType: z
-      .enum(Object.values(WAGE_TYPES) as [WageTypes, ...WageTypes[]])
-      .optional()
-      .openapi({ example: "YEARLY" }),
-  })
+export type CreateJobInput = z.infer<typeof CreateJobInputSchema>;
+
+export const CreateRoleJobInputSchema = RoleJobEntitySchema.omit({
+  id: true,
+  jobType: true,
+})
+  .extend({ id: z.cuid2() })
   .refine(
     ({ wagesMin, wagesMax }) =>
       wagesMin == null || wagesMax == null || wagesMax > wagesMin,
@@ -325,39 +265,13 @@ export const CreateRoleJobInputSchema = z
     },
   );
 
-export const CreateGigJobInputSchema = z
-  .object({
-    id: z.cuid2().openapi({ example: "ckj1a2b3c0000gig1" }),
-    overview: z
-      .string()
-      .openapi({ example: "Need a logo designed for a new brand." }),
-    deliverables: z
-      .string()
-      .openapi({ example: "Vector files, PNGs, and a brand guide." }),
-    employeeRequirements: z
-      .string()
-      .optional()
-      .openapi({ example: "Portfolio required." }),
-    aboutCompany: z
-      .string()
-      .optional()
-      .openapi({ example: "E-commerce store." }),
-    requiredSkills: z
-      .array(z.string())
-      .openapi({ example: ["Graphic Design", "Illustrator"] }),
-    wagesMin: z.number().optional().nullable().openapi({ example: 100 }),
-    wagesMax: z.number().optional().nullable().openapi({ example: 500 }),
-    wagesCurrency: z
-      .enum(
-        Object.values(WAGES_CURRENCY) as [WagesCurrency, ...WagesCurrency[]],
-      )
-      .optional()
-      .openapi({ example: "USD" }),
-    wagesType: z
-      .enum(Object.values(WAGE_TYPES) as [WageTypes, ...WageTypes[]])
-      .optional()
-      .openapi({ example: "FIXED" }),
-  })
+export type CreateRoleJobInput = z.infer<typeof CreateRoleJobInputSchema>;
+
+export const CreateGigJobInputSchema = GigJobEntitySchema.omit({
+  id: true,
+  jobType: true,
+})
+  .extend({ id: z.cuid2() })
   .refine(
     ({ wagesMin, wagesMax }) =>
       wagesMin == null || wagesMax == null || wagesMax > wagesMin,
@@ -367,103 +281,79 @@ export const CreateGigJobInputSchema = z
     },
   );
 
-export const UpdateRoleJobInputSchema = CreateRoleJobInputSchema.partial()
-  .extend({ version: z.int().openapi({ example: 2 }) })
-  .required({ id: true });
-
-export const UpdateGigJobInputSchema = CreateGigJobInputSchema.partial()
-  .extend({ version: z.int().openapi({ example: 2 }) })
-  .required({ id: true });
+export type CreateGigJobInput = z.infer<typeof CreateGigJobInputSchema>;
 
 export const UpdateJobInputSchema = CreateJobInputBaseSchema.partial().extend({
   id: z.cuid2().openapi({ example: "ckj1a2b3c0000job1" }),
   status: z
     .enum(Object.values(JOB_STATUS) as [JobStatus, ...JobStatus[]])
-    .optional()
-    .openapi({ example: "CLOSED" }),
-  version: z.int().openapi({ example: 2 }),
+    .optional(),
+  version: z.number().int().openapi({ example: 2 }),
 });
 
-export const NormalizedJobSchema = z.union([
-  JobWithGigDetailsEntitySchema,
-  JobEntitySchema,
-  JobWithRoleDetailsEntitySchema,
-]);
-
-export const GetCreatedJobsOutputSchema = z.object({
-  jobs: z.array(NormalizedJobSchema).openapi({ example: [] }),
-  noOfJobs: z.number().openapi({ example: 45 }),
-  noOfActiveJobs: z.number().openapi({ example: 12 }),
-  noOfArchivedJobs: z.number().openapi({ example: 33 }),
-});
+export type UpdateJobInput = z.infer<typeof UpdateJobInputSchema>;
 
 export const GetJobsInputSchema = z.object({
   q: z.string().optional().openapi({ example: "frontend engineer" }),
-  jobType: z
-    .enum(Object.values(JOB_TYPE) as [string, ...string[]])
-    .optional()
-    .openapi({ example: "ROLE" }),
-  workMode: z
-    .string()
-    .optional()
-    .describe("Comma-separated values, e.g. 'Remote,Hybrid'")
-    .openapi({ example: "Remote,Hybrid" }),
+  jobType: z.enum(Object.values(JOB_TYPE) as [string, ...string[]]).optional(),
+  workMode: z.string().optional().describe("Comma-separated values"),
   location: z
     .enum(Object.values(JOB_LOCATIONS) as [string, ...string[]])
-    .optional()
-    .openapi({ example: "LAGOS" }),
-  employmentType: z
-    .string()
-    .optional()
-    .describe("Comma-separated values, e.g. 'Full Time,Freelance'")
-    .openapi({ example: "Full Time,Freelance" }),
-  gigType: z
-    .enum(Object.values(GIG_TYPE) as [string, ...string[]])
-    .optional()
-    .openapi({ example: "PROJECT_BASED" }),
-  requiredSkills: z
-    .string()
-    .optional()
-    .describe("Comma-separated skills")
-    .openapi({ example: "React,TypeScript" }),
-  status: z.string().optional().openapi({ example: "OPEN" }),
-  page: z.coerce.number().min(1).default(1).openapi({ example: 1 }),
-  limit: z.coerce.number().min(1).max(100).default(20).openapi({ example: 20 }),
+    .optional(),
+  employmentType: z.string().optional().describe("Comma-separated values"),
+  gigType: z.enum(Object.values(GIG_TYPE) as [string, ...string[]]).optional(),
+  requiredSkills: z.string().optional().describe("Comma-separated skills"),
+  status: z.string().optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
 });
+
+export type GetJobsInput = z.infer<typeof GetJobsInputSchema>;
 
 export const GetJobsOutputSchema = z.object({
-  jobs: z.array(NormalizedJobSchema).openapi({ example: [] }),
-  total: z.number().openapi({ example: 150 }),
-  page: z.number().openapi({ example: 1 }),
-  limit: z.number().openapi({ example: 20 }),
-  totalPages: z.number().openapi({ example: 8 }),
-  hasNextPage: z.boolean().openapi({ example: true }),
-  hasPrevPage: z.boolean().openapi({ example: false }),
+  jobs: z.array(NormalizedJobSchema),
+  total: z.number(),
+  page: z.number(),
+  limit: z.number(),
+  totalPages: z.number(),
+  hasNextPage: z.boolean(),
+  hasPrevPage: z.boolean(),
 });
 
+export type GetJobsOutput = z.infer<typeof GetJobsOutputSchema>;
 
-
-export const JobSearchDocumentSchema = z.object({
-  id: z.cuid2().openapi({ example: "ckj1a2b3c0000doc" }),
-  title: z.string().openapi({ example: "Senior Frontend Engineer" }),
-  brandId: z.cuid2().openapi({ example: "ckj1a2b3c0000brnd" }),
-  brandName: z.string().openapi({ example: "Acme Corp" }),
-  brandImgUrl: z.string().nullable().optional().openapi({ example: "https://example.com/logo.png" }),
-  jobType: z.enum(["GIG", "ROLE"]).openapi({ example: "ROLE" }),
-  status: z.string().optional().openapi({ example: "OPEN" }),
-  employmentType: z.string().nullable().optional().openapi({ example: "FULL_TIME" }),
-  workMode: z.string().openapi({ example: "REMOTE" }),
-  gigType: z.string().nullable().optional().openapi({ example: "PROJECT_BASED" }),
-  location: z.string().openapi({ example: "LAGOS" }),
-  overview: z.string().openapi({ example: "Looking for a seasoned engineer to lead our product development." }),
-  requiredSkills: z.array(z.string()).openapi({ example: ["React", "TypeScript", "Next.js"] }),
-  wagesMin: z.number().nullable().optional().openapi({ example: 80000 }),
-  wagesMax: z.number().nullable().optional().openapi({ example: 120000 }),
-  wagesCurrency: z.string().nullable().optional().openapi({ example: "USD" }),
-  wagesType: z.string().nullable().optional().openapi({ example: "YEARLY" }),
-  createdAt: z.string().openapi({ example: "2026-03-11T09:00:00.000Z" }),
-  updatedAt: z.string().openapi({ example: "2026-03-11T09:00:00.000Z" }),
-}).openapi({
-  title: "Job Search Document",
-  description: "Flattened schema used for indexing jobs in search engines.",
+export const GetCreatedJobsOutputSchema = z.object({
+  jobs: z.array(NormalizedJobSchema),
+  noOfJobs: z.number(),
+  noOfActiveJobs: z.number(),
+  noOfArchivedJobs: z.number(),
 });
+
+export type GetCreatedJobsOutput = z.infer<typeof GetCreatedJobsOutputSchema>;
+
+export const JobSearchDocumentSchema = z
+  .object({
+    id: z.cuid2(),
+    title: z.string(),
+    isApplied: z.boolean().default(false).optional(),
+    brandId: z.cuid2(),
+    brandName: z.string(),
+    brandImgUrl: z.string().nullable().optional(),
+    jobType: z.enum(["GIG", "ROLE"]),
+    status: z.string().optional(),
+    employmentType: z.string().nullable().optional(),
+    workMode: z.string(),
+    gigType: z.string().nullable().optional(),
+    location: z.string(),
+    overview: z.string(),
+    requiredSkills: z.array(z.string()),
+    wagesMin: z.number().nullable().optional(),
+    wagesMax: z.number().nullable().optional(),
+    wagesCurrency: z.string().nullable().optional(),
+    wagesType: z.string().nullable().optional(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  })
+  .openapi("JobSearchDocument");
+
+export type JobSearchDocument = z.infer<typeof JobSearchDocumentSchema>;

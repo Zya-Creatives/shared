@@ -1,6 +1,6 @@
 import { z } from "@hono/zod-openapi";
-import { ProfileIdentifierSchema } from "./common";
 import { LINK_TYPES } from "../constants";
+import { ProfileIdentifierSchema } from "./common";
 import { MinimalUserSchema } from "./user";
 
 export const MinimalBrandEntitySchema = z.object({
@@ -10,7 +10,6 @@ export const MinimalBrandEntitySchema = z.object({
   bio: z.string().optional().openapi({
     example: "Leading software development firm focused on AI.",
   }),
-
   disciplines: z
     .array(z.string())
     .optional()
@@ -21,6 +20,8 @@ export const MinimalBrandEntitySchema = z.object({
     .openapi({ example: "2025-10-13T09:00:00.000Z" }),
   updatedAt: z.coerce.date().openapi({ example: "2025-10-13T09:00:00.000Z" }),
 });
+
+export type MinimalBrandEntity = z.infer<typeof MinimalBrandEntitySchema>;
 
 export const BrandEntitySchema = z
   .object({
@@ -34,7 +35,6 @@ export const BrandEntitySchema = z
       .array(z.string())
       .optional()
       .openapi({ example: ["Marketing", "Product Development"] }),
-
     links: z
       .object({
         url: z.url(),
@@ -56,6 +56,8 @@ export const BrandEntitySchema = z
   })
   .openapi("BrandEntitySchema");
 
+export type BrandEntity = z.infer<typeof BrandEntitySchema>;
+
 export const CreateBrandProfileInputSchema = z
   .object({
     brandName: z
@@ -71,6 +73,10 @@ export const CreateBrandProfileInputSchema = z
   .openapi({
     title: "create brand profile",
   });
+
+export type CreateBrandProfileInput = z.infer<
+  typeof CreateBrandProfileInputSchema
+>;
 
 export const UpdateBrandProfileInputSchema = z
   .object({
@@ -109,22 +115,36 @@ export const UpdateBrandProfileInputSchema = z
     title: "update brand profile",
   });
 
+export type UpdateBrandProfileInput = z.infer<
+  typeof UpdateBrandProfileInputSchema
+>;
+
 export const GetBrandInputSchema = z.object({
   value: z.cuid2(),
   by: ProfileIdentifierSchema.shape.by,
 });
 
+export type GetBrandInput = z.infer<typeof GetBrandInputSchema>;
+
 export const GetBrandQuerySchema = ProfileIdentifierSchema;
 
 export const CreateBrandOutputSchema = BrandEntitySchema;
 
+export type CreateBrandOutput = z.infer<typeof CreateBrandOutputSchema>;
+
 export const GetBrandOutputSchema = BrandEntitySchema;
 
+export type GetBrandOutput = z.infer<typeof GetBrandOutputSchema>;
+
 export const UpdateBrandOutputSchema = BrandEntitySchema;
+
+export type UpdateBrandOutput = z.infer<typeof UpdateBrandOutputSchema>;
 
 export const BrandWithUserEntitySchema = MinimalBrandEntitySchema.extend({
   user: MinimalUserSchema,
 });
+
+export type BrandWithUserEntity = z.infer<typeof BrandWithUserEntitySchema>;
 
 export const SearchBrandInputSchema = z.object({
   string: z
@@ -140,7 +160,11 @@ export const SearchBrandInputSchema = z.object({
   cursor: z.string().optional(),
 });
 
+export type SearchBrandInput = z.infer<typeof SearchBrandInputSchema>;
+
 export const SearchBrandOutputSchema = z.object({
   brands: z.array(BrandWithUserEntitySchema),
   nextCursor: z.string().optional().nullable(),
 });
+
+export type SearchBrandOutput = z.infer<typeof SearchBrandOutputSchema>;

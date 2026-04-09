@@ -1,17 +1,40 @@
 import { z } from "@hono/zod-openapi";
 import {
   EXPERIENCE_LEVELS,
-  ExperienceLevel,
+  type ExperienceLevel,
   GEOGRAPHIC_FOCUS,
-  GeographicFocus,
+  type GeographicFocus,
   INVESTMENT_SIZES,
-  InvestmentSize,
+  type InvestmentSize,
   INVESTOR_TYPES,
-  InvestorType,
+  type InvestorType,
   LINK_TYPES,
 } from "../constants";
 import { CuidSchema, ProfileIdentifierSchema } from "./common";
 import { MinimalUserSchema } from "./user";
+
+const WebsiteUrlInputSchema = z
+  .string()
+  .transform((val) => {
+    if (!val) return val;
+    if (val.startsWith("http://") || val.startsWith("https://")) {
+      return val;
+    }
+    return `https://${val}`;
+  })
+  .pipe(z.url("Invalid URL").or(z.literal("")))
+  .optional();
+
+const InvestorLinkSchema = z.object({
+  url: z.union([z.url({ message: "Please enter a valid URL" }), z.literal("")]),
+  type: z.enum(LINK_TYPES),
+});
+
+const InvestorAchievementSchema = z.object({
+  title: z.string(),
+  link: z.string().optional(),
+  year: z.coerce.number().int().optional(),
+});
 
 export const MinimalInvestorEntitySchema = z.object({
   id: z.cuid2().openapi({ example: "inv_cksd0v6q0000s9a5y8z7p3x9" }),
@@ -71,6 +94,8 @@ export const MinimalInvestorEntitySchema = z.object({
     .openapi({ example: "2025-10-13T09:00:00.000Z" }),
 });
 
+export type MinimalInvestorEntity = z.infer<typeof MinimalInvestorEntitySchema>;
+
 export const InvestorEntitySchema = z
   .object({
     id: z.cuid2().openapi({ example: "inv_cksd0v6q0000s9a5y8z7p3x9" }),
@@ -115,24 +140,8 @@ export const InvestorEntitySchema = z
       .url()
       .optional()
       .openapi({ example: "https://investorpartners.com" }),
-    links: z
-      .object({
-        url: z.union([
-          z.url({ message: "Please enter a valid URL" }),
-          z.literal(""),
-        ]),
-        type: z.enum(LINK_TYPES),
-      })
-      .array()
-      .optional(),
-    achievements: z
-      .object({
-        title: z.string(),
-        link: z.string().optional(),
-        year: z.coerce.number().int().optional(),
-      })
-      .array()
-      .optional(),
+    links: z.array(InvestorLinkSchema).optional(),
+    achievements: z.array(InvestorAchievementSchema).optional(),
     disciplines: z
       .array(z.string())
       .optional()
@@ -149,23 +158,19 @@ export const InvestorEntitySchema = z
   })
   .openapi("InvestorEntity");
 
+export type InvestorEntity = z.infer<typeof InvestorEntitySchema>;
+
 export const InvestorWithUserEntitySchema = MinimalInvestorEntitySchema.extend({
   user: MinimalUserSchema,
 });
 
+export type InvestorWithUserEntity = z.infer<
+  typeof InvestorWithUserEntitySchema
+>;
+
 export const CreateInvestorProfileInputSchema = z
   .object({
-    websiteURL: z
-      .string()
-      .transform((val) => {
-        if (!val) return val;
-        if (val.startsWith("http://") || val.startsWith("https://")) {
-          return val;
-        }
-        return `https://${val}`;
-      })
-      .pipe(z.url("Invalid URL").or(z.literal("")))
-      .optional(),
+    websiteURL: WebsiteUrlInputSchema,
     experienceLevel: z
       .enum(
         Object.values(EXPERIENCE_LEVELS) as [
@@ -173,7 +178,6 @@ export const CreateInvestorProfileInputSchema = z
           ...ExperienceLevel[],
         ],
       )
-      .default(EXPERIENCE_LEVELS.YEAR_0_1)
       .openapi({
         example: "0-1 year",
       }),
@@ -185,22 +189,16 @@ export const CreateInvestorProfileInputSchema = z
     title: "Create Investor Profile",
   });
 
+export type CreateInvestorInput = z.infer<
+  typeof CreateInvestorProfileInputSchema
+>;
+
 export const UpdateInvestorProfileInputSchema = z
   .object({
     bio: z.string().max(600).optional().openapi({
       example: "Seasoned venture capitalist with a focus on healthtech.",
     }),
-    websiteURL: z
-      .string()
-      .transform((val) => {
-        if (!val) return val;
-        if (val.startsWith("http://") || val.startsWith("https://")) {
-          return val;
-        }
-        return `https://${val}`;
-      })
-      .pipe(z.url("Invalid URL").or(z.literal("")))
-      .optional(),
+    websiteURL: WebsiteUrlInputSchema,
     experienceLevel: z
       .enum(
         Object.values(EXPERIENCE_LEVELS) as [
@@ -247,24 +245,8 @@ export const UpdateInvestorProfileInputSchema = z
       .openapi({
         example: "GLOBAL",
       }),
-    links: z
-      .object({
-        url: z.union([
-          z.url({ message: "Please enter a valid URL" }),
-          z.literal(""),
-        ]),
-        type: z.enum(LINK_TYPES),
-      })
-      .array()
-      .optional(),
-    achievements: z
-      .object({
-        title: z.string(),
-        link: z.string().optional(),
-        year: z.coerce.number().int().optional(),
-      })
-      .array()
-      .optional(),
+    links: z.array(InvestorLinkSchema).optional(),
+    achievements: z.array(InvestorAchievementSchema).optional(),
     location: z.string().optional().openapi({
       example: "UK",
     }),
@@ -273,6 +255,10 @@ export const UpdateInvestorProfileInputSchema = z
   .openapi({
     title: "Update Investor Profile",
   });
+
+export type UpdateInvestorInput = z.infer<
+  typeof UpdateInvestorProfileInputSchema
+>;
 
 export const ListInvestorsInputSchema = z
   .object({
@@ -311,6 +297,8 @@ export const ListInvestorsInputSchema = z
   })
   .openapi("ListInvestorsInput");
 
+export type ListInvestorsInput = z.infer<typeof ListInvestorsInputSchema>;
+
 export const SearchInvestorInputSchema = z.object({
   string: z
     .string()
@@ -325,19 +313,33 @@ export const SearchInvestorInputSchema = z.object({
   cursor: z.string().optional(),
 });
 
+export type SearchInvestorInput = z.infer<typeof SearchInvestorInputSchema>;
+
 export const GetInvestorParamsSchema = z.object({
   value: CuidSchema,
 });
 
+export type GetInvestorParams = z.infer<typeof GetInvestorParamsSchema>;
+
 export const GetInvestorQuerySchema = ProfileIdentifierSchema;
+
+export type GetInvestorQuery = z.infer<typeof GetInvestorQuerySchema>;
 
 export const CreateInvestorOutputSchema = InvestorEntitySchema;
 
+export type CreateInvestorOutput = z.infer<typeof CreateInvestorOutputSchema>;
+
 export const GetInvestorOutputSchema = InvestorEntitySchema;
 
+export type GetInvestorOutput = z.infer<typeof GetInvestorOutputSchema>;
+
 export const UpdateInvestorOutputSchema = InvestorEntitySchema;
+
+export type UpdateInvestorOutput = z.infer<typeof UpdateInvestorOutputSchema>;
 
 export const SearchInvestorOutputSchema = z.object({
   investors: z.array(InvestorWithUserEntitySchema),
   nextCursor: z.string().optional().nullable(),
 });
+
+export type SearchInvestorOutput = z.infer<typeof SearchInvestorOutputSchema>;

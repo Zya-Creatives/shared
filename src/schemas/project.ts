@@ -11,10 +11,8 @@ import { BookmarkEntitySchema } from "./bookmark";
 import { ViewEntitySchema } from "./view";
 import { MinimalUserSchema } from "./user";
 import { ActivitySchema } from "./activity";
-
-/**
- * BASE ENTITY SCHEMAS
- */
+import { FileEntitySchema } from "./file";
+import { LikeEntitySchema } from "./like";
 
 export const ProjectEntitySchema = z
   .object({
@@ -35,7 +33,7 @@ export const ProjectEntitySchema = z
     problemBeingSolved: z.string().max(600).optional(),
     whoItsFor: z.string().max(600).optional(),
     ventureStage: z.enum(VENTURE_STAGES).optional(),
-    capitalLookingToRaise: z.string(),
+    capitalLookingToRaise: z.number(),
     capitalLookingToRaiseCurrency: z.enum(WAGES_CURRENCY).optional(),
     currentTraction: z.string().max(600),
     isOpenToInvestment: z.boolean().default(false),
@@ -47,6 +45,16 @@ export const ProjectEntitySchema = z
   })
   .openapi("ProjectEntity");
 
+export type ProjectEntity = z.infer<typeof ProjectEntitySchema>;
+
+export const ProjectWithFilesEntitySchema = ProjectEntitySchema.extend({
+  files: z.array(FileEntitySchema).optional(),
+}).openapi("ProjectWithFilesEntity");
+
+export type ProjectWithFilesEntity = z.infer<
+  typeof ProjectWithFilesEntitySchema
+>;
+
 export const MinimalProjectSchema = ProjectEntitySchema.pick({
   id: true,
   title: true,
@@ -57,6 +65,8 @@ export const MinimalProjectSchema = ProjectEntitySchema.pick({
   imagePlaceholderUrl: true,
 }).openapi("MinimalProject");
 
+export type MinimalProject = z.infer<typeof MinimalProjectSchema>;
+
 export const ProjectSocialGraphEntitySchema = z
   .object({
     noOfLikes: z.number().int().optional(),
@@ -65,10 +75,6 @@ export const ProjectSocialGraphEntitySchema = z
     noOfViews: z.number().int().optional(),
   })
   .openapi("ProjectSocialGraphEntity");
-
-/**
- * INPUT SCHEMAS
- */
 
 export const CreateProjectInputSchema = z
   .object({
@@ -80,27 +86,55 @@ export const CreateProjectInputSchema = z
   })
   .openapi("CreateProjectInput");
 
+export type CreateProjectInput = z.infer<typeof CreateProjectInputSchema>;
+
 export const UpdateProjectInputSchema = z
   .object({
     id: z.cuid2(),
     title: z.string().optional(),
-    description: z.string().optional(),
+    description: z
+      .string()
+      .min(10, "Add a bit more detail to your description.")
+      .optional(),
     overview: z.string().optional(),
-    url: z.url().or(z.literal("")).optional(),
+    url: z
+      .string()
+      .transform((val) => {
+        if (!val) return val;
+        if (val.startsWith("http://") || val.startsWith("https://")) return val;
+        return `https://${val}`;
+      })
+      .pipe(z.string().url("Check your link.").or(z.literal("")))
+      .optional(),
     imagePlaceholderUrl: z.url().optional(),
     tags: z.array(z.string()).optional(),
     projectCreatorType: z.enum(ROLES).optional(),
-    clientId: z.cuid2().optional(),
+    clientId: z
+      .string()
+      .transform((val) => (val === "" ? undefined : val))
+      .pipe(z.string().cuid2().optional()),
     clientType: z.enum(CLIENT_TYPES).optional(),
     clientName: z.string().optional(),
     isFeatured: z.boolean().optional(),
     status: z.enum(PROJECT_STATUS).optional(),
-    problemBeingSolved: z.string().max(600).optional(),
-    whoItsFor: z.string().max(600).optional(),
+    problemBeingSolved: z
+      .string()
+      .min(20, "Describe the problem you're solving.")
+      .max(600)
+      .optional(),
+    whoItsFor: z
+      .string()
+      .min(5, "Tell us who this is for.")
+      .max(600)
+      .optional(),
     ventureStage: z.enum(VENTURE_STAGES).optional(),
-    capitalLookingToRaise: z.string().optional(),
+    capitalLookingToRaise: z.number().optional(),
     capitalLookingToRaiseCurrency: z.enum(WAGES_CURRENCY).optional(),
-    currentTraction: z.string().max(600).optional(),
+    currentTraction: z
+      .string()
+      .min(10, "Share your current traction.")
+      .max(600)
+      .optional(),
     isOpenToInvestment: z.boolean().default(false),
     startDate: z.coerce.date().optional(),
     endDate: z.coerce.date().optional(),
@@ -113,42 +147,38 @@ export const UpdateProjectInputSchema = z
       ctx.addIssue({
         path: ["startDate"],
         code: "custom",
-        message: "Start date cannot be in the future",
+        message: "Start date cannot be in the future.",
       });
     }
     if (startDate && endDate && startDate > endDate) {
       ctx.addIssue({
-        path: ["startDate"],
+        path: ["endDate"],
         code: "custom",
-        message: "Start date cannot be after end date",
+        message: "End date must follow the start date.",
       });
     }
   })
   .openapi("UpdateProjectInput");
-
-export const SearchProjectsInputSchema = z
-  .object({
-    query: z.string().optional(),
-    tags: z.array(z.string()).optional(),
-    limit: z.coerce.number().min(1).max(100).default(20),
-    cursor: z.string().optional(),
-  })
-  .openapi("SearchProjectsInput");
+  
+export type UpdateProjectInput = z.infer<typeof UpdateProjectInputSchema>;
 
 export const CommentOnProjectInputSchema = CommentEntitySchema;
 
-/**
- * OUTPUT / VIEW SCHEMAS
- */
+export type CommentOnProjectInput = z.infer<typeof CommentOnProjectInputSchema>;
 
 export const ProjectDetailsEntitySchema = ProjectEntitySchema.extend({
   user: MinimalUserSchema,
+  files: z.array(FileEntitySchema).optional(),
 }).openapi("ProjectDetailsEntity");
+
+export type ProjectDetailsEntity = z.infer<typeof ProjectDetailsEntitySchema>;
 
 export const GetProjectOutputSchema = ProjectDetailsEntitySchema.extend({
   isLiked: z.boolean().optional(),
   isBookmarked: z.boolean().optional(),
 }).openapi("GetProjectOutput");
+
+export type GetProjectOutput = z.infer<typeof GetProjectOutputSchema>;
 
 export const ProjectSearchDocumentSchema = z
   .object({
@@ -157,24 +187,70 @@ export const ProjectSearchDocumentSchema = z
     title: z.string(),
     imagePlaceholderUrl: z.url(),
     projectCreatorType: z.enum(ROLES),
+    isOpenToInvestment: z.boolean(),
     createdAt: z.number(),
     updatedAt: z.number(),
     description: z.string().optional(),
-    capitalLookingToRaise: z.string().optional(),
+    capitalLookingToRaise: z.number().optional(),
     capitalLookingToRaiseCurrency: z.enum(WAGES_CURRENCY).optional(),
     ventureStage: z.enum(VENTURE_STAGES).optional(),
     url: z.url().optional(),
     tags: z.array(z.string()).optional(),
     creatorUsername: z.string(),
     creatorImageUrl: z.string(),
+    creatorName: z.string(),
     clientId: z.string().optional(),
     clientType: z.enum(CLIENT_TYPES).optional(),
     clientName: z.string().optional(),
     isFeatured: z.boolean().optional(),
     startDate: z.number().optional(),
     endDate: z.number().optional(),
+    files: z.array(FileEntitySchema).optional(),
   })
   .openapi("ProjectSearchDocument");
+
+export type ProjectSearchDocument = z.infer<typeof ProjectSearchDocumentSchema>;
+
+const coerceArray = (val: unknown) => {
+  if (typeof val === "string") return val === "" ? [] : val.split(",");
+  return val;
+};
+
+const coerceBoolean = (val: unknown) => {
+  if (val === "true") return true;
+  if (val === "false") return false;
+  return val;
+};
+
+export const SearchProjectsInputSchema = z
+  .object({
+    query: z.string().optional(),
+
+    limit: z.coerce.number().optional().default(40),
+    cursor: z.string().optional().nullable(),
+
+    tags: z.preprocess(coerceArray, z.array(z.string())).optional(),
+
+    isOpenToInvestment: z.preprocess(coerceBoolean, z.boolean()).optional(),
+
+    minCapital: z.coerce.number().optional(),
+    maxCapital: z.coerce.number().optional(),
+
+    ventureStages: z
+      .preprocess(coerceArray, z.array(z.enum(VENTURE_STAGES)))
+      .optional(),
+
+    projectCreatorTypes: z
+      .preprocess(coerceArray, z.array(z.enum(ROLES)))
+      .optional(),
+
+    clientTypes: z
+      .preprocess(coerceArray, z.array(z.enum(CLIENT_TYPES)))
+      .optional(),
+  })
+  .openapi("SearchProjectsInput");
+
+export type SearchProjectsInput = z.infer<typeof SearchProjectsInputSchema>;
 
 export const SearchProjectsOutputSchema = z
   .object({
@@ -183,15 +259,25 @@ export const SearchProjectsOutputSchema = z
   })
   .openapi("SearchProjectsOutput");
 
+export type SearchProjectsOutput = z.infer<typeof SearchProjectsOutputSchema>;
+
 export const ProjectWithProjectCommentsEntitySchema =
   MinimalProjectSchema.extend({
     comments: z.array(CommentEntitySchema),
   }).openapi("ProjectWithProjectCommentsEntity");
 
+export type ProjectWithProjectCommentsEntity = z.infer<
+  typeof ProjectWithProjectCommentsEntitySchema
+>;
+
 export const GetProjectWithCommentsOutputSchema =
   ProjectWithProjectCommentsEntitySchema.extend({
     nextCursor: z.string().optional().nullable(),
   }).openapi("GetProjectWithCommentsOutput");
+
+export type GetProjectWithCommentsOutput = z.infer<
+  typeof GetProjectWithCommentsOutputSchema
+>;
 
 export const ProjectWithLikesEntitySchema = MinimalProjectSchema.extend({
   likes: z.array(
@@ -202,42 +288,60 @@ export const ProjectWithLikesEntitySchema = MinimalProjectSchema.extend({
   ),
 }).openapi("ProjectWithLikesEntity");
 
+export type ProjectWithLikesEntity = z.infer<
+  typeof ProjectWithLikesEntitySchema
+>;
+
 export const GetProjectWithLikesOutputSchema =
   ProjectWithLikesEntitySchema.extend({
     nextCursor: z.string().optional().nullable(),
   }).openapi("GetProjectWithLikesOutput");
 
+export type GetProjectWithLikesOutput = z.infer<
+  typeof GetProjectWithLikesOutputSchema
+>;
+
 export const ProjectWithProjectViewsEntitySchema = MinimalProjectSchema.extend({
   views: z.array(ViewEntitySchema),
 }).openapi("ProjectWithProjectViewsEntity");
+
+export type ProjectWithProjectViewsEntity = z.infer<
+  typeof ProjectWithProjectViewsEntitySchema
+>;
 
 export const ProjectWithProjectBookmarksEntitySchema =
   MinimalProjectSchema.extend({
     bookmarks: z.array(BookmarkEntitySchema),
   }).openapi("ProjectWithProjectBookmarksEntity");
 
+export type ProjectWithProjectBookmarksEntity = z.infer<
+  typeof ProjectWithProjectBookmarksEntitySchema
+>;
+
 export const ProjectUpdateOutputEntitySchema = z.object({
   id: z.cuid2(),
 });
+
 export const CreateProjectOutputSchema = ProjectEntitySchema;
+export type CreateProjectOutput = z.infer<typeof CreateProjectOutputSchema>;
+
 export const UpdateProjectOutputSchema = ProjectEntitySchema;
+export type UpdateProjectOutput = z.infer<typeof UpdateProjectOutputSchema>;
+
 export const DeleteProjectOutputSchema = ProjectEntitySchema;
+export type DeleteProjectOutput = z.infer<typeof DeleteProjectOutputSchema>;
+
 export const CommentOnProjectOutputSchema = CommentEntitySchema.omit({
   likesCount: true,
   isLiked: true,
 });
-
-/**
- * SEARCH & UTILITY SCHEMAS
- */
+export type CommentOnProjectOutput = z.infer<
+  typeof CommentOnProjectOutputSchema
+>;
 
 export const ProjectIdSchema = z.object({ projectId: z.cuid2() });
+export type ProjectIdInput = z.infer<typeof ProjectIdSchema>;
 
-export const CreateProjectFileInputSchema = z.object({
-  key: z.string().max(500),
-  projectId: z.cuid2(),
-});
-
-export const DeleteProjectFileInputSchema = z.object({
-  keys: z.array(z.string()),
-});
+export type ProjectViewEntity = z.infer<typeof ViewEntitySchema>;
+export type ProjectLikeEntity = z.infer<typeof LikeEntitySchema>;
+export type ProjectCommentEntity = z.infer<typeof CommentEntitySchema>;

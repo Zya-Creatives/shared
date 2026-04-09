@@ -14,6 +14,7 @@ import type {
   ActivityType,
   ActivityParentType,
 } from "../constants";
+
 import { ProjectEntitySchema, ProjectSearchDocumentSchema } from "./project";
 import { BookmarkEntitySchema } from "./bookmark";
 import { LikeEntitySchema } from "./like";
@@ -26,10 +27,7 @@ import {
   PostWithFilesEntitySchema,
 } from "./post";
 import { JobEntitySchema, JobSearchDocumentSchema } from "./job";
-
-// ==========================================
-// 1. CORE USER ENTITIES
-// ==========================================
+import { ProductEntitySchema } from "./product";
 
 export const UserEntitySchema = z
   .object({
@@ -67,6 +65,9 @@ export const UserEntitySchema = z
   })
   .openapi("BaseUserEntity");
 
+export type BaseUserEntity = z.infer<typeof UserEntitySchema>;
+export type UserEntity = z.infer<typeof UserEntitySchema>;
+
 export const MinimalUserSchema = UserEntitySchema.pick({
   id: true,
   name: true,
@@ -75,6 +76,8 @@ export const MinimalUserSchema = UserEntitySchema.pick({
   username: true,
   role: true,
 }).openapi("MinimalUser");
+
+export type MinimalUser = z.infer<typeof MinimalUserSchema>;
 
 export const UserProfileEntitySchema = UserEntitySchema.extend({
   profileType: z
@@ -86,6 +89,8 @@ export const UserProfileEntitySchema = UserEntitySchema.extend({
   investor: InvestorEntitySchema,
 }).openapi("UserProfileEntity");
 
+export type UserProfileEntity = z.infer<typeof UserProfileEntitySchema>;
+
 export const UserStatsEntitySchema = z.object({
   followerCount: z.int().openapi({ example: 1540 }),
   followingCount: z.int().openapi({ example: 234 }),
@@ -94,9 +99,7 @@ export const UserStatsEntitySchema = z.object({
     .openapi({ example: ["cksd0v6q0000s9a5y8z7p3x9", "clm1a2b3c0000abc"] }),
 });
 
-// ==========================================
-// 2. CONTENT ASSOCIATIONS (Projects, Posts)
-// ==========================================
+export type UserStatsEntity = z.infer<typeof UserStatsEntitySchema>;
 
 export const UserWithProjectsEntitySchema = z
   .object({
@@ -107,6 +110,10 @@ export const UserWithProjectsEntitySchema = z
   })
   .openapi("UserWithProjectsEntity");
 
+export type UserWithProjectsEntity = z.infer<
+  typeof UserWithProjectsEntitySchema
+>;
+
 export const UserWithPostsEntitySchema = z
   .object({
     userId: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
@@ -114,9 +121,15 @@ export const UserWithPostsEntitySchema = z
   })
   .openapi("UserWithPostsEntity");
 
-// ==========================================
-// 3. LIKES
-// ==========================================
+export type UserWithUserPostsEntity = z.infer<typeof UserWithPostsEntitySchema>;
+
+export const UserAuthStatusEntitySchema = z.object({
+  exists: z.boolean(),
+  isOAuthOnly: z.boolean(),
+  providers: z.array(z.string()),
+});
+
+export type UserAuthStatusEntity = z.infer<typeof UserAuthStatusEntitySchema>;
 
 export const UserWithProjectLikesEntitySchema = z.object({
   userId: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
@@ -137,6 +150,10 @@ export const UserWithProjectLikesEntitySchema = z.object({
     .openapi({ example: [] }),
 });
 
+export type UserWithProjectLikesEntity = z.infer<
+  typeof UserWithProjectLikesEntitySchema
+>;
+
 export const UserWithPostLikesEntitySchema = z.object({
   userId: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
   postLikes: z
@@ -156,9 +173,9 @@ export const UserWithPostLikesEntitySchema = z.object({
     .openapi({ example: [] }),
 });
 
-// ==========================================
-// 4. BOOKMARKS
-// ==========================================
+export type UserWithPostLikesEntity = z.infer<
+  typeof UserWithPostLikesEntitySchema
+>;
 
 export const UserWithJobBookmarksEntitySchema = z.object({
   userId: z.cuid2().openapi({ example: "afoaifaofi" }),
@@ -173,15 +190,27 @@ export const UserWithJobBookmarksEntitySchema = z.object({
     .optional(),
 });
 
+export type UserWithJobBookmarksEntity = z.infer<
+  typeof UserWithJobBookmarksEntitySchema
+>;
+
 export const UserWithJobBookmarksInputSchema = z.object({
   cursor: z.string().optional().nullable(),
   limit: z.int().positive().optional().nullable(),
 });
 
+export type UserWithJobBookmarksInput = z.infer<
+  typeof UserWithJobBookmarksInputSchema
+>;
+
 export const UserWithJobBookmarksOutputSchema = z.object({
   bookmarks: UserWithJobBookmarksEntitySchema,
   nextCursor: z.string().nullable(),
 });
+
+export type UserWithJobBookmarksOutput = z.infer<
+  typeof UserWithJobBookmarksOutputSchema
+>;
 
 export const UserWithProjectBookmarksEntitySchema = z
   .object({
@@ -196,6 +225,10 @@ export const UserWithProjectBookmarksEntitySchema = z
   })
   .openapi("UserWithProjectBookmarksEntity");
 
+export type UserWithProjectBookmarksEntity = z.infer<
+  typeof UserWithProjectBookmarksEntitySchema
+>;
+
 export const UserWithPostBookmarksEntitySchema = z.object({
   userId: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
   postBookmarks: z.array(
@@ -205,15 +238,51 @@ export const UserWithPostBookmarksEntitySchema = z.object({
   ),
 });
 
+export type UserWithPostBookmarksEntity = z.infer<
+  typeof UserWithPostBookmarksEntitySchema
+>;
+
+export const UserWithProductsEntitySchema = z.object({
+  userId: z.cuid2(),
+  products: z.array(ProductEntitySchema),
+});
+
+export type UserWithProductsEntity = z.infer<
+  typeof UserWithProductsEntitySchema
+>;
+
 export const GetUserWithProjectBookmarksInputSchema =
   UserWithJobBookmarksInputSchema;
+
+export type GetUserWithProjectBookmarksInput = z.infer<
+  typeof GetUserWithProjectBookmarksInputSchema
+>;
+
 export const GetUserWithPostBookmarksInputSchema =
   UserWithJobBookmarksInputSchema;
+
+export type GetUserWithPostBookmarksInput = z.infer<
+  typeof GetUserWithPostBookmarksInputSchema
+>;
 
 export const GetUserWithProjectBookmarksOutputSchema = z.object({
   bookmarks: UserWithProjectBookmarksEntitySchema,
   nextCursor: z.string().nullable(),
 });
+
+export type GetUserWithProjectBookmarksOutput = z.infer<
+  typeof GetUserWithProjectBookmarksOutputSchema
+>;
+
+export const GetUserWithProductsOutputSchema = z.object({
+  products: UserWithProductsEntitySchema,
+  noOfProducts: z.int().nullable(),
+  nextCursor: z.string().nullable(),
+});
+
+export type UserWithProductsOutput = z.infer<
+  typeof GetUserWithProductsOutputSchema
+>;
 
 export const GetUserWithPostBookmarksOutputSchema = z.object({
   bookmarks: z.array(
@@ -224,9 +293,9 @@ export const GetUserWithPostBookmarksOutputSchema = z.object({
   nextCursor: z.string().nullable(),
 });
 
-// ==========================================
-// 5. FOLLOWERS & FOLLOWING
-// ==========================================
+export type GetUserWithPostBookmarksOutput = z.infer<
+  typeof GetUserWithPostBookmarksOutputSchema
+>;
 
 export const UserWithFollowingEntitySchema = MinimalUserSchema.extend({
   following: z
@@ -242,6 +311,10 @@ export const UserWithFollowingEntitySchema = MinimalUserSchema.extend({
     }),
 }).openapi("UserWithFollowingEntity");
 
+export type UserWithFollowingEntity = z.infer<
+  typeof UserWithFollowingEntitySchema
+>;
+
 export const UserWithFollowersEntitySchema = MinimalUserSchema.extend({
   followers: z
     .array(
@@ -256,15 +329,23 @@ export const UserWithFollowersEntitySchema = MinimalUserSchema.extend({
     }),
 }).openapi("UserWithFollowersEntity");
 
+export type UserWithFollowersEntity = z.infer<
+  typeof UserWithFollowersEntitySchema
+>;
+
 export const GetUserFollowingInputSchema = z.object({
   searchQuery: z.string().optional().openapi({ example: "design systems" }),
   offset: z.number().int().nonnegative().optional().openapi({ example: 20 }),
 });
 
+export type GetUserFollowingInput = z.infer<typeof GetUserFollowingInputSchema>;
+
 export const GetUserFollowersInputSchema = z.object({
   searchQuery: z.string().optional().openapi({ example: "design systems" }),
   offset: z.number().int().nonnegative().optional().openapi({ example: 20 }),
 });
+
+export type GetUserFollowersInput = z.infer<typeof GetUserFollowersInputSchema>;
 
 export const GetUserFollowingOutputSchema = z.object({
   nextCursor: z.string().openapi({ example: "cksd0v6q0000nxtcur" }),
@@ -278,6 +359,10 @@ export const GetUserFollowingOutputSchema = z.object({
     .openapi({ example: [] }),
 });
 
+export type GetUserFollowingOutput = z.infer<
+  typeof GetUserFollowingOutputSchema
+>;
+
 export const GetUserFollowersOutputSchema = z.object({
   nextCursor: z.string().openapi({ example: "cksd0v6q0000nxtcur" }),
   followers: z
@@ -290,32 +375,64 @@ export const GetUserFollowersOutputSchema = z.object({
     .openapi({ example: [] }),
 });
 
-// ==========================================
-// 6. AUTHENTICATED USER OUTPUTS
-// ==========================================
+export type GetUserFollowersOutput = z.infer<
+  typeof GetUserFollowersOutputSchema
+>;
 
 export const GetAuthenticatedUserOutputSchema = UserEntitySchema;
+
+export type GetAuthenticatedUserOutput = z.infer<
+  typeof GetAuthenticatedUserOutputSchema
+>;
+
 export const GetAuthenticatedUserProfileOutputSchema = UserProfileEntitySchema;
+
+export type GetAuthenticatedUserProfileOutput = z.infer<
+  typeof GetAuthenticatedUserProfileOutputSchema
+>;
+
 export const GetAuthenticatedUserWithProjectsOutputSchema =
   UserWithProjectsEntitySchema;
+
+export type GetAuthenticatedUserWithProjectsOutput = z.infer<
+  typeof GetAuthenticatedUserWithProjectsOutputSchema
+>;
+
 export const GetAuthenticatedUserWithProjectBookmarksOutputSchema =
   UserWithProjectBookmarksEntitySchema;
+
+export type GetAuthenticatedUserWithProjectBookmarksOutput = z.infer<
+  typeof GetAuthenticatedUserWithProjectBookmarksOutputSchema
+>;
+
 export const GetAuthenticatedUserWithProjectLikesOutputSchema =
   UserWithProjectLikesEntitySchema;
+
+export type GetAuthenticatedUserWithProjectLikesOutput = z.infer<
+  typeof GetAuthenticatedUserWithProjectLikesOutputSchema
+>;
+
 export const GetAuthenticatedUserWithUserFollowingOutputSchema =
   UserWithFollowingEntitySchema;
+
+export type GetAuthenticatedUserWithUserFollowingOutput = z.infer<
+  typeof GetAuthenticatedUserWithUserFollowingOutputSchema
+>;
+
 export const GetAuthenticatedUserWithUserFollowersOutputSchema =
   UserWithFollowersEntitySchema;
 
-// ==========================================
-// 7. ACTIVITY
-// ==========================================
+export type GetAuthenticatedUserWithUserFollowersOutput = z.infer<
+  typeof GetAuthenticatedUserWithUserFollowersOutputSchema
+>;
 
 export const GetUserActivityInputSchema = z.object({
   activityType: z
     .enum(Object.values(ACTIVITY_TYPES) as [ActivityType, ...ActivityType[]])
     .openapi({ example: "LIKE" }),
 });
+
+export type GetUserActivityInput = z.infer<typeof GetUserActivityInputSchema>;
 
 export const GetUserActivityOutputSchema = z
   .array(
@@ -333,25 +450,41 @@ export const GetUserActivityOutputSchema = z
   )
   .openapi({ example: [] });
 
-// ==========================================
-// 8. SEARCH
-// ==========================================
+export type GetUserActivityOutput = z.infer<typeof GetUserActivityOutputSchema>;
+
+const coerceArray = (val: unknown) => {
+  if (typeof val === "string") return val === "" ? [] : val.split(",");
+  return val;
+};
 
 export const SearchUsersInputSchema = z.object({
   query: z.string().default("").openapi({
     example: "john",
     description: "Search by name, email, username, or discipline",
   }),
-  role: z
-    .enum(Object.values(ROLES) as [Role, ...Role[]])
+  roles: z
+    .preprocess(
+      coerceArray,
+      z.array(z.enum(Object.values(ROLES) as [Role, ...Role[]])),
+    )
     .optional()
-    .openapi({ example: "CREATIVE" }),
+    .openapi({ example: ["CREATIVE", "BRAND"] }),
+  disciplines: z
+    .preprocess(coerceArray, z.array(z.string()))
+    .optional()
+    .openapi({ example: ["Design Systems", "Web Development"] }),
+  locations: z
+    .preprocess(coerceArray, z.array(z.string()))
+    .optional()
+    .openapi({ example: ["Lagos, Nigeria", "London, UK"] }),
   limit: z.coerce.number().min(1).max(100).default(20).openapi({ example: 20 }),
-  cursor: z.string().optional().openapi({
+  cursor: z.string().nullable().optional().openapi({
     example: "cksd0v6q0000cursor",
     description: "The offset/cursor for pagination",
   }),
 });
+
+export type SearchUsersInput = z.infer<typeof SearchUsersInputSchema>;
 
 export const SearchUsersOutputSchema = z.object({
   users: z
@@ -378,6 +511,8 @@ export const SearchUsersOutputSchema = z.object({
   }),
 });
 
+export type SearchUsersOutput = z.infer<typeof SearchUsersOutputSchema>;
+
 export const UserSearchDocumentSchema = z
   .object({
     id: z.cuid2().openapi({ example: "cksd0v6q0000s9a5y8z7p3x9" }),
@@ -391,9 +526,6 @@ export const UserSearchDocumentSchema = z
     role: z
       .enum(Object.values(ROLES) as [Role, ...Role[]])
       .openapi({ example: "CREATIVE" }),
-    bio: z.string().nullable().openapi({
-      example: "Passionate designer and developer based in Lagos.",
-    }),
     location: z.string().nullable().openapi({ example: "Lagos, Nigeria" }),
     disciplines: z
       .array(z.string())
@@ -412,3 +544,5 @@ export const UserSearchDocumentSchema = z
     title: "User Search Document",
     description: "Flattened schema used for indexing users in search engines.",
   });
+
+export type UserSearchDocument = z.infer<typeof UserSearchDocumentSchema>;

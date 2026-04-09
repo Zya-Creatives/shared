@@ -3,6 +3,9 @@ import { EXPERIENCE_LEVELS, ExperienceLevel, LINK_TYPES } from "../constants";
 import { ProfileIdentifierSchema } from "./common";
 import { MinimalUserSchema } from "./user";
 
+// -----------------------------------------------------------------------------
+// Minimal Creative Entity
+// -----------------------------------------------------------------------------
 export const MinimalCreativeEntitySchema = z.object({
   id: z.cuid2().openapi({ example: "cre_cksd0v6q0000s9a5y8z7p3x9" }),
   userId: z.cuid2().openapi({ example: "user_abc123" }),
@@ -20,7 +23,6 @@ export const MinimalCreativeEntitySchema = z.object({
     )
     .optional()
     .openapi({ example: EXPERIENCE_LEVELS.YEAR_0_1 }),
-
   disciplines: z
     .array(z.string())
     .optional()
@@ -29,6 +31,11 @@ export const MinimalCreativeEntitySchema = z.object({
   updatedAt: z.coerce.date().openapi({ example: "2025-10-13T09:00:00.000Z" }),
 });
 
+export type MinimalCreativeEntity = z.infer<typeof MinimalCreativeEntitySchema>;
+
+// -----------------------------------------------------------------------------
+// Full Creative Entity
+// -----------------------------------------------------------------------------
 export const CreativeEntitySchema = z
   .object({
     id: z.cuid2().openapi({ example: "cre_cksd0v6q0000s9a5y8z7p3x9" }),
@@ -48,7 +55,6 @@ export const CreativeEntitySchema = z
       )
       .optional()
       .openapi({ example: EXPERIENCE_LEVELS.YEAR_0_1 }),
-
     disciplines: z
       .array(z.string())
       .optional()
@@ -87,7 +93,6 @@ export const CreativeEntitySchema = z
       .optional()
       .openapi({ example: "2025-10-13T09:00:00.000Z" }),
     updatedAt: z.coerce.date().openapi({ example: "2025-10-13T09:00:00.000Z" }),
-
   })
   .openapi({
     title: "CreativeEntitySchema",
@@ -95,38 +100,38 @@ export const CreativeEntitySchema = z
       "Represents a creative profile, including bio, experience level, location, disciplines and timestamps.",
   });
 
+export type CreativeEntity = z.infer<typeof CreativeEntitySchema>;
+
+// -----------------------------------------------------------------------------
+// Creative Profile Actions (Create / Update)
+// -----------------------------------------------------------------------------
 export const CreateCreativeProfileInputSchema = z
   .object({
     experienceLevel: z
       .enum(EXPERIENCE_LEVELS)
       .describe("Overall experience range of the creative.")
-      .default(EXPERIENCE_LEVELS.YEAR_0_1)
-      .openapi({
-        example: EXPERIENCE_LEVELS.YEAR_1_3,
-      }),
-    role: z.string().optional().openapi({ example: "Designer" }),
-
+      .openapi({ example: EXPERIENCE_LEVELS.YEAR_1_3 }),
+    role: z.string().openapi({ example: "Designer" }),
     location: z
       .string()
       .max(100)
-      .optional()
       .describe("Primary location where the creative works or resides.")
-      .openapi({
-        example: "Lagos, Nigeria",
-      }),
+      .openapi({ example: "Lagos, Nigeria" }),
     disciplineSlugs: z
       .array(z.string())
       .min(1, "At least one discipline is required")
       .default([])
       .describe("List of discipline slugs representing the creative’s fields.")
-      .openapi({
-        example: ["ui-ux", "frontend"],
-      }),
+      .openapi({ example: ["ui-ux", "frontend"] }),
   })
   .openapi({
     title: "create creative profile",
     description: "Payload for creating a new creative profile.",
   });
+
+export type CreateCreativeProfileInput = z.infer<
+  typeof CreateCreativeProfileInputSchema
+>;
 
 export const UpdateCreativeProfileInputSchema = z
   .object({
@@ -185,23 +190,46 @@ export const UpdateCreativeProfileInputSchema = z
     title: "update creative profile",
   });
 
+export type UpdateCreativeProfileInput = z.infer<
+  typeof UpdateCreativeProfileInputSchema
+>;
+
+// -----------------------------------------------------------------------------
+// Queries & Outputs
+// -----------------------------------------------------------------------------
 export const GetCreativeInputSchema = z.object({
   value: z.cuid2(),
   by: ProfileIdentifierSchema.shape.by,
 });
 
+export type GetCreativeInput = z.infer<typeof GetCreativeInputSchema>;
+
 export const GetCreativeQuerySchema = ProfileIdentifierSchema;
 
+// Re-exports for explicit intent
 export const CreateCreativeOutputSchema = CreativeEntitySchema;
+export type CreateCreativeOutput = z.infer<typeof CreateCreativeOutputSchema>;
 
 export const GetCreativeOutputSchema = CreativeEntitySchema;
+export type GetCreativeOutput = z.infer<typeof GetCreativeOutputSchema>;
 
 export const UpdateCreativeOutputSchema = CreativeEntitySchema;
+export type UpdateCreativeOutput = z.infer<typeof UpdateCreativeOutputSchema>;
 
+// -----------------------------------------------------------------------------
+// Entity With User
+// -----------------------------------------------------------------------------
 export const CreativeWithUserEntitySchema = MinimalCreativeEntitySchema.extend({
   user: MinimalUserSchema,
 });
 
+export type CreativeWithUserEntity = z.infer<
+  typeof CreativeWithUserEntitySchema
+>;
+
+// -----------------------------------------------------------------------------
+// Search Actions
+// -----------------------------------------------------------------------------
 export const SearchCreativeInputSchema = z.object({
   string: z
     .string()
@@ -216,7 +244,11 @@ export const SearchCreativeInputSchema = z.object({
   cursor: z.string().optional(),
 });
 
+export type SearchCreativeInput = z.infer<typeof SearchCreativeInputSchema>;
+
 export const SearchCreativeOutputSchema = z.object({
   creatives: z.array(CreativeWithUserEntitySchema),
   nextCursor: z.string().optional().nullable(),
 });
+
+export type SearchCreativeOutput = z.infer<typeof SearchCreativeOutputSchema>;
