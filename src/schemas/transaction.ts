@@ -5,12 +5,7 @@ import {
   TRANSACTION_STATUSES,
   PAYMENT_PROVIDERS,
 } from "../constants";
-
-export const TransactionDiscountSnapshotSchema = z.object({
-  code: z.string().optional(),
-  amount: z.number().int("Amount must be a whole number"),
-  type: z.enum(DISCOUNT_TYPES),
-});
+import { ProductDiscountEntitySchema } from "./product";
 
 export const BaseTransactionSchema = z.object({
   id: z.cuid2(),
@@ -27,30 +22,28 @@ export const BaseTransactionSchema = z.object({
   paymentProvider: z.enum(PAYMENT_PROVIDERS),
   providerTransactionId: z.string().nullable().optional(),
 
-  discountApplied: TransactionDiscountSnapshotSchema.nullable().optional(),
+  discountApplied: ProductDiscountEntitySchema.nullable().optional(),
 
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
 
+// ==========================================
+// INPUT SCHEMAS
+// ==========================================
+
 export const InitTransactionInputSchema = z.object({
   productId: z
     .cuid2()
     .openapi({ description: "ID of the product being purchased" }),
-  paymentProvider: z.enum(PAYMENT_PROVIDERS),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  email: z
+    .email(),
   discountCode: z
     .string()
-    .optional()
-    .openapi({ description: "Optional discount code applied at checkout" }),
-  amount: z
-    .number()
-    .int("Amount must be a whole number (cents/kobo)")
-    .min(0)
-    .optional()
-    .openapi({
-      description:
-        "Required for PWYW pricing. The amount the buyer chooses to pay in cents/kobo.",
-    }),
+    .optional(),
+  amount: z.number().int("Amount must be a whole number (cents/kobo)").min(0),
 });
 
 export const CreateTransactionInputSchema = BaseTransactionSchema.pick({
@@ -64,8 +57,8 @@ export const CreateTransactionInputSchema = BaseTransactionSchema.pick({
   paymentProvider: true,
   status: true,
 }).extend({
-  discountApplied: TransactionDiscountSnapshotSchema.optional(),
-  providerTransactionId: z.string().optional(), 
+  discountApplied: ProductDiscountEntitySchema.optional(),
+  providerTransactionId: z.string().optional(),
 });
 
 export const UpdateTransactionWebhookInputSchema = z.object({
@@ -73,16 +66,32 @@ export const UpdateTransactionWebhookInputSchema = z.object({
   providerTransactionId: z.string(),
 });
 
+// ==========================================
+// ENTITY & OUTPUT SCHEMAS
+// ==========================================
+
 export const TransactionEntitySchema = BaseTransactionSchema.extend({
   productTitle: z.string().optional(),
   sellerName: z.string().optional(),
   sellerId: z.string().optional(),
   sellerUsername: z.string().optional(),
+  buyerName: z.string().optional(),
+  buyerUsername: z.string().optional(),
+  buyerEmail: z.email(),
 }).openapi({ title: "TransactionEntity" });
 
-export type TransactionDiscountSnapshot = z.infer<
-  typeof TransactionDiscountSnapshotSchema
->;
+export const InitTransactionOutputSchema = z
+  .object({
+    transaction: TransactionEntitySchema,
+    checkoutUrl: z.url().nullable().openapi({
+      description: "The Stripe/Paystack checkout URL to redirect the user to",
+    }),
+  })
+  .openapi({ title: "InitTransactionResult" });
+
+// ==========================================
+// TYPES EXPORTS
+// ==========================================
 
 export type BaseTransactionEntity = z.infer<typeof BaseTransactionSchema>;
 
@@ -95,3 +104,4 @@ export type UpdateTransactionWebhookInput = z.infer<
 >;
 
 export type TransactionEntity = z.infer<typeof TransactionEntitySchema>;
+export type InitTransactionResult = z.infer<typeof InitTransactionOutputSchema>;

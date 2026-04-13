@@ -357,3 +357,29 @@ export const JobSearchDocumentSchema = z
   .openapi("JobSearchDocument");
 
 export type JobSearchDocument = z.infer<typeof JobSearchDocumentSchema>;
+
+export const UpdateRoleJobInputSchema = CreateRoleJobInputSchema.partial()
+  .extend({
+    version: z.number().int().openapi({ example: 2 }),
+  })
+  .required({
+    id: true,
+  });
+export type CreateRoleJobOutput = z.infer<typeof RoleJobEntitySchema>;
+export type CreateGigJobOutput = z.infer<typeof GigJobEntitySchema>;
+
+export type UpdateRoleJobInput = z.infer<typeof UpdateRoleJobInputSchema>;
+
+export const UpdateGigJobInputSchema = CreateGigJobInputSchema.partial()
+  .extend({
+    version: z.number().int().openapi({ example: 2 }),
+  })
+  .required({
+    id: true,
+  });
+
+export type UpdateGigJobInput = z.infer<typeof UpdateGigJobInputSchema>;
+
+export type UpdateRoleJobOutput = z.infer<typeof RoleJobEntitySchema>;
+
+export type UpdateGigJobOutput = z.infer<typeof GigJobEntitySchema>;

@@ -10,7 +10,6 @@ export * from "./feed";
 export * from "./activity";
 export * from "./message";
 export * from "./chat";
-export * from "./job";
 export * from "./user-strike";
 export * from "./notification";
 export * from "./investor-signal"
