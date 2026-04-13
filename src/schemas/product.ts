@@ -44,7 +44,6 @@ const ProductCoreInputSchema = z.object({
 
 export const CreateProductInputSchema = ProductCoreInputSchema.superRefine(
   (data, ctx) => {
-
     if (
       data.pricingModel === PRICING_MODELS.FIXED &&
       (!data.price || data.price <= 0)
@@ -164,7 +163,6 @@ export const UpdateProductInputSchema = ProductCoreInputSchema.extend(
     id: z.cuid2().openapi({ description: "ID of the product being updated" }),
   });
 
-
 export const ProductEntitySchema = z
   .object({
     id: z.cuid2(),
@@ -254,6 +252,20 @@ export const GetMarketplaceInfoOutputSchema = z.object({
   communityFavourites: z.array(ProductSearchDocumentSchema),
 });
 
+export const MarketplaceProductEntitySchema = ProductEntitySchema.omit({
+  discounts: true,
+});
+
+export const ProductDiscountCheckInputSchema = z.object({
+  discountCode: z.string(),
+  productId: z.cuid2(),
+});
+
+export const ProductDiscountCheckOutputSchema = z.object({
+  exists: z.boolean(),
+  discount: ProductDiscountEntitySchema,
+});
+
 export type ProductLink = z.infer<typeof ProductLinkSchema>;
 export type SearchProductInput = z.infer<typeof SearchProductInputSchema>;
 export type SearchProductOutput = z.infer<typeof SearchProductOutputSchema>;
@@ -272,3 +284,9 @@ export type ProductServiceAndComplianceInputEntity = z.infer<
 export type UpdateProductInputEntity = z.infer<typeof UpdateProductInputSchema>;
 export type ProductEntity = z.infer<typeof ProductEntitySchema>;
 export type ProductSearchDocument = z.infer<typeof ProductSearchDocumentSchema>;
+export type MarketplaceProductEntity = z.infer<
+  typeof MarketplaceProductEntitySchema
+>;
+
+export type ProductDiscountCheckInput = z.infer<typeof ProductDiscountCheckInputSchema>;
+export type ProductDiscountCheckOutput = z.infer<typeof ProductDiscountCheckOutputSchema>;

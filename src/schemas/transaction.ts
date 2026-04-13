@@ -23,14 +23,10 @@ export const BaseTransactionSchema = z.object({
   providerTransactionId: z.string().nullable().optional(),
 
   discountApplied: ProductDiscountEntitySchema.nullable().optional(),
-
+  productNameSnapshot: z.string().optional(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
-
-// ==========================================
-// INPUT SCHEMAS
-// ==========================================
 
 export const InitTransactionInputSchema = z.object({
   productId: z
@@ -38,11 +34,8 @@ export const InitTransactionInputSchema = z.object({
     .openapi({ description: "ID of the product being purchased" }),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  email: z
-    .email(),
-  discountCode: z
-    .string()
-    .optional(),
+  email: z.email(),
+  discountCode: z.string().optional(),
   amount: z.number().int("Amount must be a whole number (cents/kobo)").min(0),
 });
 
