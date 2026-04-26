@@ -5,9 +5,7 @@ import {
   POST_TYPES,
 } from "../constants";
 import { FileEntitySchema, CreateFileInputSchema } from "./file";
-import { CommentEntitySchema } from "./comment";
 import { EntityStatsSchema } from "./entity-stats";
-import { ActivitySchema } from "./activity";
 import { cleanHtml } from "../utils/clean-html";
 
 export const PostEntitySchema = z.object({

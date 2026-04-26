@@ -263,8 +263,50 @@ export const ProductDiscountCheckInputSchema = z.object({
 
 export const ProductDiscountCheckOutputSchema = z.object({
   exists: z.boolean(),
-  discount: ProductDiscountEntitySchema,
+  discount: ProductDiscountEntitySchema.nullable(),
 });
+
+export const ProductStatsOutputSchema = z.object({
+  salesToday: z.number().int(),
+  revenueToday: z.number().int(),
+  totalProductRevenue: z.number().int(),
+});
+
+export const ProductTransactionItemSchema = z.object({
+  id: z.string(),
+  customerEmail: z.string().nullable(),
+  orderId: z.string().nullable(),
+  price: z.number().int(),
+  status: z.string(),
+  date: z.coerce.date(),
+});
+
+export const ProductTransactionsOutputSchema = z.object({
+  transactions: z.array(ProductTransactionItemSchema),
+});
+
+export const RevenueChartPointSchema = z.object({
+  date: z.string().openapi({ example: "2023-11-25" }),
+  revenue: z.number().int(),
+});
+
+export const ProductRevenueChartOutputSchema = z.object({
+  chartData: z.array(RevenueChartPointSchema),
+});
+
+export const RevenueChartInputSchema = z.object({
+  startDate: z.string().optional().openapi({ description: "YYYY-MM-DD" }),
+  endDate: z.string().optional().openapi({ description: "YYYY-MM-DD" }),
+});
+
+export const SellerDashboardStatsOutputSchema = z.object({
+  totalSales: z.number().int(),
+  totalViews: z.number().int(), 
+  totalProducts: z.number().int(),
+  totalDrafts: z.number().int(),
+});
+
+export type SellerDashboardStatsOutput = z.infer<typeof SellerDashboardStatsOutputSchema>;
 
 export type ProductLink = z.infer<typeof ProductLinkSchema>;
 export type SearchProductInput = z.infer<typeof SearchProductInputSchema>;
@@ -288,5 +330,21 @@ export type MarketplaceProductEntity = z.infer<
   typeof MarketplaceProductEntitySchema
 >;
 
-export type ProductDiscountCheckInput = z.infer<typeof ProductDiscountCheckInputSchema>;
-export type ProductDiscountCheckOutput = z.infer<typeof ProductDiscountCheckOutputSchema>;
+export type ProductDiscountCheckInput = z.infer<
+  typeof ProductDiscountCheckInputSchema
+>;
+export type ProductDiscountCheckOutput = z.infer<
+  typeof ProductDiscountCheckOutputSchema
+>;
+export type ProductStatsOutput = z.infer<typeof ProductStatsOutputSchema>;
+export type ProductTransactionItem = z.infer<
+  typeof ProductTransactionItemSchema
+>;
+export type ProductTransactionsOutput = z.infer<
+  typeof ProductTransactionsOutputSchema
+>;
+export type RevenueChartPoint = z.infer<typeof RevenueChartPointSchema>;
+export type ProductRevenueChartOutput = z.infer<
+  typeof ProductRevenueChartOutputSchema
+>;
+export type RevenueChartInput = z.infer<typeof RevenueChartInputSchema>;

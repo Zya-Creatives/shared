@@ -31,6 +31,9 @@ export const BrandEntitySchema = z
     bio: z.string().optional().openapi({
       example: "Leading software development firm focused on AI.",
     }),
+    location: z.string().openapi({
+      example: "UK",
+    }),
     disciplines: z
       .array(z.string())
       .optional()
@@ -64,6 +67,9 @@ export const CreateBrandProfileInputSchema = z
       .string()
       .min(1, "Brand name is required")
       .openapi({ example: "Acme Creative Studio" }),
+    location: z.string().openapi({
+      example: "UK",
+    }),
     disciplineSlugs: z
       .array(z.string())
       .min(1, "At least one discipline is required")
@@ -91,6 +97,9 @@ export const UpdateBrandProfileInputSchema = z
       })
       .array()
       .optional(),
+    location: z.string().openapi({
+      example: "UK",
+    }),
     achievements: z
       .object({
         title: z.string(),

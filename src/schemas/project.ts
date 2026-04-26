@@ -104,15 +104,16 @@ export const UpdateProjectInputSchema = z
         if (val.startsWith("http://") || val.startsWith("https://")) return val;
         return `https://${val}`;
       })
-      .pipe(z.string().url("Check your link.").or(z.literal("")))
+      .pipe(z.url("Check your link.").or(z.literal("")))
       .optional(),
-    imagePlaceholderUrl: z.url().optional(),
+    imagePlaceholderUrl: z.url().optional().or(z.literal("")),
     tags: z.array(z.string()).optional(),
     projectCreatorType: z.enum(ROLES).optional(),
     clientId: z
       .string()
-      .transform((val) => (val === "" ? undefined : val))
-      .pipe(z.string().cuid2().optional()),
+      .optional()
+      .transform((val) => (val === "" || val === undefined ? undefined : val))
+      .pipe(z.cuid2().optional()),
     clientType: z.enum(CLIENT_TYPES).optional(),
     clientName: z.string().optional(),
     isFeatured: z.boolean().optional(),
@@ -138,7 +139,7 @@ export const UpdateProjectInputSchema = z
     isOpenToInvestment: z.boolean().default(false),
     startDate: z.coerce.date().optional(),
     endDate: z.coerce.date().optional(),
-    version: z.number().int(),
+    version: z.number().int().default(1),
   })
   .superRefine(({ startDate, endDate }, ctx) => {
     const today = new Date();
@@ -154,12 +155,12 @@ export const UpdateProjectInputSchema = z
       ctx.addIssue({
         path: ["endDate"],
         code: "custom",
-        message: "End date must follow the start date.",
+        message: "End date must be after the start date.",
       });
     }
   })
   .openapi("UpdateProjectInput");
-  
+
 export type UpdateProjectInput = z.infer<typeof UpdateProjectInputSchema>;
 
 export const CommentOnProjectInputSchema = CommentEntitySchema;

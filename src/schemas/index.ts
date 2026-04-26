@@ -25,4 +25,5 @@ export * from "./investor-shortlist";
 export * from "./payout-method";
 export * from "./seller";
 export * from "./product";
-export * from "./transaction"
+export * from "./transaction";
+export * from "./settings";
