@@ -1,6 +1,7 @@
 import { z } from "@hono/zod-openapi";
 import { CommentEntitySchema } from "./comment";
 import { ActivitySchema } from "./activity";
+import { LINK_TYPES } from "../constants";
 
 export const CuidSchema = z.cuid2({ error: "Invalid CUID2 is written." });
 
@@ -51,3 +52,34 @@ export const EntityRepliesOutputSchema = z.object({
   nextCursor: z.string().nullable(),
 });
 export type EntityRepliesOutput = z.infer<typeof EntityRepliesOutputSchema>;
+
+
+export const LinkSchema = z.object({
+  url: z.url({ message: "Please enter a valid URL" }).or(z.literal("")),
+  type: z.enum(LINK_TYPES).default(LINK_TYPES.GENERIC_WEBSITE),
+});
+
+export const AchievementSchema = z.object({
+  title: z.string().min(1),
+  link: z.url().optional(),
+  year: z.number().int().optional(),
+});
+
+export const WorkExperienceSchema = z.object({
+  companyName: z.string().min(1),
+  position: z.string().min(1),
+  startDate: z.iso.datetime().optional(),
+  endDate: z.iso.datetime().optional(),
+  currentlyWorking: z.boolean().default(false),
+  description: z.string().default(""),
+});
+
+export const WebsiteUrlInputSchema = z
+  .string()
+  .transform((val) => {
+    if (!val) return val;
+    if (val.startsWith("http://") || val.startsWith("https://")) return val;
+    return `https://${val}`;
+  })
+  .pipe(z.url("Invalid URL").or(z.literal("")))
+  .optional();

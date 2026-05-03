@@ -3,130 +3,91 @@ import { LINK_TYPES } from "../constants";
 import { ProfileIdentifierSchema } from "./common";
 import { MinimalUserSchema } from "./user";
 
-export const MinimalBrandEntitySchema = z.object({
-  id: z.cuid2().openapi({ example: "brd_cksd0v6q0000s9a5y8z7p3x9" }),
-  userId: z.cuid2().openapi({ example: "user_owner_123" }),
-  brandName: z.string().openapi({ example: "TechInnovate Inc." }),
-  bio: z.string().optional().openapi({
-    example: "Leading software development firm focused on AI.",
-  }),
-  disciplines: z
-    .array(z.string())
-    .optional()
-    .openapi({ example: ["Marketing", "Product Development"] }),
-  createdAt: z.coerce
-    .date()
-    .optional()
-    .openapi({ example: "2025-10-13T09:00:00.000Z" }),
-  updatedAt: z.coerce.date().openapi({ example: "2025-10-13T09:00:00.000Z" }),
+
+const BrandShape = z.object({
+  brandName: z.string().min(1).max(200),
+  bio: z.string().max(600).default(""),
+  location: z.string(),
+  disciplines: z.array(z.string()).default([]),
+  links: z
+    .array(
+      z.object({
+        url: z.url(),
+        type: z.enum(LINK_TYPES).default(LINK_TYPES.GENERIC_WEBSITE),
+      }),
+    )
+    .default([]),
+  achievements: z
+    .array(
+      z.object({
+        title: z.string(),
+        link: z.url().optional(),
+        year: z.number().int().optional(),
+      }),
+    )
+    .default([]),
 });
 
-export type MinimalBrandEntity = z.infer<typeof MinimalBrandEntitySchema>;
+export type BrandShapeType = z.infer<typeof BrandShape>;
+
 
 export const BrandEntitySchema = z
   .object({
     id: z.cuid2().openapi({ example: "brd_cksd0v6q0000s9a5y8z7p3x9" }),
     userId: z.cuid2().openapi({ example: "user_owner_123" }),
-    brandName: z.string().openapi({ example: "TechInnovate Inc." }),
-    bio: z.string().optional().openapi({
-      example: "Leading software development firm focused on AI.",
-    }),
-    location: z.string().openapi({
-      example: "UK",
-    }),
-    disciplines: z
-      .array(z.string())
-      .optional()
-      .openapi({ example: ["Marketing", "Product Development"] }),
-    links: z
-      .object({
-        url: z.url(),
-        type: z.enum(LINK_TYPES).default(LINK_TYPES.GENERIC_WEBSITE),
-      })
-      .array()
-      .optional(),
-    achievements: z
-      .object({
-        title: z.string(),
-        link: z.url().optional(),
-        year: z.number().int().optional(),
-      })
-      .array()
-      .optional(),
-    createdAt: z.coerce.date().openapi({ example: "2025-10-13T09:00:00.000Z" }),
-    updatedAt: z.coerce.date().openapi({ example: "2025-10-13T09:00:00.000Z" }),
+    ...BrandShape.shape,
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
     version: z.int(),
   })
-  .openapi("BrandEntitySchema");
+  .openapi("BrandEntity");
 
 export type BrandEntity = z.infer<typeof BrandEntitySchema>;
 
-export const CreateBrandProfileInputSchema = z
-  .object({
-    brandName: z
-      .string()
-      .min(1, "Brand name is required")
-      .openapi({ example: "Acme Creative Studio" }),
-    location: z.string().openapi({
-      example: "UK",
-    }),
-    disciplineSlugs: z
-      .array(z.string())
-      .min(1, "At least one discipline is required")
-      .default([])
-      .openapi({ example: ["ui-ux", "frontend"] }),
-  })
-  .openapi({
-    title: "create brand profile",
-  });
+export const MinimalBrandEntitySchema = BrandEntitySchema.pick({
+  id: true,
+  userId: true,
+  brandName: true,
+  bio: true,
+  disciplines: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type MinimalBrandEntity = z.infer<typeof MinimalBrandEntitySchema>;
+
+export const BrandWithUserEntitySchema = MinimalBrandEntitySchema.extend({
+  user: MinimalUserSchema,
+});
+
+export type BrandWithUserEntity = z.infer<typeof BrandWithUserEntitySchema>;
+
+export const CreateBrandProfileInputSchema = BrandShape.pick({
+  brandName: true,
+  location: true,
+}).extend({
+  disciplineSlugs: z
+    .array(z.string())
+    .min(1, "At least one discipline is required"),
+});
 
 export type CreateBrandProfileInput = z.infer<
   typeof CreateBrandProfileInputSchema
 >;
 
-export const UpdateBrandProfileInputSchema = z
-  .object({
-    brandName: z.string().min(1).optional().openapi({ example: "Acme Studio" }),
-    links: z
-      .object({
-        url: z.union([
-          z.url({ message: "Please enter a valid URL" }),
-          z.literal(""),
-        ]),
-        type: z.enum(LINK_TYPES),
-      })
-      .array()
-      .optional(),
-    location: z.string().openapi({
-      example: "UK",
-    }),
-    achievements: z
-      .object({
-        title: z.string(),
-        link: z.url().optional(),
-        year: z.number().int().optional(),
-      })
-      .array()
-      .optional(),
-    bio: z
-      .string()
-      .max(600)
-      .optional()
-      .openapi({ example: "Updated bio for our creative agency." }),
-    disciplineSlugs: z
-      .array(z.string())
-      .min(1, "At least one discipline is required")
-      .optional()
-      .openapi({ example: ["frontend", "ui-ux"] }),
+export const UpdateBrandProfileInputSchema = BrandShape.partial()
+  .extend({
+    disciplineSlugs: z.array(z.string()).optional(),
     version: z.int(),
   })
-  .openapi({
-    title: "update brand profile",
+  .refine((d) => Object.values(d).some((v) => v !== undefined), {
+    message: "At least one field must be provided",
   });
 
 export type UpdateBrandProfileInput = z.infer<
   typeof UpdateBrandProfileInputSchema
 >;
+
 
 export const GetBrandInputSchema = z.object({
   value: z.cuid2(),
@@ -137,35 +98,9 @@ export type GetBrandInput = z.infer<typeof GetBrandInputSchema>;
 
 export const GetBrandQuerySchema = ProfileIdentifierSchema;
 
-export const CreateBrandOutputSchema = BrandEntitySchema;
-
-export type CreateBrandOutput = z.infer<typeof CreateBrandOutputSchema>;
-
-export const GetBrandOutputSchema = BrandEntitySchema;
-
-export type GetBrandOutput = z.infer<typeof GetBrandOutputSchema>;
-
-export const UpdateBrandOutputSchema = BrandEntitySchema;
-
-export type UpdateBrandOutput = z.infer<typeof UpdateBrandOutputSchema>;
-
-export const BrandWithUserEntitySchema = MinimalBrandEntitySchema.extend({
-  user: MinimalUserSchema,
-});
-
-export type BrandWithUserEntity = z.infer<typeof BrandWithUserEntitySchema>;
-
 export const SearchBrandInputSchema = z.object({
-  string: z
-    .string()
-    .min(1, { message: "Search string cannot be empty" })
-    .max(200, { message: "Search string cannot exceed 200 characters" }),
-  limit: z.coerce
-    .number()
-    .int({ message: "Limit must be an integer" })
-    .min(1, { message: "Limit must be at least 1" })
-    .max(100, { message: "Limit cannot exceed 100" })
-    .default(20),
+  string: z.string().min(1, "Search string cannot be empty").max(200),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
   cursor: z.string().optional(),
 });
 
@@ -173,7 +108,16 @@ export type SearchBrandInput = z.infer<typeof SearchBrandInputSchema>;
 
 export const SearchBrandOutputSchema = z.object({
   brands: z.array(BrandWithUserEntitySchema),
-  nextCursor: z.string().optional().nullable(),
+  nextCursor: z.string().nullable().optional(),
 });
 
 export type SearchBrandOutput = z.infer<typeof SearchBrandOutputSchema>;
+
+export const CreateBrandOutputSchema = BrandEntitySchema;
+export type CreateBrandOutput = z.infer<typeof CreateBrandOutputSchema>;
+
+export const GetBrandOutputSchema = BrandEntitySchema;
+export type GetBrandOutput = z.infer<typeof GetBrandOutputSchema>;
+
+export const UpdateBrandOutputSchema = BrandEntitySchema;
+export type UpdateBrandOutput = z.infer<typeof UpdateBrandOutputSchema>;
