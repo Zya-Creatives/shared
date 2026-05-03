@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+
 import {
   APPLICATION_STATUS,
   ApplicationStatus,
@@ -10,8 +11,15 @@ import {
   JobAvailabilityTypes,
   JobType,
 } from "../constants";
+
 import { MinimalUserSchema } from "./user";
 import { NormalizedJobSchema } from "./job";
+
+/**
+ * --------------------------------
+ * ENUMS
+ * --------------------------------
+ */
 
 const ApplicationStatusSchema = z.enum(
   Object.values(APPLICATION_STATUS) as [
@@ -31,33 +39,26 @@ const JobAvailabilitySchema = z.enum(
   ],
 );
 
-export const MinimalJobApplicationEntitySchema = z.object({
-  user: MinimalUserSchema,
+/**
+ * --------------------------------
+ * SHAPE
+ * --------------------------------
+ */
+
+const JobApplicationShape = z.object({
   jobId: z.cuid2(),
-  id: z.cuid2(),
-  coverLetter: z.string(),
-  createdAt: z.coerce.date(),
-  applicationStatus: ApplicationStatusSchema,
-});
-
-export type MinimalJobApplicationEntity = z.infer<
-  typeof MinimalJobApplicationEntitySchema
->;
-
-export const BaseJobApplicationEntitySchema = z.object({
-  id: z.string(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-  availability: z.enum(JOB_AVAILABILITY_TYPES).optional(),
-  experienceLevel: z.enum(EXPERIENCE_LEVELS).optional(),
-  jobId: z.string(),
-  applicantId: z.string(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  emailAddress: z.string().optional(),
+  emailAddress: z.email().optional(),
   phoneNumber: z.string().nullable(),
   currentRole: z.string(),
   resumeUrl: z.url(),
+  experienceLevel: ExperienceLevelSchema.optional(),
+  availability: JobAvailabilitySchema.optional(),
+  coverLetter: z.string().nullable(),
+  receiveEmailUpdates: z.boolean(),
+  wagesAmount: z.number().nullable(),
+
   workSampleUrls: z
     .array(
       z.object({
@@ -67,17 +68,18 @@ export const BaseJobApplicationEntitySchema = z.object({
       }),
     )
     .optional(),
+
   zyaProjects: z
     .array(
       z.object({
         projectName: z.string(),
         projectImgUrl: z.url().optional(),
-        projectId: z.string(),
+        projectId: z.cuid2(),
         tags: z.array(z.string()).optional(),
       }),
     )
     .optional(),
-  applicationStatus: ApplicationStatusSchema,
+
   linkUrls: z
     .array(
       z.object({
@@ -86,117 +88,75 @@ export const BaseJobApplicationEntitySchema = z.object({
       }),
     )
     .optional(),
-  coverLetter: z.string().nullable(),
-  receiveEmailUpdates: z.boolean(),
-  wagesAmount: z.number().nullable(),
 });
 
-export type BaseJobApplicationEntity = z.infer<
-  typeof BaseJobApplicationEntitySchema
->;
+export type JobApplicationShapeType = z.infer<typeof JobApplicationShape>;
 
-export const JobApplicationEntitySchema = z.object({
-  id: z.string(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  jobId: z.cuid2(),
-  user: MinimalUserSchema,
-  emailAddress: z.email().optional(),
-  phoneNumber: z.string().optional(),
-  currentRole: z.string().optional(),
-  experienceLevel: ExperienceLevelSchema.optional(),
-  resumeUrl: z.url(),
-  workSampleUrls: z
-    .array(
-      z.object({
-        url: z.url(),
-        name: z.string().optional(),
-        mimeType: z.string().optional(),
-      }),
-    )
-    .optional(),
-  zyaProjects: z
-    .array(
-      z.object({
-        projectName: z.string(),
-        projectImgUrl: z.url(),
-        projectId: z.cuid2(),
-        tags: z.array(z.string()).optional(),
-      }),
-    )
-    .optional(),
-  applicationStatus: ApplicationStatusSchema.default("Application Sent"),
-  applicantId: z.cuid2(),
-  linkUrls: z
-    .array(
-      z.object({ url: z.url(), isPortfolioUrl: z.boolean().default(false) }),
-    )
-    .optional(),
-  coverLetter: z.string().optional(),
-  receiveEmailUpdates: z.boolean().optional(),
-  wagesAmount: z.coerce.number().optional(),
-  availability: JobAvailabilitySchema.optional(),
-  createdAt: z.coerce
-    .date()
-    .optional()
-    .openapi({ example: "2025-10-13T09:00:00.000Z" }),
-  updatedAt: z.coerce.date().openapi({ example: "2025-10-13T09:00:00.000Z" }),
-});
+/**
+ * --------------------------------
+ * BASE ENTITY
+ * --------------------------------
+ */
+
+export const JobApplicationEntitySchema = z
+  .object({
+    id: z.cuid2(),
+    applicantId: z.cuid2(),
+    user: MinimalUserSchema,
+
+    ...JobApplicationShape.shape,
+
+    applicationStatus: ApplicationStatusSchema,
+
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
+  })
+  .openapi("JobApplication");
 
 export type JobApplicationEntity = z.infer<typeof JobApplicationEntitySchema>;
 
-export const CreateJobApplicationInputSchema = z.object({
+/**
+ * --------------------------------
+ * DERIVED ENTITIES
+ * --------------------------------
+ */
+
+export const MinimalJobApplicationEntitySchema = z.object({
+  id: z.cuid2(),
   jobId: z.cuid2(),
-  applicantId: z.cuid2(),
-  jobSections: z.array(z.enum(JOB_SECTIONS)).optional(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  emailAddress: z.email().optional(),
-  phoneNumber: z.string().optional(),
-  currentRole: z.string().optional(),
-  experienceLevel: ExperienceLevelSchema.optional(),
-  resumeUrl: z.url().optional(),
-  coverLetter: z.string().optional(),
-  availability: z.enum(JOB_AVAILABILITY_TYPES).optional(),
-  wagesAmount: z.coerce.number().optional(),
-  receiveEmailUpdates: z.boolean().optional(),
-  workSampleUrls: z
-    .array(
-      z.object({
-        url: z.url(),
-        name: z.string().optional(),
-        mimeType: z.string().optional(),
-      }),
-    )
-    .optional(),
-  linkUrls: z
-    .array(z.object({ url: z.url(), isPortfolioUrl: z.boolean() }))
-    .optional(),
-  zyaProjects: z
-    .array(
-      z.object({
-        projectName: z.string(),
-        projectId: z.cuid2(),
-        projectImgUrl: z.url(),
-        tags: z.array(z.string()).optional(),
-      }),
-    )
-    .optional(),
+  user: MinimalUserSchema,
+  coverLetter: z.string(),
+  applicationStatus: ApplicationStatusSchema,
+  createdAt: z.iso.datetime(),
 });
 
-export type CreateJobApplicationInput = z.infer<
-  typeof CreateJobApplicationInputSchema
+export type MinimalJobApplicationEntity = z.infer<
+  typeof MinimalJobApplicationEntitySchema
 >;
 
 export const TrackedJobApplicationEntitySchema = z.object({
   id: z.cuid2(),
-  createdAt: z.coerce.date(),
   applicationStatus: ApplicationStatusSchema,
+  createdAt: z.iso.datetime(),
   job: NormalizedJobSchema,
 });
 
 export type TrackedJobApplicationEntity = z.infer<
   typeof TrackedJobApplicationEntitySchema
+>;
+
+/**
+ * --------------------------------
+ * INPUTS
+ * --------------------------------
+ */
+
+export const CreateJobApplicationInputSchema = JobApplicationShape.extend({
+  jobSections: z.array(z.enum(JOB_SECTIONS)).optional(),
+});
+
+export type CreateJobApplicationInput = z.infer<
+  typeof CreateJobApplicationInputSchema
 >;
 
 export const UpdateJobApplicationInputSchema =
@@ -222,6 +182,12 @@ export const GetTrackedJobApplicationsInputSchema = z.object({
 export type GetTrackedJobApplicationsInput = z.infer<
   typeof GetTrackedJobApplicationsInputSchema
 >;
+
+/**
+ * --------------------------------
+ * OUTPUTS
+ * --------------------------------
+ */
 
 export const GetTrackedJobApplicationsOutputSchema = z.object({
   applications: z.array(TrackedJobApplicationEntitySchema),

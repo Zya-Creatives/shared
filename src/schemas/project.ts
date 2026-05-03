@@ -8,7 +8,6 @@ import {
 } from "../constants";
 import { CommentEntitySchema } from "./comment";
 import { BookmarkEntitySchema } from "./bookmark";
-import { ViewEntitySchema } from "./view";
 import { MinimalUserSchema } from "./user";
 import { ActivitySchema } from "./activity";
 import { FileEntitySchema } from "./file";
@@ -75,6 +74,13 @@ export const ProjectSocialGraphEntitySchema = z
     noOfViews: z.number().int().optional(),
   })
   .openapi("ProjectSocialGraphEntity");
+
+export type ProjectSocialGraphEntity = z.infer<
+  typeof ProjectSocialGraphEntitySchema
+>;
+export type PostSocialGraphEntity = z.infer<
+  typeof ProjectSocialGraphEntitySchema
+>;
 
 export const CreateProjectInputSchema = z
   .object({
@@ -302,14 +308,6 @@ export type GetProjectWithLikesOutput = z.infer<
   typeof GetProjectWithLikesOutputSchema
 >;
 
-export const ProjectWithProjectViewsEntitySchema = MinimalProjectSchema.extend({
-  views: z.array(ViewEntitySchema),
-}).openapi("ProjectWithProjectViewsEntity");
-
-export type ProjectWithProjectViewsEntity = z.infer<
-  typeof ProjectWithProjectViewsEntitySchema
->;
-
 export const ProjectWithProjectBookmarksEntitySchema =
   MinimalProjectSchema.extend({
     bookmarks: z.array(BookmarkEntitySchema),
@@ -343,6 +341,5 @@ export type CommentOnProjectOutput = z.infer<
 export const ProjectIdSchema = z.object({ projectId: z.cuid2() });
 export type ProjectIdInput = z.infer<typeof ProjectIdSchema>;
 
-export type ProjectViewEntity = z.infer<typeof ViewEntitySchema>;
 export type ProjectLikeEntity = z.infer<typeof LikeEntitySchema>;
 export type ProjectCommentEntity = z.infer<typeof CommentEntitySchema>;

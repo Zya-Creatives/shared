@@ -19,6 +19,8 @@ export const RegisterSchema = z.object({
     .max(100, { message: "Password must be at most 100 characters" }),
 });
 
+export type RegisterInput = z.infer<typeof RegisterSchema>;
+
 export const LoginSchema = z.object({
   identifier: z
     .string()
@@ -41,3 +43,5 @@ export const LoginSchema = z.object({
     .max(100, { message: "Password must be at most 100 characters" }),
   rememberMe: z.boolean(),
 });
+
+export type LoginInput = z.infer<typeof LoginSchema>;

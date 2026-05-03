@@ -36,3 +36,7 @@ export const LikeInputSchema = z.object({
 });
 
 export const LikeOutputSchema = LikeEntitySchema;
+
+export type LikeEntity = z.infer<typeof LikeEntitySchema>;
+export type LikeInput = z.infer<typeof LikeInputSchema>;
+export type LikeOutput = z.infer<typeof LikeOutputSchema>;

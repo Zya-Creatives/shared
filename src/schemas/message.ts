@@ -1,100 +1,107 @@
 import { z } from "@hono/zod-openapi";
+
 import { ACTIVITY_PARENT_TYPES, MESSAGE_TYPES } from "../constants";
-import { CreateFileInputSchema } from "./file";
 
-// 1. Base primitives
-export const LinkMetaSchema = z.object({
-  url: z.url(),
-  title: z.string().optional(),
-  description: z.string().optional(),
-  image: z.url().optional(),
-});
+/**
+ * --------------------------------
+ * SHAPE
+ * --------------------------------
+ */
 
-// 2. The API Output Schema (Enriched)
-export const MessageEntitySchema = z.object({
-  id: z.cuid2(),
+const MessageShape = z.object({
   chatId: z.cuid2(),
-  senderId: z.cuid2(),
-  receiverId: z.cuid2(),
-
-  // Content & Type
-  content: z.string().optional().default(""),
+  content: z.string().optional(),
   messageType: z.enum(MESSAGE_TYPES).default("DEFAULT_MESSAGE"),
 
-  // Parent/Threading
   parentId: z.cuid2().optional(),
   parentType: z.enum(ACTIVITY_PARENT_TYPES).optional(),
 
-  // Reply Context
   replyToMessageId: z.cuid2().optional(),
-  replyToContent: z.string().optional(),
-  replyToImages: z.array(z.url()).optional(),
-  replyToLinkMeta: LinkMetaSchema.optional(),
 
-  // Metadata
-  linkMeta: LinkMetaSchema.optional(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date().optional(),
-  deletedBySender: z.boolean().default(false),
-  deletedByReceiver: z.boolean().default(false),
-  isEdited: z.boolean().default(false),
-  deletedAt: z.coerce.date().optional(),
+  linkMeta: z
+    .object({
+      url: z.url(),
+      title: z.string().optional(),
+      description: z.string().optional(),
+      image: z.url().optional(),
+    })
+    .optional(),
 });
 
-export const DeleteMessagesInputSchema = z.object({
-  messageIds: z.array(z.cuid2()),
-  deleteForEveryone: z.boolean().default(false),
-});
+export type MessageShapeType = z.infer<typeof MessageShape>;
+
+/**
+ * --------------------------------
+ * BASE ENTITY
+ * --------------------------------
+ */
+
+export const MessageEntitySchema = z
+  .object({
+    id: z.cuid2(),
+    senderId: z.cuid2(),
+    receiverId: z.cuid2(),
+
+    ...MessageShape.shape,
+
+    replyToContent: z.string().optional(),
+    replyToImages: z.array(z.url()).optional(),
+    replyToLinkMeta: MessageShape.shape.linkMeta,
+
+    deletedBySender: z.boolean().default(false),
+    deletedByReceiver: z.boolean().default(false),
+    isEdited: z.boolean().default(false),
+
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime().optional(),
+    deletedAt: z.iso.datetime().optional(),
+  })
+  .openapi("Message");
+
+export type MessageEntity = z.infer<typeof MessageEntitySchema>;
 
 export const MessageFileEntitySchema = z.object({
   id: z.cuid2(),
   messageId: z.cuid2(),
   fileId: z.cuid2(),
   url: z.url(),
-  order: z.number().int().default(0),
+  order: z.int(),
 });
 
 export const MessageWithFilesEntitySchema = MessageEntitySchema.extend({
-  messageFiles: z.array(MessageFileEntitySchema).default([]),
+  messageFiles: z.array(MessageFileEntitySchema),
 });
 
-// 3. Inputs
-export const CreateMessageInputSchema = z.object({
-  id: z.cuid2(),
-  chatId: z.cuid2(),
-  senderId: z.cuid2(),
-  receiverId: z.cuid2(),
+/**
+ * --------------------------------
+ * INPUTS
+ * --------------------------------
+ */
 
-  content: z.string().optional(),
-  messageType: z.enum(MESSAGE_TYPES).default("DEFAULT_MESSAGE"),
-
-  parentId: z.cuid2().optional(),
-  replyToMessageId: z.cuid2().optional(),
-
-  linkMeta: LinkMetaSchema.optional(),
+export const CreateMessageInputSchema = MessageShape.extend({
   files: z
-    .array(CreateFileInputSchema.extend({ order: z.number().int() }))
+    .array(
+      z.object({
+        key: z.string(),
+        mimeType: z.string(),
+        order: z.int(),
+      }),
+    )
     .optional(),
 });
 
 export const EditMessageInputSchema = z.object({
-  id: z.cuid2(),
-  chatId: z.cuid2(),
-  senderId: z.cuid2(),
-  receiverId: z.cuid2(),
+  messageId: z.cuid2(),
   content: z.string().optional(),
-  isEdited: z.boolean().default(true),
 });
+
+/**
+ * --------------------------------
+ * OUTPUTS
+ * --------------------------------
+ */
 
 export const GetMessagesOutputSchema = z.object({
   messages: z.array(MessageWithFilesEntitySchema),
-  nextCursor: z.string().nullable(),
-});
-
-export const MessageIdSchema = z.object({
-  messageId: z.cuid2(),
-});
-
-export const ChatIdParamSchema = z.object({
-  chatId: z.cuid2(),
+  nextCursor: z.string().optional(),
 });

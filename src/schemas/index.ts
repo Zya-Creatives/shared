@@ -1,6 +1,7 @@
 export * from "./auth";
 export * from "./brand";
 export * from "./common";
+export * from "./comment";
 export * from "./creative";
 export * from "./user";
 export * from "./project";
@@ -27,3 +28,4 @@ export * from "./seller";
 export * from "./product";
 export * from "./transaction";
 export * from "./settings";
+export * from "./view";

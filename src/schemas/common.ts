@@ -83,3 +83,8 @@ export const WebsiteUrlInputSchema = z
   })
   .pipe(z.url("Invalid URL").or(z.literal("")))
   .optional();
+
+export type Cursor = {
+  id: string;
+  createdAt: string;
+};

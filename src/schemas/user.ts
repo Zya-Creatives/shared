@@ -22,11 +22,7 @@ import { LikeEntitySchema } from "./like";
 import { BrandEntitySchema } from "./brand";
 import { CreativeEntitySchema } from "./creative";
 import { InvestorEntitySchema } from "./investor";
-import {
-  FeedPostEntitySchema,
-  PostEntitySchema,
-  PostWithFilesEntitySchema,
-} from "./post";
+import { PostEntitySchema, PostWithFilesEntitySchema } from "./post";
 import { JobSearchDocumentSchema } from "./job";
 import { ProductEntitySchema } from "./product";
 
@@ -226,7 +222,7 @@ export const UserWithJobBookmarksInputSchema = z.object({
 export type UserAuthStatusEntity = z.infer<typeof UserAuthStatusEntitySchema>;
 export type UserWithJobBookmarksInput = z.infer<
   typeof UserWithJobBookmarksEntitySchema
->; 
+>;
 
 /**
  * --------------------------------

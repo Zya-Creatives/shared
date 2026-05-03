@@ -1,38 +1,57 @@
 import { z } from "@hono/zod-openapi";
+
 import { ACTIVITY_PARENT_TYPES } from "../constants";
+
+/**
+ * --------------------------------
+ * SHAPE
+ * --------------------------------
+ */
+
+const BookmarkShape = z.object({
+  parentId: z.cuid2(),
+  parentType: z.enum(ACTIVITY_PARENT_TYPES),
+});
+
+export type BookmarkShapeType = z.infer<typeof BookmarkShape>;
+
+/**
+ * --------------------------------
+ * BASE ENTITY
+ * --------------------------------
+ */
 
 export const BookmarkEntitySchema = z
   .object({
-    id: z.cuid2().openapi({
-      description: "Unique identifier for the bookmark.",
-      title: "Bookmark ID",
-    }),
-    createdAt: z.coerce.date().optional().openapi({
-      description: "Timestamp when the bookmark was created.",
-      title: "Created At",
-    }),
-    userId: z.cuid2().openapi({
-      description: "Identifier of the user who created the bookmark.",
-      title: "User ID",
-    }),
-    parentId: z.cuid2().openapi({
-      description: "Identifier of the parent entity that was bookmarked.",
-      title: "Parent ID",
-    }),
-    parentType: z.enum(ACTIVITY_PARENT_TYPES).openapi({
-      description: "Type of the parent entity this statistic belongs to.",
-      title: "Parent Type",
-    }),
+    id: z.cuid2(),
+    userId: z.cuid2(),
+    ...BookmarkShape.shape,
+    createdAt: z.iso.datetime(),
   })
-  .openapi({
-    title: "Bookmark",
-    description: "Represents a user bookmark on a specific parent entity.",
-  });
+  .openapi("Bookmark");
 
-export const BookmarkInputSchema = z.object({
-  parentId: z.string(),
-  parentType: z.enum(ACTIVITY_PARENT_TYPES),
-  userId: z.string(),
-});
+export type BookmarkEntity = z.infer<typeof BookmarkEntitySchema>;
+
+/**
+ * --------------------------------
+ * INPUTS
+ * --------------------------------
+ */
+
+export const CreateBookmarkInputSchema = BookmarkShape.extend({});
+
+export type CreateBookmarkInput = z.infer<typeof CreateBookmarkInputSchema>;
+
+export const DeleteBookmarkInputSchema = BookmarkShape.extend({});
+
+export type DeleteBookmarkInput = z.infer<typeof DeleteBookmarkInputSchema>;
+
+/**
+ * --------------------------------
+ * OUTPUTS
+ * --------------------------------
+ */
 
 export const BookmarkOutputSchema = BookmarkEntitySchema;
+
+export type BookmarkOutput = z.infer<typeof BookmarkOutputSchema>;

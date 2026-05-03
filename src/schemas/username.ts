@@ -9,3 +9,5 @@ export const UsernameSchema = z.object({
       message: "Username may only contain letters, numbers, and underscores",
     }),
 });
+
+export type UsernameInput = z.infer<typeof UsernameSchema>;

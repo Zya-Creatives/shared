@@ -1,88 +1,120 @@
 import { z } from "@hono/zod-openapi";
 
-export const BaseDisciplineEntitySchema = z.object({
-  slug: z.string().openapi({ example: "digital-art" }),
-  name: z.string().openapi({ example: "Digital Art" }),
+/**
+ * --------------------------------
+ * SHAPE
+ * --------------------------------
+ */
+
+const DisciplineShape = z.object({
+  slug: z.string(),
+  name: z.string(),
 });
 
-export const TagEntitySchema = z.object({
-  id: z.int(),
+export type DisciplineShapeType = z.infer<typeof DisciplineShape>;
+
+const TagShape = z.object({
   name: z.string(),
   disciplineSlug: z.string().optional(),
 });
 
+export type TagShapeType = z.infer<typeof TagShape>;
+
+/**
+ * --------------------------------
+ * BASE ENTITY
+ * --------------------------------
+ */
+
+export const BaseDisciplineEntitySchema =
+  DisciplineShape.openapi("BaseDiscipline");
+
+export type BaseDisciplineEntity = z.infer<typeof BaseDisciplineEntitySchema>;
+
+export const TagEntitySchema = z
+  .object({
+    id: z.int(),
+    ...TagShape.shape,
+  })
+  .openapi("Tag");
+
+export type TagEntity = z.infer<typeof TagEntitySchema>;
+
+/**
+ * --------------------------------
+ * DERIVED ENTITIES
+ * --------------------------------
+ */
+
 export const DisciplineEntitySchema = BaseDisciplineEntitySchema.extend({
-  tags: z
-    .array(z.string().openapi({ example: "illustration" }))
-    .optional()
-    .openapi({ example: ["illustration", "concept-art"] }),
-}).openapi({ title: "DisciplineEntity" });
+  tags: z.array(z.string()).optional(),
+}).openapi("Discipline");
 
-export const DisciplineUpdateOutputSchema = z
-  .object({
-    slug: z.string().openapi({ example: "digital-art" }),
-  })
-  .openapi({ title: "DisciplineUpdateOutput" });
+export type DisciplineEntity = z.infer<typeof DisciplineEntitySchema>;
 
-export const CreateDisciplinesInputSchema = z
-  .object({
-    disciplines: z
-      .array(
-        z.object({
-          name: z.string().max(128).openapi({ example: "Mathematics" }),
-          tags: z
-            .array(z.string().openapi({ example: "algebra" }))
-            .default([])
-            .openapi({ example: ["algebra", "geometry"] }),
-        })
-      )
-      .openapi({
-        description: "Array of disciplines to upsert.",
-        example: [
-          { name: "Mathematics", tags: ["algebra", "geometry"] },
-          { name: "Physics", tags: ["mechanics", "optics"] },
-        ],
-      }),
-  })
-  .openapi({ title: "CreateDisciplinesInput" });
+/**
+ * --------------------------------
+ * INPUTS
+ * --------------------------------
+ */
 
-export const CreateDisciplinesOutputSchema = z
-  .object({
-    disciplines: z.array(z.string()),
-  })
-  .openapi({ title: "CreateDisciplinesOutput" });
-
-export const GetDisciplinesInputSchema = z
-  .object({
-    withTags: z
-      .union([z.literal("true"), z.literal("false")])
-      .optional()
-      .openapi({
-        description: "Whether to include tags in the response.",
-        example: "true",
-      }),
-    getDefault: z
-      .union([z.literal("true"), z.literal("false")])
-      .optional()
-      .openapi({
-        description:
-          "Fetch the default list of disciplines (non user-added disciplines).",
-      }),
-    slugs: z.string().optional().openapi({
-      description: "Comma-separated list of discipline slugs to filter by.",
-      example: "mathematics,physics",
+export const CreateDisciplinesInputSchema = z.object({
+  disciplines: z.array(
+    z.object({
+      name: z.string().max(128),
+      tags: z.array(z.string()).default([]),
     }),
-  })
-  .openapi({ title: "GetDisciplinesInput" });
+  ),
+});
 
-export const GetDisciplinesOutputSchema = z
-  .object({
-    disciplines: z.array(DisciplineEntitySchema),
-  })
-  .openapi({ title: "GetDisciplinesOutput" });
+export type CreateDisciplinesInput = z.infer<
+  typeof CreateDisciplinesInputSchema
+>;
 
-export const SlugInputSchema = z
-  .object({
-    slug: z.string().max(128).openapi({ example: "mathematics" }),
-  })
-  .openapi({ title: "SlugInput" });
+export const GetDisciplinesInputSchema = z.object({
+  withTags: z
+    .enum(["true", "false"])
+    .optional()
+    .transform((value) => value === "true"),
+  getDefault: z
+    .enum(["true", "false"])
+    .optional()
+    .transform((value) => value === "true"),
+  slugs: z.string().optional(),
+});
+
+export type GetDisciplinesInput = z.infer<typeof GetDisciplinesInputSchema>;
+
+export const SlugInputSchema = z.object({
+  slug: z.string().max(128),
+});
+
+export type SlugInput = z.infer<typeof SlugInputSchema>;
+
+/**
+ * --------------------------------
+ * OUTPUTS
+ * --------------------------------
+ */
+
+export const DisciplineUpdateOutputSchema = z.object({
+  slug: z.string(),
+});
+
+export type DisciplineUpdateOutput = z.infer<
+  typeof DisciplineUpdateOutputSchema
+>;
+
+export const CreateDisciplinesOutputSchema = z.object({
+  disciplines: z.array(z.string()),
+});
+
+export type CreateDisciplinesOutput = z.infer<
+  typeof CreateDisciplinesOutputSchema
+>;
+
+export const GetDisciplinesOutputSchema = z.object({
+  disciplines: z.array(DisciplineEntitySchema),
+});
+
+export type GetDisciplinesOutput = z.infer<typeof GetDisciplinesOutputSchema>;

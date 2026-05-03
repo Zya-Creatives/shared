@@ -19,3 +19,9 @@ export const UpsertUserStrikeInputSchema = z.object({
 });
 
 export const UpsertUserStrikeOutputSchema = UserStrikeEntitySchema;
+
+export type UserStrikeEntity = z.infer<typeof UserStrikeEntitySchema>;
+export type UpsertUserStrikeInput = z.infer<typeof UpsertUserStrikeInputSchema>;
+export type UpsertUserStrikeOutput = z.infer<
+  typeof UpsertUserStrikeOutputSchema
+>;

@@ -1,18 +1,47 @@
 import { z } from "@hono/zod-openapi";
+
 import { MESSAGE_REQUEST_STATUS } from "../constants";
 
-export const BaseChatEntitySchema = z.object({
-  id: z.cuid2(),
+/**
+ * --------------------------------
+ * SHAPE
+ * --------------------------------
+ */
+
+const ChatShape = z.object({
   senderId: z.cuid2(),
   receiverId: z.cuid2(),
   isMessageRequest: z.boolean().default(true),
   messageRequestStatus: z.enum(MESSAGE_REQUEST_STATUS).default("PENDING"),
-  acceptedAt: z.coerce.date().nullable(),
-  declinedAt: z.coerce.date().nullable(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date().nullable(),
-  deletedAt: z.coerce.date().nullable(),
 });
+
+export type ChatShapeType = z.infer<typeof ChatShape>;
+
+/**
+ * --------------------------------
+ * BASE ENTITY
+ * --------------------------------
+ */
+
+export const BaseChatEntitySchema = z
+  .object({
+    id: z.cuid2(),
+    ...ChatShape.shape,
+    acceptedAt: z.iso.datetime().nullable(),
+    declinedAt: z.iso.datetime().nullable(),
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime().nullable(),
+    deletedAt: z.iso.datetime().nullable(),
+  })
+  .openapi("BaseChat");
+
+export type BaseChatEntity = z.infer<typeof BaseChatEntitySchema>;
+
+/**
+ * --------------------------------
+ * DERIVED ENTITIES
+ * --------------------------------
+ */
 
 export const ChatEntitySchema = BaseChatEntitySchema.extend({
   senderName: z.string(),
@@ -24,35 +53,67 @@ export const ChatEntitySchema = BaseChatEntitySchema.extend({
   receiverImgUrl: z.string().nullable(),
 
   lastMessageSent: z.string().nullable(),
-  lastMessageAt: z.coerce.date().nullable(),
+  lastMessageAt: z.iso.datetime().nullable(),
   isUnread: z.boolean().default(false),
   isOnline: z.boolean().default(false),
-});
+}).openapi("Chat");
+
+export type ChatEntity = z.infer<typeof ChatEntitySchema>;
+
+/**
+ * --------------------------------
+ * INPUTS
+ * --------------------------------
+ */
 
 export const CreateChatInputSchema = z.object({
-  senderId: z.cuid2(),
   receiverId: z.cuid2(),
 });
 
-export const CreateChatOutputSchema = BaseChatEntitySchema;
+export type CreateChatInput = z.infer<typeof CreateChatInputSchema>;
 
-export const ChatIdSchema = z.object({
+export const ChatIdInputSchema = z.object({
   chatId: z.cuid2(),
 });
 
+export type ChatIdInput = z.infer<typeof ChatIdInputSchema>;
+
+export const AcceptMessageRequestInputSchema = ChatIdInputSchema.extend({});
+
+export type AcceptMessageRequestInput = z.infer<
+  typeof AcceptMessageRequestInputSchema
+>;
+
+export const DeclineMessageRequestInputSchema = ChatIdInputSchema.extend({});
+
+export type DeclineMessageRequestInput = z.infer<
+  typeof DeclineMessageRequestInputSchema
+>;
+
+/**
+ * --------------------------------
+ * OUTPUTS
+ * --------------------------------
+ */
+
+export const CreateChatOutputSchema = BaseChatEntitySchema;
+
+export type CreateChatOutput = z.infer<typeof CreateChatOutputSchema>;
+
 export const GetChatsOutputSchema = z.array(ChatEntitySchema);
+
+export type GetChatsOutput = z.infer<typeof GetChatsOutputSchema>;
 
 export const GetChatsForUserOutputSchema = z.object({
   chats: z.array(ChatEntitySchema),
   nextCursor: z.string().nullable(),
 });
 
+export type GetChatsForUserOutput = z.infer<typeof GetChatsForUserOutputSchema>;
+
 export const GetMessageRequestsForUserOutputSchema =
   GetChatsForUserOutputSchema;
 
-export const AcceptMessageRequestInputSchema = z.object({
-  chatId: z.cuid2(),
-  userId: z.cuid2(),
-});
-
-export const DeclineMessageRequestInputSchema = AcceptMessageRequestInputSchema;
+export type GetMessageRequestsForUserOutput = z.infer<
+  typeof GetMessageRequestsForUserOutputSchema
+>;

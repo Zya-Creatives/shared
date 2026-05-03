@@ -1,354 +1,293 @@
 import { z } from "@hono/zod-openapi";
+
 import {
   ACTIVITY_PARENT_TYPES,
   POST_BADGE_TYPES,
   POST_TYPES,
 } from "../constants";
+
 import { FileEntitySchema, CreateFileInputSchema } from "./file";
-import { EntityStatsSchema } from "./entity-stats";
+import { EntityStatsEntitySchema } from "./entity-stats";
 import { cleanHtml } from "../utils/clean-html";
 
-export const PostEntitySchema = z.object({
-  id: z
-    .cuid2()
-    .openapi({ description: "Post id", example: "ckj1a2b3c0000xyz" }),
-  parentId: z
-    .cuid2()
-    .optional()
-    .openapi({ description: "Parent id", example: "ckj1a2b3c0000abc" }),
-  parentType: z
-    .enum(ACTIVITY_PARENT_TYPES)
-    .default(ACTIVITY_PARENT_TYPES.POST)
-    .openapi({ example: "POST" }),
-  tags: z
-    .array(
-      z.object({
-        name: z.string().openapi({ example: "javascript" }),
-        id: z.int().openapi({ example: 101 }),
-      }),
-    )
-    .optional()
-    .openapi({ example: [{ name: "javascript", id: 101 }] }),
-  mentions: z
-    .array(z.string())
-    .optional()
-    .openapi({ example: ["cuid123", "cuid456"] }),
-  badge: z.enum(POST_BADGE_TYPES).optional().openapi({ example: "FEATURED" }),
-  userId: z
-    .cuid2()
-    .openapi({ description: "User id", example: "ckj1a2b3c0000def" }),
-  creatorUsername: z
-    .string()
-    .optional()
-    .openapi({ description: "Username", example: "dev_guru" }),
-  creatorFullName: z.string().optional().openapi({ example: "Jane Doe" }),
-  creatorImageUrl: z
-    .cuid2()
-    .optional()
-    .openapi({ description: "Creator Image ID", example: "clm1a2b3c0000pic" }),
+/**
+ * --------------------------------
+ * SHARED
+ * --------------------------------
+ */
+
+export const LinkMetaSchema = z.object({
+  url: z.url(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  image: z.url().optional(),
+});
+
+export type LinkMeta = z.infer<typeof LinkMetaSchema>;
+
+const PostTagSchema = z.object({
+  id: z.int(),
+  name: z.string(),
+});
+
+export type PostTag = z.infer<typeof PostTagSchema>;
+
+/**
+ * --------------------------------
+ * SHAPE
+ * --------------------------------
+ */
+
+const PostShape = z.object({
+  parentId: z.cuid2().optional(),
+  parentType: z.enum(ACTIVITY_PARENT_TYPES).default(ACTIVITY_PARENT_TYPES.POST),
+
   content: z
     .string()
     .optional()
     .refine(
-      (val) => {
-        if (!val) return true;
-        const plainText = cleanHtml(val, Number.MAX_SAFE_INTEGER);
+      (value) => {
+        if (!value) return true;
+        const plainText = cleanHtml(value, Number.MAX_SAFE_INTEGER);
         return plainText.length <= 300;
       },
       { message: "Post content cannot exceed 300 characters" },
-    )
-    .openapi({ example: "Check out my new portfolio update!" }),
-  postType: z.enum(POST_TYPES).openapi({
-    description: "Type of the post entity",
-    title: "Post Type",
-    example: "PROJECT",
-  }),
-  createdAt: z.coerce
-    .date()
-    .optional()
-    .openapi({ example: "2026-03-11T14:43:09Z" }),
-  linkMeta: z
-    .object({
-      url: z.url().openapi({ example: "https://example.com" }),
-      title: z.string().optional().openapi({ example: "Example Website" }),
-      description: z
-        .string()
-        .optional()
-        .openapi({ example: "This is an example link" }),
-      image: z
-        .url()
-        .optional()
-        .openapi({ example: "https://example.com/preview.jpg" }),
-    })
-    .optional()
-    .openapi({
-      description: "Optional metadata for a single link in the post",
-    }),
+    ),
+
+  postType: z.enum(POST_TYPES).default("DEFAULT_POST"),
+  badge: z.enum(POST_BADGE_TYPES).optional(),
+  mentions: z.array(z.cuid2()).max(15).optional(),
+  linkMeta: LinkMetaSchema.optional(),
 });
+
+export type PostShapeType = z.infer<typeof PostShape>;
+
+/**
+ * --------------------------------
+ * BASE ENTITY
+ * --------------------------------
+ */
+
+export const PostEntitySchema = z
+  .object({
+    id: z.cuid2(),
+    userId: z.cuid2(),
+
+    ...PostShape.shape,
+
+    tags: z.array(PostTagSchema).optional(),
+
+    creatorUsername: z.string().optional(),
+    creatorFullName: z.string().optional(),
+    creatorImageUrl: z.string().optional(),
+
+    createdAt: z.iso.datetime(),
+  })
+  .openapi("Post");
+
 export type PostEntity = z.infer<typeof PostEntitySchema>;
 
+/**
+ * --------------------------------
+ * DERIVED ENTITIES
+ * --------------------------------
+ */
+
 export const PostWithFilesEntitySchema = PostEntitySchema.extend({
-  files: z
-    .array(FileEntitySchema)
-    .optional()
-    .openapi({ description: "Files attached to the post", example: [] }),
-});
+  files: z.array(FileEntitySchema).optional(),
+}).openapi("PostWithFiles");
+
 export type PostWithFilesEntity = z.infer<typeof PostWithFilesEntitySchema>;
 
 export const MinimalPostSchema = PostEntitySchema.pick({
   id: true,
   parentId: true,
   content: true,
-});
+}).openapi("MinimalPost");
+
+export type MinimalPost = z.infer<typeof MinimalPostSchema>;
 
 export const FeedPostEntitySchema = PostWithFilesEntitySchema.extend({
-  stats: EntityStatsSchema,
-  score: z.number().openapi({ example: 98.5 }),
-  isLiked: z.boolean().optional().openapi({ example: true }),
-  isFollowing: z.boolean().optional().openapi({ example: false }),
-  isBookmarked: z.boolean().optional().openapi({ example: false }),
-});
+  stats: EntityStatsEntitySchema,
+  score: z.number(),
+  isLiked: z.boolean().optional(),
+  isFollowing: z.boolean().optional(),
+  isBookmarked: z.boolean().optional(),
+}).openapi("FeedPost");
+
 export type FeedPostEntity = z.infer<typeof FeedPostEntitySchema>;
 
-export const CreatePostInputSchema = z.object({
-  id: z.cuid2().openapi({ example: "ckj1a2b3c0000xyz" }),
-  parentId: z
-    .cuid2({ message: "Invalid parentId" })
-    .optional()
-    .openapi({ description: "Parent id", example: "ckl1a2b3c0000abc" }),
-  parentType: z
-    .enum(ACTIVITY_PARENT_TYPES)
-    .default(ACTIVITY_PARENT_TYPES.POST)
-    .openapi({ example: "POST" }),
-  content: z
-    .string()
-    .max(2000, { message: "Post content cannot exceed 2000 characters" })
-    .optional()
-    .openapi({
-      description: "Post content",
-      example: "New project announcement",
-    }),
-  postType: z
-    .enum(POST_TYPES)
-    .default("DEFAULT_POST")
-    .openapi({ description: "Post type", example: "PROJECT" }),
+/**
+ * --------------------------------
+ * INPUTS
+ * --------------------------------
+ */
+
+export const CreatePostInputSchema = PostShape.extend({
+  content: z.string().max(2000).optional(),
+
   files: z
     .array(
       CreateFileInputSchema.extend({
-        order: z
-          .number()
-          .int({ message: "File order must be an integer" })
-          .max(5, { message: "File order cannot exceed 5" })
-          .default(1)
-          .openapi({ example: 1 }),
-        isThumbnail: z.boolean().optional().openapi({ example: false }),
+        order: z.number().int().max(5).default(1),
+        isThumbnail: z.boolean().optional(),
       }),
     )
-    .max(5, { message: "Cannot attach more than 5 files" })
-    .optional()
-    .openapi({
-      example: [
-        {
-          key: "uploads/img.png",
-          mimeType: "image/png",
-          order: 1,
-          isThumbnail: false,
-        },
-      ],
-    }),
-  tags: z
-    .array(z.string().min(1, { message: "Tag cannot be empty" }))
-    .max(3, { message: "Cannot add more than 3 tags" })
-    .optional()
-    .openapi({ example: ["react", "frontend"] }),
-  mentions: z
-    .array(z.cuid2())
-    .max(15, { message: "Cannot mention more than 15 users" })
-    .optional()
-    .openapi({ example: ["cuid123"] }),
-  badge: z.enum(POST_BADGE_TYPES).optional().openapi({ example: "TRENDING" }),
-  linkMeta: z
-    .object({
-      url: z
-        .url({ message: "Invalid URL format" })
-        .openapi({ example: "https://example.com" }),
-      title: z
-        .string()
-        .max(200, { message: "Title cannot exceed 200 characters" })
-        .optional()
-        .openapi({ example: "Example Website" }),
-      description: z
-        .string()
-        .max(500, { message: "Description cannot exceed 500 characters" })
-        .optional()
-        .openapi({ example: "This is an example link" }),
-      image: z
-        .string({ message: "" })
-        .optional()
-        .openapi({ example: "https://example.com/preview.jpg" }),
-    })
-    .optional()
-    .openapi({
-      description: "Optional metadata for a single link in the post",
-    }),
+    .max(5)
+    .optional(),
+
+  tags: z.array(z.string().min(1)).max(3).optional(),
 });
+
 export type CreatePostInput = z.infer<typeof CreatePostInputSchema>;
 
-export const PostIdSchema = z.object({
-  postId: z.cuid2().openapi({ example: "ckj1a2b3c0000xyz" }),
+export const PostIdInputSchema = z.object({
+  postId: z.cuid2(),
 });
-export type PostIdInput = z.infer<typeof PostIdSchema>;
+
+export type PostIdInput = z.infer<typeof PostIdInputSchema>;
+
 export const LinkPreviewInputSchema = z.object({
-  url: z.url().openapi({ example: "https://example.com/article" }),
+  url: z.url(),
 });
+
 export type LinkPreviewInput = z.infer<typeof LinkPreviewInputSchema>;
+
 export const ReportPostInputSchema = z.object({
-  complaint: z
-    .string()
-    .max(200, { error: "Complaint cannot be longer than 200 characters" })
-    .openapi({ example: "This post contains spam." }),
+  complaint: z.string().max(200),
 });
+
 export type ReportPostInput = z.infer<typeof ReportPostInputSchema>;
+
 export const GetFeedInputSchema = z.object({
-  limit: z.number().int().optional().openapi({ example: 20 }),
-  cursor: z.string().optional().openapi({ example: "ckj1a2b3c0000cur" }),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  cursor: z.string().optional(),
 });
+
 export type GetFeedInput = z.infer<typeof GetFeedInputSchema>;
+
 export const SearchPostInputSchema = z.object({
-  queryString: z
-    .string()
-    .min(1, { message: "Search string cannot be empty" })
-    .max(200, { message: "Search string cannot exceed 200 characters" })
-    .openapi({ example: "typescript utility types" }),
-  cursor: z.string().optional().openapi({ example: "ckj1a2b3c0000cur" }),
+  queryString: z.string().min(1).max(200),
+  cursor: z.string().optional(),
 });
+
 export type SearchPostInput = z.infer<typeof SearchPostInputSchema>;
 
+/**
+ * --------------------------------
+ * OUTPUTS
+ * --------------------------------
+ */
+
 export const CreatePostOutputSchema = PostEntitySchema;
+
 export type CreatePostOutput = z.infer<typeof CreatePostOutputSchema>;
+
 export const GetPostOutputSchema = PostWithFilesEntitySchema;
+
 export type GetPostOutput = z.infer<typeof GetPostOutputSchema>;
-export const LinkPreviewOutputSchema = z.object({
-  title: z.string().openapi({ example: "Great Article" }),
-  description: z
-    .string()
-    .optional()
-    .openapi({ example: "A detailed breakdown of the topic." }),
-  image: z
-    .string()
-    .optional()
-    .openapi({ example: "https://example.com/hero.jpg" }),
-  url: z
-    .string()
-    .optional()
-    .openapi({ example: "https://example.com/article" }),
-});
+
+export const LinkPreviewOutputSchema = LinkMetaSchema;
+
 export type LinkPreviewOutput = z.infer<typeof LinkPreviewOutputSchema>;
+
 export const GetFeedOutputSchema = z.object({
-  feed: z.array(FeedPostEntitySchema).openapi({ example: [] }),
-  nextCursor: z
-    .string()
-    .optional()
-    .nullable()
-    .openapi({ example: "ckj1a2b3c0000nxt" }),
+  feed: z.array(FeedPostEntitySchema),
+  nextCursor: z.string().optional(),
 });
+
 export type GetFeedOutput = z.infer<typeof GetFeedOutputSchema>;
+
 export const SearchPostOutputSchema = z.object({
-  posts: z.array(FeedPostEntitySchema).openapi({ example: [] }),
-  nextCursor: z
-    .string()
-    .optional()
-    .nullable()
-    .openapi({ example: "ckj1a2b3c0000nxt" }),
+  posts: z.array(FeedPostEntitySchema),
+  nextCursor: z.string().optional(),
 });
+
 export type SearchPostOutput = z.infer<typeof SearchPostOutputSchema>;
 
+/**
+ * --------------------------------
+ * ANALYTICS
+ * --------------------------------
+ */
+
 const AnalyticsChartItemSchema = z.object({
-  x: z.string().openapi({ example: "2026-03-11" }),
-  y: z.number().openapi({ example: 150 }),
+  x: z.string(),
+  y: z.number(),
 });
+
 export const PostAnalyticsOutputSchema = z.object({
   awareness: z.object({
-    reach: z.number().openapi({ example: 5000 }),
-    impressions: z.number().openapi({ example: 6500 }),
-    visitors: z.number().openapi({ example: 1200 }),
-    newFollowers: z.number().openapi({ example: 45 }),
+    reach: z.number(),
+    impressions: z.number(),
+    visitors: z.number(),
+    newFollowers: z.number(),
   }),
+
   engagement: z.object({
-    rate: z.number().openapi({ example: 4.2 }),
-    likes: z.number().openapi({ example: 210 }),
-    comments: z.number().openapi({ example: 34 }),
-    linkCopied: z.number().openapi({ example: 12 }),
-    bookmarks: z.number().openapi({ example: 56 }),
-    tagsClicked: z
-      .array(AnalyticsChartItemSchema)
-      .openapi({ example: [{ x: "javascript", y: 25 }] }),
-    platformShares: z
-      .array(AnalyticsChartItemSchema)
-      .openapi({ example: [{ x: "Twitter", y: 10 }] }),
+    rate: z.number(),
+    likes: z.number(),
+    comments: z.number(),
+    linkCopied: z.number(),
+    bookmarks: z.number(),
+    tagsClicked: z.array(AnalyticsChartItemSchema),
+    platformShares: z.array(AnalyticsChartItemSchema),
   }),
+
   behavior: z.object({
-    viralityScore: z.number().openapi({ example: 8.5 }),
-    frictionRatio: z.number().openapi({ example: 1.2 }),
-    consumptionDepth: z.number().openapi({ example: 65.4 }),
+    viralityScore: z.number(),
+    frictionRatio: z.number(),
+    consumptionDepth: z.number(),
     sentiment: z.object({
-      positive: z.number().openapi({ example: 85 }),
-      negative: z.number().openapi({ example: 5 }),
-      score: z.number().openapi({ example: 9.1 }),
-      reports: z.number().openapi({ example: 0 }),
-      notInterested: z.number().openapi({ example: 2 }),
-      status: z.enum(["Healthy", "Polarizing"]).openapi({ example: "Healthy" }),
+      positive: z.number(),
+      negative: z.number(),
+      score: z.number(),
+      reports: z.number(),
+      notInterested: z.number(),
+      status: z.enum(["Healthy", "Polarizing"]),
     }),
   }),
 });
+
 export type PostAnalyticsOutput = z.infer<typeof PostAnalyticsOutputSchema>;
+
+/**
+ * --------------------------------
+ * SEARCH DOCUMENT
+ * --------------------------------
+ */
 
 export const PostSearchDocumentSchema = z
   .object({
-    id: z.cuid2().openapi({ example: "ckj1a2b3c0000doc" }),
-    userId: z.cuid2().openapi({ example: "ckj1a2b3c0000usr" }),
-    parentId: z.cuid2().nullable().openapi({ example: "ckj1a2b3c0000prt" }),
-    parentType: z.enum(ACTIVITY_PARENT_TYPES).openapi({ example: "POST" }),
-    creatorUsername: z.string().nullable().openapi({ example: "tech_lead" }),
-    creatorFullName: z.string().nullable().openapi({ example: "Alex Smith" }),
-    creatorImageUrl: z
-      .cuid2()
-      .nullable()
-      .openapi({ example: "clm1a2b3c0000pic" }),
-    tagIds: z.array(z.number()).openapi({ example: [101, 102] }),
-    tagNames: z.array(z.string()).openapi({ example: ["react", "typescript"] }),
-    badge: z.enum(POST_BADGE_TYPES).nullable().openapi({ example: "TRENDING" }),
-    postType: z.enum(POST_TYPES).openapi({ example: "PROJECT" }),
-    content: z
-      .string()
-      .nullable()
-      .openapi({ example: "Here is my latest open source tool." }),
-    linkTitle: z.string().nullable().openapi({ example: "GitHub Repo" }),
-    linkDescription: z
-      .string()
-      .nullable()
-      .openapi({ example: "A fast, modern build system." }),
-    linkUrl: z
-      .url()
-      .nullable()
-      .openapi({ example: "https://github.com/project" }),
-    linkImage: z
-      .url()
-      .nullable()
-      .openapi({ example: "https://github.com/image.png" }),
-    files: z.array(FileEntitySchema).nullable().openapi({ example: [] }),
-    mentions: z
-      .array(z.cuid2())
-      .max(15, { message: "Cannot mention more than 15 users" })
-      .optional()
-      .openapi({ example: ["cuid123"] }),
-    createdAt: z
-      .string()
-      .nullable()
-      .openapi({ example: "2026-03-11T14:43:09.000Z" }),
+    id: z.cuid2(),
+    userId: z.cuid2(),
+
+    parentId: z.cuid2().nullable(),
+    parentType: z.enum(ACTIVITY_PARENT_TYPES),
+
+    creatorUsername: z.string().nullable(),
+    creatorFullName: z.string().nullable(),
+    creatorImageUrl: z.string().nullable(),
+
+    tagIds: z.array(z.number()),
+    tagNames: z.array(z.string()),
+
+    badge: z.enum(POST_BADGE_TYPES).nullable(),
+    postType: z.enum(POST_TYPES),
+
+    content: z.string().nullable(),
+
+    linkTitle: z.string().nullable(),
+    linkDescription: z.string().nullable(),
+    linkUrl: z.url().nullable(),
+    linkImage: z.url().nullable(),
+
+    files: z.array(FileEntitySchema).nullable(),
+
+    mentions: z.array(z.cuid2()).max(15).optional(),
+
+    createdAt: z.iso.datetime().nullable(),
   })
-  .openapi({
-    title: "Post Search Document",
-    description: "Flattened schema used for indexing posts in search engines.",
-  });
+  .openapi("PostSearchDocument");
+
 export type PostSearchDocument = z.infer<typeof PostSearchDocumentSchema>;

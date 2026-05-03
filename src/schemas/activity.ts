@@ -15,3 +15,4 @@ export const ActivitySchema = z.object({
   isFollowing: z.boolean().optional(),
 });
 
+export type ActivityEntity = z.infer<typeof ActivitySchema>;
