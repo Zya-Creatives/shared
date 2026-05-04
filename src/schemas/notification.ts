@@ -1,7 +1,7 @@
 import { z } from "@hono/zod-openapi";
 
 import { ACTIVITY_PARENT_TYPES, NOTIFICATION_TYPES } from "../constants";
-import { MinimalUserSchema } from "./user";
+import { MinimalUserSchema } from "./minimal-user";
 
 /**
  * --------------------------------
@@ -40,6 +40,8 @@ export const NotificationEntitySchema = z
   })
   .openapi("Notification");
 
+export type NotificationEntity = z.infer<typeof NotificationEntitySchema>;
+
 export const NotificationDetailsEntitySchema = NotificationEntitySchema.extend({
   actor: MinimalUserSchema,
   recipient: MinimalUserSchema,
@@ -48,6 +50,10 @@ export const NotificationDetailsEntitySchema = NotificationEntitySchema.extend({
   itemImgUrl: z.string().optional(),
   itemStatus: z.string().optional(),
 });
+
+export type NotificationDetailsEntity = z.infer<
+  typeof NotificationDetailsEntitySchema
+>;
 
 /**
  * --------------------------------
@@ -61,9 +67,15 @@ export const ListNotificationsInputSchema = z.object({
   unreadOnly: z.boolean().optional().default(false),
 });
 
+export type ListNotificationsInput = z.infer<
+  typeof ListNotificationsInputSchema
+>;
+
 export const MarkReadInputSchema = z.object({
   notificationIds: z.array(z.cuid2()).min(1),
 });
+
+export type MarkReadInput = z.infer<typeof MarkReadInputSchema>;
 
 /**
  * --------------------------------
@@ -77,6 +89,14 @@ export const ListNotificationsOutputSchema = z.object({
   unreadCount: z.int(),
 });
 
+export type ListNotificationsOutput = z.infer<
+  typeof ListNotificationsOutputSchema
+>;
+
 export const NotificationCountOutputSchema = z.object({
   unreadCount: z.int(),
 });
+
+export type NotificationCountOutput = z.infer<
+  typeof NotificationCountOutputSchema
+>;

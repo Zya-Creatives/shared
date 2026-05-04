@@ -37,6 +37,8 @@ export const PayoutMethodEntitySchema = z
   })
   .openapi("PayoutMethod");
 
+export type PayoutMethodEntity = z.infer<typeof PayoutMethodEntitySchema>;
+
 /**
  * --------------------------------
  * INPUTS
@@ -47,7 +49,15 @@ export const CreatePayoutMethodInputSchema = PayoutMethodShape.omit({
   externalBankId: true,
 });
 
+export type CreatePayoutMethodInput = z.infer<
+  typeof CreatePayoutMethodInputSchema
+>;
+
 export const UpdatePayoutMethodInputSchema = PayoutMethodShape.partial();
+
+export type UpdatePayoutMethodInput = z.infer<
+  typeof UpdatePayoutMethodInputSchema
+>;
 
 /**
  * --------------------------------
@@ -59,9 +69,13 @@ export const VerifyAccountOutputSchema = z.object({
   accountName: z.string(),
 });
 
+export type VerifyAccountOutput = z.infer<typeof VerifyAccountOutputSchema>;
+
 export const BankListOutputSchema = z.array(
   z.object({
     name: z.string(),
     code: z.string(),
   }),
 );
+
+export type BankListOutput = z.infer<typeof BankListOutputSchema>;

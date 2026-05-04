@@ -25,6 +25,7 @@ import { InvestorEntitySchema } from "./investor";
 import { PostEntitySchema, PostWithFilesEntitySchema } from "./post";
 import { JobSearchDocumentSchema } from "./job";
 import { ProductEntitySchema } from "./product";
+import { MinimalUserSchema } from "./minimal-user";
 
 /**
  * --------------------------------
@@ -72,16 +73,6 @@ export type UserEntity = z.infer<typeof UserEntitySchema>;
  * --------------------------------
  */
 
-export const MinimalUserSchema = UserEntitySchema.pick({
-  id: true,
-  name: true,
-  email: true,
-  image: true,
-  username: true,
-  role: true,
-}).openapi("MinimalUser");
-
-export type MinimalUser = z.infer<typeof MinimalUserSchema>;
 
 export const UserProfileEntitySchema = UserEntitySchema.extend({
   profileType: z.enum(["creative", "brand", "investor"]).optional(),

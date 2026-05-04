@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+/**
+ * --------------------------------
+ * PROFILE VISIBILITY
+ * --------------------------------
+ */
+
 export const ProfileVisibilitySettingsSchema = z
   .object({
     privateAccount: z.boolean().default(false),
@@ -24,6 +30,12 @@ export type ProfileVisibilitySettings = z.infer<
   typeof ProfileVisibilitySettingsSchema
 >;
 
+/**
+ * --------------------------------
+ * EXPLORE & FEED
+ * --------------------------------
+ */
+
 export const ExploreAndFeedSettingsSchema = z
   .object({
     feedAlgorithm: z
@@ -37,6 +49,12 @@ export const ExploreAndFeedSettingsSchema = z
 export type ExploreAndFeedSettings = z.infer<
   typeof ExploreAndFeedSettingsSchema
 >;
+
+/**
+ * --------------------------------
+ * NOTIFICATIONS
+ * --------------------------------
+ */
 
 export const NotificationsSettingsSchema = z
   .object({
@@ -58,17 +76,29 @@ export const NotificationsSettingsSchema = z
 
 export type NotificationsSettings = z.infer<typeof NotificationsSettingsSchema>;
 
+/**
+ * --------------------------------
+ * ENTITY
+ * --------------------------------
+ */
+
 export const UserSettingsSchema = z.object({
   id: z.cuid2(),
   userId: z.cuid2(),
   profileVisibilitySettings: ProfileVisibilitySettingsSchema,
   exploreAndFeedSettings: ExploreAndFeedSettingsSchema,
   notificationSettings: NotificationsSettingsSchema,
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
 
 export type UserSettings = z.infer<typeof UserSettingsSchema>;
+
+/**
+ * --------------------------------
+ * INPUTS
+ * --------------------------------
+ */
 
 export const CreateUserSettingsInputSchema = z.object({
   userId: z.cuid2(),
@@ -82,4 +112,14 @@ export const CreateUserSettingsInputSchema = z.object({
 
 export type CreateUserSettingsInput = z.infer<
   typeof CreateUserSettingsInputSchema
+>;
+
+/**
+ * Optional but useful (you’ll likely need this soon)
+ */
+export const UpdateUserSettingsInputSchema =
+  CreateUserSettingsInputSchema.partial();
+
+export type UpdateUserSettingsInput = z.infer<
+  typeof UpdateUserSettingsInputSchema
 >;

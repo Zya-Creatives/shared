@@ -2,24 +2,24 @@ import { z } from "@hono/zod-openapi";
 
 import {
   EMPLOYMENT_TYPE,
-  EmploymentType,
+  type EmploymentType,
   EXPERIENCE_LEVELS,
-  ExperienceLevel,
+  type ExperienceLevel,
   GIG_TYPE,
-  GigType,
+  type GigType,
   JOB_LOCATIONS,
   JOB_SECTIONS,
   JOB_STATUS,
+  type JobStatus,
   JOB_TYPE,
-  JobLocation,
-  JobStatus,
-  JobType,
+  type JobType,
   WAGES_CURRENCY,
-  WagesCurrency,
+  type WagesCurrency,
   WAGE_TYPES,
-  WageTypes,
+  type WageTypes,
   WORK_MODE,
-  WorkMode,
+  type WorkMode,
+  JobLocation,
 } from "../constants";
 
 /**
@@ -28,40 +28,44 @@ import {
  * --------------------------------
  */
 
-const JobTypeSchema = z.enum(
+export const JobTypeSchema = z.enum(
   Object.values(JOB_TYPE) as [JobType, ...JobType[]],
 );
 
-const EmploymentTypeSchema = z.enum(
+export const EmploymentTypeSchema = z.enum(
   Object.values(EMPLOYMENT_TYPE) as [EmploymentType, ...EmploymentType[]],
 );
 
-const WorkModeSchema = z.enum(
+export const WorkModeSchema = z.enum(
   Object.values(WORK_MODE) as [WorkMode, ...WorkMode[]],
 );
 
-const JobStatusSchema = z.enum(
+export const JobStatusSchema = z.enum(
   Object.values(JOB_STATUS) as [JobStatus, ...JobStatus[]],
 );
 
-const GigTypeSchema = z.enum(
+export const GigTypeSchema = z.enum(
   Object.values(GIG_TYPE) as [GigType, ...GigType[]],
 );
 
-const LocationSchema = z.enum(
+export const JobLocationSchema = z.enum(
   Object.values(JOB_LOCATIONS) as [JobLocation, ...JobLocation[]],
 );
 
-const ExperienceLevelSchema = z.enum(
+export const ExperienceLevelSchema = z.enum(
   Object.values(EXPERIENCE_LEVELS) as [ExperienceLevel, ...ExperienceLevel[]],
 );
 
-const WageCurrencySchema = z.enum(
+export const WageCurrencySchema = z.enum(
   Object.values(WAGES_CURRENCY) as [WagesCurrency, ...WagesCurrency[]],
 );
 
-const WageTypeSchema = z.enum(
+export const WageTypeSchema = z.enum(
   Object.values(WAGE_TYPES) as [WageTypes, ...WageTypes[]],
+);
+
+export const JobSectionSchema = z.enum(
+  Object.values(JOB_SECTIONS) as [string, ...string[]],
 );
 
 /**
@@ -70,17 +74,15 @@ const WageTypeSchema = z.enum(
  * --------------------------------
  */
 
-const JobShape = z.object({
+export const JobShape = z.object({
   title: z.string().min(3).max(255),
   brandId: z.cuid2(),
   jobType: JobTypeSchema,
   employmentType: EmploymentTypeSchema.optional(),
   workMode: WorkModeSchema,
   gigType: GigTypeSchema.optional(),
-  location: LocationSchema,
-  jobSections: z.array(
-    z.enum(Object.values(JOB_SECTIONS) as [string, ...string[]]),
-  ),
+  location: JobLocationSchema,
+  jobSections: z.array(JobSectionSchema),
 });
 
 export type JobShapeType = z.infer<typeof JobShape>;
@@ -94,6 +96,7 @@ export type JobShapeType = z.infer<typeof JobShape>;
 export const JobEntitySchema = z
   .object({
     id: z.cuid2(),
+
     ...JobShape.shape,
 
     status: JobStatusSchema,
@@ -118,7 +121,7 @@ export type JobEntity = z.infer<typeof JobEntitySchema>;
  * --------------------------------
  */
 
-const GigDetailsSchema = z.object({
+export const GigDetailsSchema = z.object({
   overview: z.string(),
   deliverables: z.string(),
   employeeRequirements: z.string().optional(),
@@ -130,7 +133,7 @@ const GigDetailsSchema = z.object({
   wagesType: WageTypeSchema.optional(),
 });
 
-const RoleDetailsSchema = z.object({
+export const RoleDetailsSchema = z.object({
   experienceLevel: ExperienceLevelSchema,
   overview: z.string(),
   keyResponsibilities: z.string(),
@@ -143,25 +146,50 @@ const RoleDetailsSchema = z.object({
   wagesType: WageTypeSchema.optional(),
 });
 
-export const JobWithGigDetailsEntitySchema = JobEntitySchema.extend(
-  GigDetailsSchema.shape,
-);
+/**
+ * --------------------------------
+ * DETAILED ENTITIES
+ * --------------------------------
+ */
 
-export type JobWithGigDetailsEntity = z.infer<
-  typeof JobWithGigDetailsEntitySchema
->;
 
-export const JobWithRoleDetailsEntitySchema = JobEntitySchema.extend(
-  RoleDetailsSchema.shape,
-);
+export const GigJobEntitySchema = JobEntitySchema.extend({
+  jobType: z.literal(JOB_TYPE.GIG),
+  gigType: GigTypeSchema,
+  employmentType: EmploymentTypeSchema.optional(),
+  ...GigDetailsSchema.shape,
+}).openapi("GigJob");
 
-export type JobWithRoleDetailsEntity = z.infer<
-  typeof JobWithRoleDetailsEntitySchema
->;
+export type GigJobEntity = z.infer<typeof GigJobEntitySchema>;
 
+export const RoleJobEntitySchema = JobEntitySchema.extend({
+  jobType: z.literal(JOB_TYPE.ROLE),
+  employmentType: EmploymentTypeSchema,
+  gigType: GigTypeSchema.optional(),
+  ...RoleDetailsSchema.shape,
+}).openapi("RoleJob");
+
+export type RoleJobEntity = z.infer<typeof RoleJobEntitySchema>;
+
+/**
+ * Backwards-compatible names.
+ */
+export const JobWithGigDetailsEntitySchema = GigJobEntitySchema;
+export type JobWithGigDetailsEntity = GigJobEntity;
+
+export const JobWithRoleDetailsEntitySchema = RoleJobEntitySchema;
+export type JobWithRoleDetailsEntity = RoleJobEntity;
+
+/**
+ * Keep this as a regular union.
+ *
+ * Do not use discriminatedUnion here because JobEntitySchema has jobType as
+ * "GIG" | "ROLE", while GigJobEntitySchema and RoleJobEntitySchema use
+ * literals. That makes the discriminator ambiguous.
+ */
 export const NormalizedJobSchema = z.union([
-  JobWithGigDetailsEntitySchema,
-  JobWithRoleDetailsEntitySchema,
+  GigJobEntitySchema,
+  RoleJobEntitySchema,
   JobEntitySchema,
 ]);
 
@@ -181,6 +209,7 @@ export const CreateJobInputSchema = JobShape.superRefine((data, ctx) => {
       message: "employmentType is required for ROLE jobs",
     });
   }
+
   if (data.jobType === JOB_TYPE.GIG && !data.gigType) {
     ctx.addIssue({
       path: ["gigType"],
@@ -227,18 +256,35 @@ export const GetJobsOutputSchema = z.object({
 
 export type GetJobsOutput = z.infer<typeof GetJobsOutputSchema>;
 
-export const JobSearchDocumentSchema = z.object({
-  id: z.cuid2(),
-  title: z.string(),
-  brandId: z.cuid2(),
-  brandName: z.string(),
-  brandImgUrl: z.string().nullable().optional(),
-  jobType: z.enum(["GIG", "ROLE"]),
-  location: z.string(),
-  overview: z.string(),
-  requiredSkills: z.array(z.string()),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
-});
+/**
+ * --------------------------------
+ * SEARCH DOCUMENT
+ * --------------------------------
+ */
+
+export const JobSearchDocumentSchema = z
+  .object({
+    id: z.cuid2(),
+    title: z.string(),
+    isApplied: z.boolean().default(false).optional(),
+    brandId: z.cuid2(),
+    brandName: z.string(),
+    brandImgUrl: z.string().nullable().optional(),
+    jobType: z.enum(["GIG", "ROLE"]),
+    status: z.string().optional(),
+    employmentType: z.string().nullable().optional(),
+    workMode: z.string(),
+    gigType: z.string().nullable().optional(),
+    location: z.string(),
+    overview: z.string(),
+    requiredSkills: z.array(z.string()),
+    wagesMin: z.number().nullable().optional(),
+    wagesMax: z.number().nullable().optional(),
+    wagesCurrency: z.string().nullable().optional(),
+    wagesType: z.string().nullable().optional(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  })
+  .openapi("JobSearchDocument");
 
 export type JobSearchDocument = z.infer<typeof JobSearchDocumentSchema>;

@@ -1,11 +1,16 @@
 import { z } from "@hono/zod-openapi";
 import {
-  DISCOUNT_TYPES,
   WAGES_CURRENCY,
   TRANSACTION_STATUSES,
   PAYMENT_PROVIDERS,
 } from "../constants";
 import { ProductDiscountEntitySchema } from "./product";
+
+/**
+ * --------------------------------
+ * BASE
+ * --------------------------------
+ */
 
 export const BaseTransactionSchema = z.object({
   id: z.cuid2(),
@@ -24,9 +29,18 @@ export const BaseTransactionSchema = z.object({
 
   discountApplied: ProductDiscountEntitySchema.nullable().optional(),
   productNameSnapshot: z.string().optional(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 });
+
+export type BaseTransactionEntity = z.infer<typeof BaseTransactionSchema>;
+
+/**
+ * --------------------------------
+ * INPUTS
+ * --------------------------------
+ */
 
 export const InitTransactionInputSchema = z.object({
   productId: z
@@ -38,6 +52,8 @@ export const InitTransactionInputSchema = z.object({
   discountCode: z.string().optional(),
   amount: z.number().int("Amount must be a whole number (cents/kobo)").min(0),
 });
+
+export type InitTransactionInput = z.infer<typeof InitTransactionInputSchema>;
 
 export const CreateTransactionInputSchema = BaseTransactionSchema.pick({
   productId: true,
@@ -54,24 +70,43 @@ export const CreateTransactionInputSchema = BaseTransactionSchema.pick({
   providerTransactionId: z.string().optional(),
 });
 
+export type CreateTransactionInput = z.infer<
+  typeof CreateTransactionInputSchema
+>;
+
 export const UpdateTransactionWebhookInputSchema = z.object({
   status: z.enum(TRANSACTION_STATUSES),
   providerTransactionId: z.string(),
 });
 
-// ==========================================
-// ENTITY & OUTPUT SCHEMAS
-// ==========================================
+export type UpdateTransactionWebhookInput = z.infer<
+  typeof UpdateTransactionWebhookInputSchema
+>;
+
+/**
+ * --------------------------------
+ * ENTITY
+ * --------------------------------
+ */
 
 export const TransactionEntitySchema = BaseTransactionSchema.extend({
   productTitle: z.string().optional(),
+
   sellerName: z.string().optional(),
-  sellerId: z.string().optional(),
   sellerUsername: z.string().optional(),
+
   buyerName: z.string().optional(),
   buyerUsername: z.string().optional(),
   buyerEmail: z.email(),
 }).openapi({ title: "TransactionEntity" });
+
+export type TransactionEntity = z.infer<typeof TransactionEntitySchema>;
+
+/**
+ * --------------------------------
+ * OUTPUTS
+ * --------------------------------
+ */
 
 export const InitTransactionOutputSchema = z
   .object({
@@ -82,19 +117,4 @@ export const InitTransactionOutputSchema = z
   })
   .openapi({ title: "InitTransactionResult" });
 
-// ==========================================
-// TYPES EXPORTS
-// ==========================================
-
-export type BaseTransactionEntity = z.infer<typeof BaseTransactionSchema>;
-
-export type InitTransactionInput = z.infer<typeof InitTransactionInputSchema>;
-export type CreateTransactionInput = z.infer<
-  typeof CreateTransactionInputSchema
->;
-export type UpdateTransactionWebhookInput = z.infer<
-  typeof UpdateTransactionWebhookInputSchema
->;
-
-export type TransactionEntity = z.infer<typeof TransactionEntitySchema>;
 export type InitTransactionResult = z.infer<typeof InitTransactionOutputSchema>;

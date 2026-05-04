@@ -11,7 +11,8 @@ import {
   LINK_TYPES,
 } from "../constants";
 import { CuidSchema, ProfileIdentifierSchema } from "./common";
-import { MinimalUserSchema } from "./user";
+import { MinimalUserSchema } from "./minimal-user";
+
 
 /**
  * --------------------------------

@@ -1,7 +1,7 @@
 import { z } from "@hono/zod-openapi";
 import { LINK_TYPES } from "../constants";
 import { ProfileIdentifierSchema } from "./common";
-import { MinimalUserSchema } from "./user";
+import { MinimalUserSchema } from "./minimal-user";
 
 
 const BrandShape = z.object({

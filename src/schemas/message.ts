@@ -47,7 +47,7 @@ export const MessageEntitySchema = z
     replyToContent: z.string().optional(),
     replyToImages: z.array(z.url()).optional(),
     replyToLinkMeta: MessageShape.shape.linkMeta,
-
+    
     deletedBySender: z.boolean().default(false),
     deletedByReceiver: z.boolean().default(false),
     isEdited: z.boolean().default(false),
@@ -68,9 +68,15 @@ export const MessageFileEntitySchema = z.object({
   order: z.int(),
 });
 
+export type MessageFileEntity = z.infer<typeof MessageFileEntitySchema>;
+
 export const MessageWithFilesEntitySchema = MessageEntitySchema.extend({
   messageFiles: z.array(MessageFileEntitySchema),
 });
+
+export type MessageWithFilesEntity = z.infer<
+  typeof MessageWithFilesEntitySchema
+>;
 
 /**
  * --------------------------------
@@ -79,6 +85,7 @@ export const MessageWithFilesEntitySchema = MessageEntitySchema.extend({
  */
 
 export const CreateMessageInputSchema = MessageShape.extend({
+  receiverId: z.cuid2(),
   files: z
     .array(
       z.object({
@@ -90,10 +97,14 @@ export const CreateMessageInputSchema = MessageShape.extend({
     .optional(),
 });
 
+export type CreateMessageInput = z.infer<typeof CreateMessageInputSchema>;
+
 export const EditMessageInputSchema = z.object({
   messageId: z.cuid2(),
   content: z.string().optional(),
 });
+
+export type EditMessageInput = z.infer<typeof EditMessageInputSchema>;
 
 /**
  * --------------------------------
@@ -105,3 +116,5 @@ export const GetMessagesOutputSchema = z.object({
   messages: z.array(MessageWithFilesEntitySchema),
   nextCursor: z.string().optional(),
 });
+
+export type GetMessagesOutput = z.infer<typeof GetMessagesOutputSchema>;

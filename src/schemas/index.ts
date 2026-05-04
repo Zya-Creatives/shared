@@ -28,4 +28,3 @@ export * from "./seller";
 export * from "./product";
 export * from "./transaction";
 export * from "./settings";
-export * from "./view";

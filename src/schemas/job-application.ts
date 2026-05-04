@@ -12,8 +12,8 @@ import {
   JobType,
 } from "../constants";
 
-import { MinimalUserSchema } from "./user";
 import { NormalizedJobSchema } from "./job";
+import { MinimalUserSchema } from "./minimal-user";
 
 /**
  * --------------------------------
