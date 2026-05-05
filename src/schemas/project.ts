@@ -263,12 +263,12 @@ export const UpdateProjectInputSchema = z
       .max(600)
       .optional(),
 
-    isOpenToInvestment: z.boolean().default(false),
+    isOpenToInvestment: z.boolean().optional(),
 
     startDate: z.iso.datetime().optional(),
     endDate: z.iso.datetime().optional(),
 
-    version: z.int().default(1),
+    version: z.int().optional(),
   })
   .superRefine(({ startDate, endDate }, ctx) => {
     if (!startDate) return;
@@ -382,6 +382,7 @@ export const ProjectSearchDocumentSchema = z
     endDate: z.iso.datetime().optional(),
 
     files: z.array(FileEntitySchema).optional(),
+    isBookmarked: z.boolean().default(false)
   })
   .openapi("ProjectSearchDocument");
 

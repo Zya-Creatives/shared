@@ -69,3 +69,14 @@ export const TrendingUsersOutputSchema = z.object({
 });
 
 export type TrendingUsersOutput = z.infer<typeof TrendingUsersOutputSchema>;
+
+export const FeedTagsInputSchema = z.object({
+  tags: z.array(z.string().min(1)).default([]),
+});
+
+export const FeedTagsSchema = z.object({
+  userId: z.cuid2(),
+  tags: z.array(z.string()),
+});
+
+export type FeedTagsInput = z.infer<typeof FeedTagsInputSchema>;
