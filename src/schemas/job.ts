@@ -288,3 +288,47 @@ export const JobSearchDocumentSchema = z
   .openapi("JobSearchDocument");
 
 export type JobSearchDocument = z.infer<typeof JobSearchDocumentSchema>;
+
+export const JobIdSchema = z.object({
+  jobId: z.cuid2().openapi({ param: { name: "jobId", in: "path" } }),
+});
+
+export type JobId = z.infer<typeof JobIdSchema>;
+
+export const BaseJobEntitySchema = JobEntitySchema;
+export type BaseJobEntity = z.infer<typeof BaseJobEntitySchema>;
+
+export const CreateGigJobInputSchema = GigDetailsSchema.extend({
+  id: z.cuid2(),
+});
+
+export type CreateGigJobInput = z.infer<typeof CreateGigJobInputSchema>;
+
+export const UpdateGigJobInputSchema = CreateGigJobInputSchema.partial().extend({
+  id: z.cuid2(),
+  version: z.int().default(1),
+});
+
+export type UpdateGigJobInput = z.infer<typeof UpdateGigJobInputSchema>;
+
+export const CreateRoleJobInputSchema = RoleDetailsSchema.extend({
+  id: z.cuid2(),
+});
+
+export type CreateRoleJobInput = z.infer<typeof CreateRoleJobInputSchema>;
+
+export const UpdateRoleJobInputSchema = CreateRoleJobInputSchema.partial().extend({
+  id: z.cuid2(),
+  version: z.int().default(1),
+});
+
+export type UpdateRoleJobInput = z.infer<typeof UpdateRoleJobInputSchema>;
+
+export const GetCreatedJobsOutputSchema = z.object({
+  jobs: z.array(NormalizedJobSchema),
+  noOfJobs: z.number(),
+  noOfArchivedJobs: z.number(),
+  noOfActiveJobs: z.number(),
+});
+
+export type GetCreatedJobsOutput = z.infer<typeof GetCreatedJobsOutputSchema>;

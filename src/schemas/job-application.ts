@@ -75,7 +75,7 @@ const JobApplicationShape = z.object({
         projectName: z.string(),
         projectImgUrl: z.url().optional(),
         projectId: z.cuid2(),
-        tags: z.array(z.string()).optional(),
+        tags: z.array(z.string()).default([]),
       }),
     )
     .optional(),
@@ -200,4 +200,12 @@ export const GetTrackedJobApplicationsOutputSchema = z.object({
 
 export type GetTrackedJobApplicationsOutput = z.infer<
   typeof GetTrackedJobApplicationsOutputSchema
+>;
+
+export const BaseJobApplicationEntitySchema = JobApplicationEntitySchema.omit({
+  user: true,
+});
+
+export type BaseJobApplicationEntity = z.infer<
+  typeof BaseJobApplicationEntitySchema
 >;
