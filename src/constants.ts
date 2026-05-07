@@ -1,3 +1,5 @@
+import z from "zod";
+
 export const ROLES = {
   CREATIVE: "CREATIVE",
   BRAND: "BRAND",
@@ -194,6 +196,39 @@ export const MESSAGE_TYPES = {
   MESSAGE_WITH_MEDIA_AND_LINKS: "MESSAGE_WITH_MEDIA_AND_LINKS",
 } as const;
 
+export const SUPPORTED_CURRENCIES = {
+  NGN: {
+    code: "NGN",
+    label: "Nigerian Naira",
+    symbol: "₦",
+  },
+  USD: {
+    code: "USD",
+    label: "US Dollar",
+    symbol: "$",
+  },
+  GBP: {
+    code: "GBP",
+    label: "British Pound",
+    symbol: "£",
+  },
+  EUR: {
+    code: "EUR",
+    label: "Euro",
+    symbol: "€",
+  },
+} as const;
+
+export type CurrencyCode =
+  keyof typeof SUPPORTED_CURRENCIES;
+
+export const CurrencyCodeSchema = z.enum([
+  "NGN",
+  "USD",
+  "GBP",
+  "EUR",
+]);
+
 export type JobLocation = (typeof JOB_LOCATIONS)[keyof typeof JOB_LOCATIONS];
 
 export const GIG_TYPE = {
@@ -206,12 +241,6 @@ export const WAGES_CURRENCY = {
   EUR: "EUR (Euro)",
   GBP: "GBP (British Pound Sterling)",
   NGN: "NGN (Nigerian Naira)",
-  CAD: "CAD (Canadian Dollar)",
-  AUD: "AUD (Australian Dollar)",
-  JPY: "JPY (Japanese Yen)",
-  CHF: "CHF (Swiss Franc)",
-  INR: "INR (Indian Rupee)",
-  ZAR: "ZAR (South African Rand)",
 } as const;
 
 export const JOB_STATUS = {

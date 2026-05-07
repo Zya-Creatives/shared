@@ -117,3 +117,18 @@ export const GetMessageRequestsForUserOutputSchema =
 export type GetMessageRequestsForUserOutput = z.infer<
   typeof GetMessageRequestsForUserOutputSchema
 >;
+
+export const ReportChatInputSchema = z.object({
+  complaint: z.string().trim().min(10).max(1000),
+  messageId: z.cuid2().optional(),
+});
+
+export type ReportChatInput = z.infer<typeof ReportChatInputSchema>
+
+export const ReportChatOutputSchema = z.object({
+  reported: z.boolean(),
+  chatId: z.string(),
+  messageId: z.string().nullable(),
+});
+
+export type ReportChatOutput = z.infer<typeof ReportChatOutputSchema>

@@ -1,15 +1,13 @@
+// job-application.schemas.ts
+
 import { z } from "@hono/zod-openapi";
 
 import {
   APPLICATION_STATUS,
-  ApplicationStatus,
   EXPERIENCE_LEVELS,
-  ExperienceLevel,
   JOB_AVAILABILITY_TYPES,
   JOB_SECTIONS,
   JOB_TYPE,
-  JobAvailabilityTypes,
-  JobType,
 } from "../constants";
 
 import { NormalizedJobSchema } from "./job";
@@ -17,35 +15,11 @@ import { MinimalUserSchema } from "./minimal-user";
 
 /**
  * --------------------------------
- * ENUMS
- * --------------------------------
- */
-
-const ApplicationStatusSchema = z.enum(
-  Object.values(APPLICATION_STATUS) as [
-    ApplicationStatus,
-    ...ApplicationStatus[],
-  ],
-);
-
-const ExperienceLevelSchema = z.enum(
-  Object.values(EXPERIENCE_LEVELS) as [ExperienceLevel, ...ExperienceLevel[]],
-);
-
-const JobAvailabilitySchema = z.enum(
-  Object.values(JOB_AVAILABILITY_TYPES) as [
-    JobAvailabilityTypes,
-    ...JobAvailabilityTypes[],
-  ],
-);
-
-/**
- * --------------------------------
  * SHAPE
  * --------------------------------
  */
 
-const JobApplicationShape = z.object({
+export const JobApplicationShape = z.object({
   jobId: z.cuid2(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
@@ -53,8 +27,8 @@ const JobApplicationShape = z.object({
   phoneNumber: z.string().nullable(),
   currentRole: z.string(),
   resumeUrl: z.url(),
-  experienceLevel: ExperienceLevelSchema.optional(),
-  availability: JobAvailabilitySchema.optional(),
+  experienceLevel: z.enum(EXPERIENCE_LEVELS).optional(),
+  availability: z.enum(JOB_AVAILABILITY_TYPES).optional(),
   coverLetter: z.string().nullable(),
   receiveEmailUpdates: z.boolean(),
   wagesAmount: z.number().nullable(),
@@ -94,6 +68,33 @@ export type JobApplicationShapeType = z.infer<typeof JobApplicationShape>;
 
 /**
  * --------------------------------
+ * RESPONSE / OFFER / STATUS TRACKING
+ * --------------------------------
+ */
+
+export const JobApplicationResponseSchema = z.object({
+  brandResponseMessage: z.string().max(3000).nullable().optional(),
+  meetingLink: z.url().nullable().optional(),
+
+  offerAcceptedAt: z.iso.datetime().nullable().optional(),
+  offerDeclinedAt: z.iso.datetime().nullable().optional(),
+  hiredAt: z.iso.datetime().nullable().optional(),
+  rejectedAt: z.iso.datetime().nullable().optional(),
+
+  lastStatusChangedAt: z.iso.datetime().nullable().optional(),
+  lastStatusViewedByApplicantAt: z.iso.datetime().nullable().optional(),
+  lastStatusViewedByBrandAt: z.iso.datetime().nullable().optional(),
+  lastUpdatedByUserId: z.cuid2().nullable().optional(),
+
+  hasUnreadStatusUpdate: z.boolean().default(false).optional(),
+});
+
+export type JobApplicationResponse = z.infer<
+  typeof JobApplicationResponseSchema
+>;
+
+/**
+ * --------------------------------
  * BASE ENTITY
  * --------------------------------
  */
@@ -105,8 +106,9 @@ export const JobApplicationEntitySchema = z
     user: MinimalUserSchema,
 
     ...JobApplicationShape.shape,
+    ...JobApplicationResponseSchema.shape,
 
-    applicationStatus: ApplicationStatusSchema,
+    applicationStatus: z.enum(APPLICATION_STATUS),
 
     createdAt: z.iso.datetime(),
     updatedAt: z.iso.datetime(),
@@ -114,6 +116,14 @@ export const JobApplicationEntitySchema = z
   .openapi("JobApplication");
 
 export type JobApplicationEntity = z.infer<typeof JobApplicationEntitySchema>;
+
+export const BaseJobApplicationEntitySchema = JobApplicationEntitySchema.omit({
+  user: true,
+});
+
+export type BaseJobApplicationEntity = z.infer<
+  typeof BaseJobApplicationEntitySchema
+>;
 
 /**
  * --------------------------------
@@ -125,8 +135,18 @@ export const MinimalJobApplicationEntitySchema = z.object({
   id: z.cuid2(),
   jobId: z.cuid2(),
   user: MinimalUserSchema,
-  coverLetter: z.string(),
-  applicationStatus: ApplicationStatusSchema,
+  coverLetter: z.string().nullable(),
+  applicationStatus: z.enum(APPLICATION_STATUS),
+
+  brandResponseMessage: z.string().nullable().optional(),
+  meetingLink: z.url().nullable().optional(),
+
+  offerAcceptedAt: z.iso.datetime().nullable().optional(),
+  offerDeclinedAt: z.iso.datetime().nullable().optional(),
+
+  lastStatusChangedAt: z.iso.datetime().nullable().optional(),
+  hasUnreadStatusUpdate: z.boolean().default(false).optional(),
+
   createdAt: z.iso.datetime(),
 });
 
@@ -136,8 +156,20 @@ export type MinimalJobApplicationEntity = z.infer<
 
 export const TrackedJobApplicationEntitySchema = z.object({
   id: z.cuid2(),
-  applicationStatus: ApplicationStatusSchema,
+  applicationStatus: z.enum(APPLICATION_STATUS),
+
+  brandResponseMessage: z.string().nullable().optional(),
+  meetingLink: z.url().nullable().optional(),
+
+  offerAcceptedAt: z.iso.datetime().nullable().optional(),
+  offerDeclinedAt: z.iso.datetime().nullable().optional(),
+
+  lastStatusChangedAt: z.iso.datetime().nullable().optional(),
+  hasUnreadStatusUpdate: z.boolean().default(false).optional(),
+
   createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime().optional(),
+
   job: NormalizedJobSchema,
 });
 
@@ -151,6 +183,12 @@ export type TrackedJobApplicationEntity = z.infer<
  * --------------------------------
  */
 
+export const ApplicationIdInputSchema = z.object({
+  id: z.cuid2(),
+});
+
+export type ApplicationIdInput = z.infer<typeof ApplicationIdInputSchema>;
+
 export const CreateJobApplicationInputSchema = JobApplicationShape.extend({
   jobSections: z.array(z.enum(JOB_SECTIONS)).optional(),
 });
@@ -162,7 +200,17 @@ export type CreateJobApplicationInput = z.infer<
 export const UpdateJobApplicationInputSchema =
   CreateJobApplicationInputSchema.partial().extend({
     id: z.cuid2(),
-    applicationStatus: ApplicationStatusSchema.optional(),
+
+    applicationStatus: z.enum(APPLICATION_STATUS).optional(),
+
+    brandResponseMessage: z.string().max(3000).nullable().optional(),
+    meetingLink: z.url().nullable().optional(),
+
+    offerAcceptedAt: z.iso.datetime().nullable().optional(),
+    offerDeclinedAt: z.iso.datetime().nullable().optional(),
+
+    lastStatusViewedByApplicantAt: z.iso.datetime().nullable().optional(),
+    lastStatusViewedByBrandAt: z.iso.datetime().nullable().optional(),
   });
 
 export type UpdateJobApplicationInput = z.infer<
@@ -171,10 +219,8 @@ export type UpdateJobApplicationInput = z.infer<
 
 export const GetTrackedJobApplicationsInputSchema = z.object({
   query: z.string().optional(),
-  status: ApplicationStatusSchema.optional(),
-  jobType: z
-    .enum(Object.values(JOB_TYPE) as [JobType, ...JobType[]])
-    .optional(),
+  status: z.enum(APPLICATION_STATUS).optional(),
+  jobType: z.enum(JOB_TYPE).optional(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
 });
@@ -202,10 +248,18 @@ export type GetTrackedJobApplicationsOutput = z.infer<
   typeof GetTrackedJobApplicationsOutputSchema
 >;
 
-export const BaseJobApplicationEntitySchema = JobApplicationEntitySchema.omit({
-  user: true,
+export const GetApplicationStatusUpdatesCountOutputSchema = z.object({
+  unreadCount: z.number(),
 });
 
-export type BaseJobApplicationEntity = z.infer<
-  typeof BaseJobApplicationEntitySchema
+export type GetApplicationStatusUpdatesCountOutput = z.infer<
+  typeof GetApplicationStatusUpdatesCountOutputSchema
+>;
+
+export const GetBrandUnansweredApplicationsOutputSchema = z.object({
+  unansweredCount: z.number(),
+});
+
+export type GetBrandUnansweredApplicationsOutput = z.infer<
+  typeof GetBrandUnansweredApplicationsOutputSchema
 >;
