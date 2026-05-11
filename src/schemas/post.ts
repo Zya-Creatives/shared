@@ -113,6 +113,7 @@ export const FeedPostEntitySchema = PostWithFilesEntitySchema.extend({
   isLiked: z.boolean().optional(),
   isFollowing: z.boolean().optional(),
   isBookmarked: z.boolean().optional(),
+  canComment: z.boolean()
 }).openapi("FeedPost");
 
 export type FeedPostEntity = z.infer<typeof FeedPostEntitySchema>;

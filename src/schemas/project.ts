@@ -382,7 +382,8 @@ export const ProjectSearchDocumentSchema = z
     endDate: z.iso.datetime().optional(),
 
     files: z.array(FileEntitySchema).optional(),
-    isBookmarked: z.boolean().default(false)
+    isBookmarked: z.boolean().default(false),
+    canComment: z.boolean()
   })
   .openapi("ProjectSearchDocument");
 
@@ -397,6 +398,7 @@ export type ProjectSearchDocument = z.infer<typeof ProjectSearchDocumentSchema>;
 export const GetProjectOutputSchema = ProjectDetailsEntitySchema.extend({
   isLiked: z.boolean().optional(),
   isBookmarked: z.boolean().optional(),
+  canComment: z.boolean()
 }).openapi("GetProjectOutput");
 
 export type GetProjectOutput = z.infer<typeof GetProjectOutputSchema>;

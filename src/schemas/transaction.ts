@@ -4,7 +4,10 @@ import {
   TRANSACTION_STATUSES,
   PAYMENT_PROVIDERS,
 } from "../constants";
-import { ProductDiscountEntitySchema } from "./product";
+import {
+  ProductDiscountEntitySchema,
+  ProductPurchaseSnapshotSchema,
+} from "./product";
 
 /**
  * --------------------------------
@@ -14,6 +17,7 @@ import { ProductDiscountEntitySchema } from "./product";
 
 export const BaseTransactionSchema = z.object({
   id: z.cuid2(),
+
   productId: z.cuid2(),
   buyerId: z.cuid2(),
   sellerId: z.cuid2(),
@@ -28,7 +32,8 @@ export const BaseTransactionSchema = z.object({
   providerTransactionId: z.string().nullable().optional(),
 
   discountApplied: ProductDiscountEntitySchema.nullable().optional(),
-  productNameSnapshot: z.string().optional(),
+
+  productSnapshot: ProductPurchaseSnapshotSchema.nullable().optional(),
 
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
@@ -46,11 +51,17 @@ export const InitTransactionInputSchema = z.object({
   productId: z
     .cuid2()
     .openapi({ description: "ID of the product being purchased" }),
+
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   email: z.email(),
+
   discountCode: z.string().optional(),
-  amount: z.number().int("Amount must be a whole number (cents/kobo)").min(0),
+
+  amount: z
+    .number()
+    .int("Amount must be a whole number in the smallest currency unit")
+    .min(0),
 });
 
 export type InitTransactionInput = z.infer<typeof InitTransactionInputSchema>;
@@ -66,8 +77,9 @@ export const CreateTransactionInputSchema = BaseTransactionSchema.pick({
   paymentProvider: true,
   status: true,
 }).extend({
-  discountApplied: ProductDiscountEntitySchema.optional(),
+  discountApplied: ProductDiscountEntitySchema.nullable().optional(),
   providerTransactionId: z.string().optional(),
+  productSnapshot: ProductPurchaseSnapshotSchema.nullable().optional(),
 });
 
 export type CreateTransactionInput = z.infer<
@@ -117,4 +129,6 @@ export const InitTransactionOutputSchema = z
   })
   .openapi({ title: "InitTransactionResult" });
 
-export type InitTransactionResult = z.infer<typeof InitTransactionOutputSchema>;
+export type InitTransactionResult = z.infer<
+  typeof InitTransactionOutputSchema
+>;

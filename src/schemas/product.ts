@@ -117,7 +117,6 @@ export type ProductEntity = z.infer<typeof ProductEntitySchema>;
 
 const ProductCoreInputSchema = ProductShape.extend({
   id: z.cuid2(),
-
   files: z.array(CreateFileInputSchema).default([]),
   productLinks: z.array(ProductLinkSchema).default([]),
 });
@@ -410,4 +409,40 @@ export const SellerDashboardStatsOutputSchema = z.object({
 
 export type SellerDashboardStatsOutput = z.infer<
   typeof SellerDashboardStatsOutputSchema
+>;
+
+export const ProductPurchaseSnapshotSchema = z.object({
+  productId: z.cuid2(),
+
+  title: z.string(),
+  description: z.string().optional(),
+  keyFeatures: z.string().optional(),
+
+  sellerId: z.cuid2(),
+  sellerName: z.string(),
+  sellerUsername: z.string(),
+  sellerImageUrl: z.url().nullable().optional(),
+
+  category: z.string(),
+  subcategory: z.string().nullable().optional(),
+  tags: z.array(z.string()).default([]),
+
+  pricingModel: z.enum(PRICING_MODELS),
+  price: z.number().int().nullable().optional(),
+  suggestedPrice: z.number().int().nullable().optional(),
+  currency: z.enum(WAGES_CURRENCY),
+
+  thumbnailImgUrl: z.url().nullable().optional(),
+
+  deliveryFiles: z.array(FileEntitySchema).default([]),
+  productLinks: z.array(ProductLinkSchema).default([]),
+
+  supportEmail: z.email().nullable().optional(),
+  supportPhone: z.string().nullable().optional(),
+
+  purchasedAt: z.iso.datetime(),
+});
+
+export type ProductPurchaseSnapshot = z.infer<
+  typeof ProductPurchaseSnapshotSchema
 >;
