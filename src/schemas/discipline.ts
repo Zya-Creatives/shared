@@ -91,6 +91,14 @@ export const SlugInputSchema = z.object({
 
 export type SlugInput = z.infer<typeof SlugInputSchema>;
 
+export const GetDisciplineTagsInputSchema = z.object({
+  substring: z.string(),
+});
+
+export type GetDisciplineTagsInput = z.infer<
+  typeof GetDisciplineTagsInputSchema
+>;
+
 /**
  * --------------------------------
  * OUTPUTS
@@ -118,3 +126,9 @@ export const GetDisciplinesOutputSchema = z.object({
 });
 
 export type GetDisciplinesOutput = z.infer<typeof GetDisciplinesOutputSchema>;
+
+export const GetDisciplineTagsOutputSchema = z.array(z.string());
+
+export type GetDisciplineTagsOutput = z.infer<
+  typeof GetDisciplineTagsOutputSchema
+>;

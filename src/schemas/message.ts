@@ -106,6 +106,29 @@ export const EditMessageInputSchema = z.object({
 
 export type EditMessageInput = z.infer<typeof EditMessageInputSchema>;
 
+export const ChatIdParamSchema = z.object({
+  chatId: z.cuid2().openapi({ param: { name: "chatId", in: "path" } }),
+});
+
+export type ChatIdParam = z.infer<typeof ChatIdParamSchema>;
+
+export const MessageParamsSchema = ChatIdParamSchema.extend({
+  messageId: z
+    .cuid2()
+    .openapi({ param: { name: "messageId", in: "path" } }),
+});
+
+export type MessageParams = z.infer<typeof MessageParamsSchema>;
+
+export const DeleteMessagesInputSchema = z.object({
+  messageIds: z.array(z.cuid2()).min(1),
+  deleteForEveryone: z.boolean().default(false),
+});
+
+export type DeleteMessagesInput = z.infer<
+  typeof DeleteMessagesInputSchema
+>;
+
 /**
  * --------------------------------
  * OUTPUTS

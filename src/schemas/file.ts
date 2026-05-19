@@ -94,6 +94,21 @@ export type GetPresignedDownloadUrlInput = z.infer<
   typeof GetPresignedDownloadUrlInputSchema
 >;
 
+export const PurchasedDownloadUrlInputSchema = z.object({
+  productId: z.cuid2(),
+  fileId: z.cuid2(),
+});
+
+export type PurchasedDownloadUrlInput = z.infer<
+  typeof PurchasedDownloadUrlInputSchema
+>;
+
+export const PublicFileUrlInputSchema = z.object({
+  fileId: z.cuid2().openapi({ example: "ckq7t9yb40001q9l5z6a5c7fg" }),
+});
+
+export type PublicFileUrlInput = z.infer<typeof PublicFileUrlInputSchema>;
+
 /**
  * --------------------------------
  * OUTPUTS
@@ -123,4 +138,13 @@ export const GetPresignedDownloadUrlOutputSchema =
 
 export type GetPresignedDownloadUrlOutput = z.infer<
   typeof GetPresignedDownloadUrlOutputSchema
+>;
+
+export const PresignedUrlJSendOutputSchema = z.object({
+  status: z.string(),
+  data: GetPresignedDownloadUrlOutputSchema,
+});
+
+export type PresignedUrlJSendOutput = z.infer<
+  typeof PresignedUrlJSendOutputSchema
 >;

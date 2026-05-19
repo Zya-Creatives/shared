@@ -202,7 +202,14 @@ export type UserWithProductsEntity = z.infer<
 export const UserAuthStatusEntitySchema = z.object({
   exists: z.boolean(),
   isOAuthOnly: z.boolean(),
+  hasPassword: z.boolean(),
+  canChangePassword: z.boolean(),
+  canSetPassword: z.boolean(),
   providers: z.array(z.string()),
+});
+
+export const DeactivateAccountInputSchema = z.object({
+  password: z.string().min(1).optional(),
 });
 
 export const UserWithJobBookmarksInputSchema = z.object({
@@ -211,8 +218,11 @@ export const UserWithJobBookmarksInputSchema = z.object({
 });
 
 export type UserAuthStatusEntity = z.infer<typeof UserAuthStatusEntitySchema>;
+export type DeactivateAccountInput = z.infer<
+  typeof DeactivateAccountInputSchema
+>;
 export type UserWithJobBookmarksInput = z.infer<
-  typeof UserWithJobBookmarksEntitySchema
+  typeof UserWithJobBookmarksInputSchema
 >;
 
 /**
@@ -284,6 +294,24 @@ export const SearchUsersOutputSchema = z.object({
   nextCursor: z.string().optional(),
 });
 export type SearchUsersOutput = z.infer<typeof SearchUsersOutputSchema>;
+
+export const MentionableUsersInputSchema = z.object({
+  query: z.string().default(""),
+  roles: SearchUsersInputSchema.shape.roles,
+  limit: z.coerce.number().int().min(1).max(10).default(10),
+});
+
+export type MentionableUsersInput = z.infer<
+  typeof MentionableUsersInputSchema
+>;
+
+export const MentionableUsersOutputSchema = SearchUsersOutputSchema.pick({
+  users: true,
+});
+
+export type MentionableUsersOutput = z.infer<
+  typeof MentionableUsersOutputSchema
+>;
 
 /**
  * --------------------------------

@@ -5,6 +5,12 @@ import { LINK_TYPES } from "../constants";
 
 export const CuidSchema = z.cuid2({ error: "Invalid CUID2 is written." });
 
+export const IdInputSchema = z.object({
+  id: z.cuid2(),
+});
+
+export type IdInput = z.infer<typeof IdInputSchema>;
+
 export const UserIdentifierSchema = z.object({
   by: z.enum(["id", "username"]).optional().default("id"),
 });
@@ -28,6 +34,7 @@ export const DefaultApiSuccessOutputSchema = z.object({
 });
 
 export type ApiSuccessOutput = z.infer<typeof DefaultApiSuccessOutputSchema>;
+export type DefaultApiSuccessOutput = ApiSuccessOutput;
 
 export const EntityCommentsOutputSchema = z.object({
   comments: z.array(CommentEntitySchema),

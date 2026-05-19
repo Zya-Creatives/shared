@@ -258,6 +258,8 @@ export const GetCreatedJobsOutputSchema = z.object({
 
 export type GetCreatedJobsOutput = z.infer<typeof GetCreatedJobsOutputSchema>;
 
+export type NormalizedJob = z.infer<typeof NormalizedJobSchema>;
+
 /**
  * --------------------------------
  * SEARCH DOCUMENT

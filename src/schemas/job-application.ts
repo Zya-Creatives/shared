@@ -189,6 +189,16 @@ export const ApplicationIdInputSchema = z.object({
 
 export type ApplicationIdInput = z.infer<typeof ApplicationIdInputSchema>;
 
+export const JobApplicationIdInputSchema = z.object({
+  applicationId: z
+    .string()
+    .openapi({ param: { name: "applicationId", in: "path" } }),
+});
+
+export type JobApplicationIdInput = z.infer<
+  typeof JobApplicationIdInputSchema
+>;
+
 export const CreateJobApplicationInputSchema = JobApplicationShape.extend({
   jobSections: z.array(z.enum(JOB_SECTIONS)).optional(),
 });
@@ -262,4 +272,13 @@ export const GetBrandUnansweredApplicationsOutputSchema = z.object({
 
 export type GetBrandUnansweredApplicationsOutput = z.infer<
   typeof GetBrandUnansweredApplicationsOutputSchema
+>;
+
+export const GetApplicationsForJobOutputSchema = z.object({
+  applications: z.array(MinimalJobApplicationEntitySchema),
+  nextCursor: z.string().optional(),
+});
+
+export type GetApplicationsForJobOutput = z.infer<
+  typeof GetApplicationsForJobOutputSchema
 >;

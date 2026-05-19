@@ -123,7 +123,7 @@ export const ReportChatInputSchema = z.object({
   messageId: z.cuid2().optional(),
 });
 
-export type ReportChatInput = z.infer<typeof ReportChatInputSchema>
+export type ReportChatInput = z.infer<typeof ReportChatInputSchema>;
 
 export const ReportChatOutputSchema = z.object({
   reported: z.boolean(),
@@ -131,4 +131,12 @@ export const ReportChatOutputSchema = z.object({
   messageId: z.string().nullable(),
 });
 
-export type ReportChatOutput = z.infer<typeof ReportChatOutputSchema>
+export type ReportChatOutput = z.infer<typeof ReportChatOutputSchema>;
+
+export const ChatListQuerySchema = z.object({
+  cursor: z.string().optional(),
+  query: z.string().trim().max(100).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+
+export type ChatListQuery = z.infer<typeof ChatListQuerySchema>;

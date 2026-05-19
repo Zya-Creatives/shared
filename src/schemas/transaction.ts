@@ -132,3 +132,56 @@ export const InitTransactionOutputSchema = z
 export type InitTransactionResult = z.infer<
   typeof InitTransactionOutputSchema
 >;
+
+export const TransactionIdInputSchema = z.object({
+  transactionId: z.cuid2().openapi({ example: "ckj1a2b3c0000xyz" }),
+});
+
+export type TransactionIdInput = z.infer<typeof TransactionIdInputSchema>;
+
+export const PurchaseLibraryInputSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+});
+
+export type PurchaseLibraryInput = z.infer<
+  typeof PurchaseLibraryInputSchema
+>;
+
+export const PurchaseLibraryItemSchema = z.object({
+  transactionId: z.cuid2(),
+  productId: z.cuid2(),
+  itemName: z.string(),
+  creator: z.object({
+    id: z.cuid2(),
+    name: z.string(),
+    username: z.string(),
+    image: z.url().nullable(),
+  }),
+  fileCategory: z.string().nullable(),
+  purchaseDate: z.iso.datetime(),
+  status: z.enum(["PURCHASED", "REFUNDED"]),
+  currency: z.enum(WAGES_CURRENCY),
+  amount: z.number().int(),
+  thumbnailImgUrl: z.url().nullable(),
+});
+
+export type PurchaseLibraryItem = z.infer<
+  typeof PurchaseLibraryItemSchema
+>;
+
+export const PurchaseLibraryOutputSchema = z.object({
+  purchases: z.array(PurchaseLibraryItemSchema),
+  pagination: z.object({
+    page: z.number().int(),
+    pageSize: z.number().int(),
+    totalItems: z.number().int(),
+    totalPages: z.number().int(),
+    hasPreviousPage: z.boolean(),
+    hasNextPage: z.boolean(),
+  }),
+});
+
+export type PurchaseLibraryOutput = z.infer<
+  typeof PurchaseLibraryOutputSchema
+>;

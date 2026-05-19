@@ -59,6 +59,19 @@ export type UpdatePayoutMethodInput = z.infer<
   typeof UpdatePayoutMethodInputSchema
 >;
 
+export const GetBanksInputSchema = z.object({
+  country: z.string().optional(),
+});
+
+export type GetBanksInput = z.infer<typeof GetBanksInputSchema>;
+
+export const VerifyAccountInputSchema = z.object({
+  accountNumber: z.string().regex(/^\d{10}$/),
+  bankCode: z.string().min(1),
+});
+
+export type VerifyAccountInput = z.infer<typeof VerifyAccountInputSchema>;
+
 /**
  * --------------------------------
  * OUTPUTS

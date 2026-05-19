@@ -65,6 +65,21 @@ export const DeleteCommentInputSchema = z.object({
 
 export type DeleteCommentInput = z.infer<typeof DeleteCommentInputSchema>;
 
+export const CommentIdInputSchema = z.object({
+  commentId: z.cuid2(),
+});
+
+export type CommentIdInput = z.infer<typeof CommentIdInputSchema>;
+
+export const ProjectCommentParamsSchema = z.object({
+  projectId: z.cuid2(),
+  commentId: z.cuid2(),
+});
+
+export type ProjectCommentParams = z.infer<
+  typeof ProjectCommentParamsSchema
+>;
+
 /**
  * --------------------------------
  * OUTPUTS
@@ -74,3 +89,20 @@ export type DeleteCommentInput = z.infer<typeof DeleteCommentInputSchema>;
 export const CommentOutputSchema = CommentEntitySchema;
 
 export type CommentOutput = z.infer<typeof CommentOutputSchema>;
+
+export const CommentThreadResponseSchema = z.object({
+  comments: z.array(CommentEntitySchema),
+});
+
+export type CommentThreadResponse = z.infer<
+  typeof CommentThreadResponseSchema
+>;
+
+export const CommentRepliesOutputSchema = z.object({
+  replies: z.array(CommentEntitySchema),
+  nextCursor: z.string().nullable(),
+});
+
+export type CommentRepliesOutput = z.infer<
+  typeof CommentRepliesOutputSchema
+>;

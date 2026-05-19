@@ -1,5 +1,7 @@
 import { z } from "@hono/zod-openapi";
 
+import { FeedPostEntitySchema } from "./post";
+
 /**
  * --------------------------------
  * SHAPE
@@ -69,6 +71,15 @@ export const TrendingUsersOutputSchema = z.object({
 });
 
 export type TrendingUsersOutput = z.infer<typeof TrendingUsersOutputSchema>;
+
+export const GetFeedWithCommentPolicyOutputSchema = z.object({
+  feed: z.array(FeedPostEntitySchema),
+  nextCursor: z.string().optional(),
+});
+
+export type GetFeedWithCommentPolicyOutput = z.infer<
+  typeof GetFeedWithCommentPolicyOutputSchema
+>;
 
 export const FeedTagsInputSchema = z.object({
   tags: z.array(z.string().min(1)).default([]),

@@ -86,6 +86,12 @@ export type GetInvestorSignalInput = z.infer<
   typeof GetInvestorSignalInputSchema
 >;
 
+export const InvestorSignalIdInputSchema = z.object({ id: z.cuid2() });
+
+export type InvestorSignalIdInput = z.infer<
+  typeof InvestorSignalIdInputSchema
+>;
+
 /**
  * --------------------------------
  * OUTPUTS
@@ -99,4 +105,13 @@ export const GetInvestorSignalOutputSchema = z.object({
 
 export type GetInvestorSignalOutput = z.infer<
   typeof GetInvestorSignalOutputSchema
+>;
+
+export const CheckInvestorSignalOutputSchema = z.object({
+  exists: z.boolean(),
+  signalId: z.string().nullable(),
+});
+
+export type CheckInvestorSignalOutput = z.infer<
+  typeof CheckInvestorSignalOutputSchema
 >;

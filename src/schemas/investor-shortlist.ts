@@ -63,6 +63,12 @@ export type GetInvestorShortlistInput = z.infer<
   typeof GetInvestorShortlistInputSchema
 >;
 
+export const InvestorShortlistItemIdInputSchema = z.object({ id: z.cuid2() });
+
+export type InvestorShortlistItemIdInput = z.infer<
+  typeof InvestorShortlistItemIdInputSchema
+>;
+
 /**
  * --------------------------------
  * OUTPUTS
@@ -76,4 +82,13 @@ export const GetInvestorShortlistOutputSchema = z.object({
 
 export type GetInvestorShortlistOutput = z.infer<
   typeof GetInvestorShortlistOutputSchema
+>;
+
+export const CheckInvestorShortlistItemOutputSchema = z.object({
+  exists: z.boolean(),
+  shortlistItemId: z.string().nullable(),
+});
+
+export type CheckInvestorShortlistItemOutput = z.infer<
+  typeof CheckInvestorShortlistItemOutputSchema
 >;

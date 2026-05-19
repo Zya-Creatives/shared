@@ -265,6 +265,12 @@ export type ProductDiscountCheckInput = z.infer<
   typeof ProductDiscountCheckInputSchema
 >;
 
+export const ProductIdInputSchema = z.object({
+  productId: z.cuid2().openapi({ example: "ckj1a2b3c0000xyz" }),
+});
+
+export type ProductIdInput = z.infer<typeof ProductIdInputSchema>;
+
 export const RevenueChartInputSchema = z.object({
   startDate: z.string().optional(),
   endDate: z.string().optional(),
