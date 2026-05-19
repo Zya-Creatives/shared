@@ -116,9 +116,7 @@ export const CreateInvestorProfileInputSchema = InvestorShape.pick({
   experienceLevel: true,
   location: true,
   websiteURL: true,
-}).extend({
-  disciplineSlugs: z.array(z.string()).min(1),
-});
+})
 
 export type CreateInvestorInput = z.infer<
   typeof CreateInvestorProfileInputSchema

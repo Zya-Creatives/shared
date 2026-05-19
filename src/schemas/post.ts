@@ -20,7 +20,7 @@ export const LinkMetaSchema = z.object({
   url: z.url(),
   title: z.string().optional(),
   description: z.string().optional(),
-  image: z.url().optional(),
+  image: z.string().optional(),
 });
 
 export type LinkMeta = z.infer<typeof LinkMetaSchema>;

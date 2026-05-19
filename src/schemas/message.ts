@@ -23,7 +23,7 @@ const MessageShape = z.object({
       url: z.url(),
       title: z.string().optional(),
       description: z.string().optional(),
-      image: z.url().optional(),
+      image: z.string().optional(),
     })
     .optional(),
 });
