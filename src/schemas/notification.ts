@@ -50,6 +50,7 @@ export const NotificationDetailsEntitySchema = NotificationEntitySchema.extend({
   itemContent: z.string().optional(),
   itemImgUrl: z.string().optional(),
   itemStatus: z.string().optional(),
+  signalProjectId: z.string().optional(),
 });
 
 export type NotificationDetailsEntity = z.infer<
@@ -132,6 +133,7 @@ export const NotificationInboxTabSchema = z.enum([
   "following",
   "likes",
   "comments",
+  "signals",
   "archived",
 ]);
 
@@ -146,6 +148,7 @@ export const NotificationInboxCategorySchema = z.enum([
   "system",
   "jobs",
   "marketplace",
+  "signals",
 ]);
 
 export const NotificationInboxKindSchema = z.enum([
@@ -168,6 +171,10 @@ export const NotificationInboxKindSchema = z.enum([
   "product_approved",
   "marketplace_drop",
   "friend_product_added",
+  "investment_signal_created",
+  "investment_signal_accepted",
+  "investment_signal_declined",
+  "investment_signal_archived",
 ]);
 
 export const NotificationInboxItemSchema = z
@@ -237,6 +244,7 @@ export const NotificationInboxItemSchema = z
           "PRODUCT",
           "CHAT",
           "SETTINGS",
+          "SIGNAL",
         ]),
         entityId: z.string().optional(),
       })
@@ -382,6 +390,7 @@ export const ListNotificationInboxOutputSchema = z.object({
       following: z.int().optional(),
       likes: z.int().optional(),
       comments: z.int().optional(),
+      signals: z.int().optional(),
       archived: z.int().optional(),
     })
     .optional(),

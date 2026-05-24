@@ -9,11 +9,7 @@ import {
 
 import { CreateFileInputSchema, FileEntitySchema } from "./file";
 
-/**
- * --------------------------------
- * SHARED
- * --------------------------------
- */
+
 
 export const ProductDiscountEntitySchema = z.object({
   discountType: z.enum(DISCOUNT_TYPES),
