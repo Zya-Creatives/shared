@@ -50,6 +50,10 @@ const CreativeShape = z.object({
       }),
     )
     .default([]),
+
+  defaultCoverLetter: z.string().max(5000).default(""),
+  defaultResumeFileId: z.cuid2().nullable().optional(),
+  defaultPortfolioFileIds: z.array(z.cuid2()).default([]),
 });
 
 export type CreativeShapeType = z.infer<typeof CreativeShape>;

@@ -114,6 +114,8 @@ export const ACTIVITY_PARENT_TYPES = {
   SIGNAL: "SIGNAL",
   PRODUCT_COVER: "PRODUCT_COVER",
   PRODUCT_DELIVERY: "PRODUCT_DELIVERY",
+  CREATIVE_RESUME: "CREATIVE_RESUME",
+  CREATIVE_PORTFOLIO: "CREATIVE_PORTFOLIO",
   COMMENT: "COMMENT",
   JOB_APPLICATION: "JOB_APPLICATION",
 } as const;
@@ -307,6 +309,21 @@ export const APPLICATION_STATUS = {
   HIRED: "Hired",
 } as const;
 
+export const CREATIVE_APPLICATION_TRACKING_STATUS = {
+  APPLIED: "APPLIED",
+  GOT_INTERVIEW: "GOT_INTERVIEW",
+  RECEIVED_OFFER: "RECEIVED_OFFER",
+  NOT_MOVING_FORWARD: "NOT_MOVING_FORWARD",
+  GOT_JOB: "GOT_JOB",
+} as const;
+
+export const JOB_APPLICATION_STEPS = {
+  PERSONAL_INFO: "PERSONAL_INFO",
+  PROFESSIONAL_INFO: "PROFESSIONAL_INFO",
+  ADDITIONAL_DETAILS: "ADDITIONAL_DETAILS",
+  REVIEW_SUBMIT: "REVIEW_SUBMIT",
+} as const;
+
 export const NOTIFICATION_TYPES = {
   FOLLOW: "Follow",
   LIKE: "Like",
@@ -405,6 +422,12 @@ export type MessageRequestStatus =
   (typeof MESSAGE_REQUEST_STATUS)[keyof typeof MESSAGE_REQUEST_STATUS];
 export type ApplicationStatus =
   (typeof APPLICATION_STATUS)[keyof typeof APPLICATION_STATUS];
+
+export type CreativeApplicationTrackingStatus =
+  (typeof CREATIVE_APPLICATION_TRACKING_STATUS)[keyof typeof CREATIVE_APPLICATION_TRACKING_STATUS];
+
+export type JobApplicationStep =
+  (typeof JOB_APPLICATION_STEPS)[keyof typeof JOB_APPLICATION_STEPS];
 export type ActivityType = (typeof ACTIVITY_TYPES)[keyof typeof ACTIVITY_TYPES];
 export type PostBadgeType =
   (typeof POST_BADGE_TYPES)[keyof typeof POST_BADGE_TYPES];

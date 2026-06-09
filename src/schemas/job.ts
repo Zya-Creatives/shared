@@ -225,6 +225,14 @@ export type UpdateRoleJobInput = z.infer<typeof UpdateRoleJobInputSchema>;
 export const GetJobsInputSchema = z.object({
   q: z.string().optional(),
   jobType: z.enum(JOB_TYPE).optional(),
+  workMode: z.string().optional(),
+  location: z.enum(JOB_LOCATIONS).optional(),
+  requiredSkills: z.string().optional(),
+  employmentType: z.string().optional(),
+  status: z.enum(JOB_STATUS).optional(),
+  wagesMin: z.coerce.number().int().min(0).optional(),
+  wagesMax: z.coerce.number().int().min(0).optional(),
+  postedAfter: z.iso.datetime().optional(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
 });

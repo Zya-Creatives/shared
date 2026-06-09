@@ -4,8 +4,10 @@ import { z } from "@hono/zod-openapi";
 
 import {
   APPLICATION_STATUS,
+  CREATIVE_APPLICATION_TRACKING_STATUS,
   EXPERIENCE_LEVELS,
   JOB_AVAILABILITY_TYPES,
+  JOB_APPLICATION_STEPS,
   JOB_SECTIONS,
   JOB_TYPE,
 } from "../constants";
@@ -93,6 +95,18 @@ export type JobApplicationResponse = z.infer<
   typeof JobApplicationResponseSchema
 >;
 
+export const JobApplicationCreativeTrackingSchema = z.object({
+  creativeTrackingStatus: z
+    .enum(CREATIVE_APPLICATION_TRACKING_STATUS)
+    .default(CREATIVE_APPLICATION_TRACKING_STATUS.APPLIED),
+  creativeTrackingStatusChangedAt: z.iso.datetime().nullable().optional(),
+  creativeTrackingNote: z.string().max(1000).nullable().optional(),
+});
+
+export type JobApplicationCreativeTracking = z.infer<
+  typeof JobApplicationCreativeTrackingSchema
+>;
+
 /**
  * --------------------------------
  * BASE ENTITY
@@ -107,6 +121,7 @@ export const JobApplicationEntitySchema = z
 
     ...JobApplicationShape.shape,
     ...JobApplicationResponseSchema.shape,
+    ...JobApplicationCreativeTrackingSchema.shape,
 
     applicationStatus: z.enum(APPLICATION_STATUS),
 
@@ -137,6 +152,11 @@ export const MinimalJobApplicationEntitySchema = z.object({
   user: MinimalUserSchema,
   coverLetter: z.string().nullable(),
   applicationStatus: z.enum(APPLICATION_STATUS),
+  creativeTrackingStatus: z
+    .enum(CREATIVE_APPLICATION_TRACKING_STATUS)
+    .default(CREATIVE_APPLICATION_TRACKING_STATUS.APPLIED),
+  creativeTrackingStatusChangedAt: z.iso.datetime().nullable().optional(),
+  creativeTrackingNote: z.string().max(1000).nullable().optional(),
 
   brandResponseMessage: z.string().nullable().optional(),
   meetingLink: z.url().nullable().optional(),
@@ -157,6 +177,11 @@ export type MinimalJobApplicationEntity = z.infer<
 export const TrackedJobApplicationEntitySchema = z.object({
   id: z.cuid2(),
   applicationStatus: z.enum(APPLICATION_STATUS),
+  creativeTrackingStatus: z
+    .enum(CREATIVE_APPLICATION_TRACKING_STATUS)
+    .default(CREATIVE_APPLICATION_TRACKING_STATUS.APPLIED),
+  creativeTrackingStatusChangedAt: z.iso.datetime().nullable().optional(),
+  creativeTrackingNote: z.string().max(1000).nullable().optional(),
 
   brandResponseMessage: z.string().nullable().optional(),
   meetingLink: z.url().nullable().optional(),
@@ -212,6 +237,8 @@ export const UpdateJobApplicationInputSchema =
     id: z.cuid2(),
 
     applicationStatus: z.enum(APPLICATION_STATUS).optional(),
+    creativeTrackingStatus: z.enum(CREATIVE_APPLICATION_TRACKING_STATUS).optional(),
+    creativeTrackingNote: z.string().max(1000).nullable().optional(),
 
     brandResponseMessage: z.string().max(3000).nullable().optional(),
     meetingLink: z.url().nullable().optional(),
@@ -227,9 +254,21 @@ export type UpdateJobApplicationInput = z.infer<
   typeof UpdateJobApplicationInputSchema
 >;
 
+export const JobApplicationStepSchema = z.enum(JOB_APPLICATION_STEPS);
+
+export const JobApplicationApplyStepsSchema = z
+  .array(JobApplicationStepSchema)
+  .default([
+    JOB_APPLICATION_STEPS.PERSONAL_INFO,
+    JOB_APPLICATION_STEPS.PROFESSIONAL_INFO,
+    JOB_APPLICATION_STEPS.ADDITIONAL_DETAILS,
+    JOB_APPLICATION_STEPS.REVIEW_SUBMIT,
+  ]);
+
 export const GetTrackedJobApplicationsInputSchema = z.object({
   query: z.string().optional(),
   status: z.enum(APPLICATION_STATUS).optional(),
+  creativeTrackingStatus: z.enum(CREATIVE_APPLICATION_TRACKING_STATUS).optional(),
   jobType: z.enum(JOB_TYPE).optional(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
