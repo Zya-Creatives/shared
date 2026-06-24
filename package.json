@@ -4,6 +4,7 @@
     "description": "",
     "scripts": {
         "build": "pnpm tsc",
+        "test:runtime-exports": "node scripts/check-runtime-exports.js",
         "prepare": "pnpm build",
         "p": "pnpm publish --no-git-checks"
     },
@@ -26,4 +27,3 @@
         "zod": "^4.1.12"
     }
 }
- 
